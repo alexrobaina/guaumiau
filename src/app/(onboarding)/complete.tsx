@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { OnboardingScreen } from '@/components/organisms/OnboardingScreen';
 import { Text } from '@/components/atoms';
@@ -8,13 +8,24 @@ import { Colors } from '@/lib/colors';
 
 export default function CompleteScreen() {
   const { data, currentStep, totalSteps, completeOnboarding } = useStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleComplete = async () => {
-    // Mark onboarding as complete
-    completeOnboarding();
+    setIsLoading(true);
     
-    // Navigate to main app
-    router.replace('/(tabs)');
+    try {
+      // Mark onboarding as complete (handles both local and Firebase saving)
+      await completeOnboarding();
+      
+      // Navigate to main app
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      // Since we always complete locally, we can still navigate
+      router.replace('/(tabs)');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -24,7 +35,8 @@ export default function CompleteScreen() {
       currentStep={currentStep}
       totalSteps={totalSteps}
       onNext={handleComplete}
-      nextButtonText="Start Training"
+      nextButtonText={isLoading ? "Saving..." : "Start Training"}
+      nextDisabled={isLoading}
       showProgress={false}
     >
       <View style={styles.container}>
@@ -43,8 +55,12 @@ export default function CompleteScreen() {
           <View style={styles.summarySection}>
             <Text style={styles.summaryLabel}>Current Grades:</Text>
             <Text style={styles.summaryValue}>
-              {data.currentGrade.boulder && data.currentGrade.sport ? 
-                `${data.currentGrade.boulder} boulder, ${data.currentGrade.sport} sport` :
+              {data.currentGrade.boulder && data.currentGrade.french ? 
+                `${data.currentGrade.boulder} boulder, ${data.currentGrade.french} french` :
+                data.currentGrade.boulder ? 
+                `${data.currentGrade.boulder} boulder` :
+                data.currentGrade.french ?
+                `${data.currentGrade.french} french` :
                 'Not set'}
             </Text>
           </View>

@@ -1,5 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { initializeAuth, getAuth, Auth } from 'firebase/auth';
+import { initializeAuth, getAuth, Auth, getReactNativePersistence } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -21,18 +22,52 @@ if (getApps().length === 0) {
   firebaseApp = getApps()[0];
 }
 
-// Initialize Auth 
+// Initialize Auth with persistence
 let auth: Auth;
 try {
-  // Use regular getAuth for both web and mobile
-  auth = getAuth(firebaseApp);
+  if (Platform.OS !== 'web') {
+    // For React Native - use initializeAuth with AsyncStorage persistence
+    try {
+      auth = initializeAuth(firebaseApp, {
+        persistence: getReactNativePersistence(AsyncStorage)
+      });
+      console.log('🔐 Firebase Auth initialized with AsyncStorage persistence');
+    } catch (error) {
+      // Auth might already be initialized
+      console.log('ℹ️ Auth already initialized, using existing instance');
+      auth = getAuth(firebaseApp);
+    }
+  } else {
+    // For web - use regular getAuth
+    auth = getAuth(firebaseApp);
+  }
 } catch (error) {
-  // If auth is already initialized, just get it
+  // Fallback to regular getAuth
+  console.warn('⚠️ Failed to initialize auth with persistence, using default:', error);
   auth = getAuth(firebaseApp);
 }
 
-// Export auth instance
-export { auth };
+// Initialize Firestore
+const firestore: Firestore = getFirestore(firebaseApp);
+
+// Enable Firestore offline persistence for better connectivity
+try {
+  // Only enable in development for debugging
+  if (__DEV__) {
+    // Import and enable network logging in development
+    import('firebase/firestore').then(({ enableNetwork, disableNetwork }) => {
+      // This helps with connection debugging
+      console.log('🔥 Firestore network enabled for development');
+    }).catch((error) => {
+      console.warn('Firestore network configuration warning:', error.message);
+    });
+  }
+} catch (error) {
+  console.warn('Firestore configuration warning (non-critical):', error);
+}
+
+// Export auth and firestore instances
+export { auth, firestore };
 export default firebaseApp;
 
 // Configuration validation

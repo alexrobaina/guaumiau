@@ -6,7 +6,7 @@ export interface OnboardingData {
   experience: 'beginner' | 'intermediate' | 'advanced' | 'elite' | null;
   currentGrade: {
     boulder: string;
-    sport: string;
+    french: string;
   };
   goals: string[];
   equipment: Equipment[];
@@ -39,7 +39,8 @@ export interface OnboardingSlice {
   setCurrentStep: (step: number) => void;
   
   // Persistence
-  completeOnboarding: () => void;
+  completeOnboarding: () => Promise<void>;
+  syncOnboardingToFirebase: () => Promise<boolean>;
   resetOnboarding: () => void;
 }
 
@@ -47,7 +48,7 @@ const initialOnboardingData: OnboardingData = {
   experience: null,
   currentGrade: {
     boulder: '',
-    sport: ''
+    french: ''
   },
   goals: [],
   equipment: [],
@@ -68,7 +69,7 @@ export const createOnboardingSlice: StateCreator<
 > = (set, get) => ({
   data: initialOnboardingData,
   currentStep: 0,
-  totalSteps: 7,
+  totalSteps: 8,
 
   // Actions
   setExperience: (experience) =>
@@ -127,10 +128,100 @@ export const createOnboardingSlice: StateCreator<
     }),
 
   // Persistence
-  completeOnboarding: () =>
-    set((state) => {
-      state.data.completed = true;
-    }),
+  completeOnboarding: async () => {
+    const state = get();
+    
+    // Always complete onboarding locally first
+    set((draft) => {
+      draft.data.completed = true;
+      draft.currentStep = 0; // Reset step counter for potential future use
+    });
+    
+    try {
+      // Try to save to Firebase (only works if user is authenticated)
+      const { isFirebaseConfigured } = await import('@/lib/firebase/config');
+      if (!isFirebaseConfigured()) {
+        console.log('ℹ️ Firebase not configured, data saved locally only');
+        return;
+      }
+
+      const authModule = await import('@/lib/firebase/auth');
+      const firestoreModule = await import('@/lib/firebase/firestore');
+      
+      const AuthService = authModule.AuthService || authModule.default;
+      const FirestoreService = firestoreModule.FirestoreService || firestoreModule.default;
+      
+      if (!AuthService || !FirestoreService) {
+        console.warn('⚠️ Firebase services not properly loaded');
+        return;
+      }
+      
+      const currentUser = AuthService.getCurrentUser();
+      if (currentUser) {
+        // User is authenticated - save to Firebase
+        await FirestoreService.saveOnboardingData(state.data);
+        console.log('✅ Onboarding data saved to Firebase');
+      } else {
+        // User not authenticated - save locally only
+        console.log('ℹ️ User not authenticated. Onboarding data saved locally only.');
+        console.log('💡 Data will sync to Firebase when user logs in.');
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to save onboarding data to Firebase:', error);
+      // Onboarding still completed locally, just log the warning
+    }
+  },
+
+  // Sync local onboarding data to Firebase (called after login)
+  syncOnboardingToFirebase: async () => {
+    const state = get();
+    
+    // Only sync if onboarding is completed locally but not synced to Firebase
+    if (!state.data.completed) {
+      return false; // Nothing to sync
+    }
+    
+    try {
+      // Check if Firebase is configured
+      const { isFirebaseConfigured } = await import('@/lib/firebase/config');
+      if (!isFirebaseConfigured()) {
+        console.log('ℹ️ Firebase not configured, skipping sync');
+        return false;
+      }
+
+      const authModule = await import('@/lib/firebase/auth');
+      const firestoreModule = await import('@/lib/firebase/firestore');
+      
+      const AuthService = authModule.AuthService || authModule.default;
+      const FirestoreService = firestoreModule.FirestoreService || firestoreModule.default;
+      
+      if (!AuthService || !FirestoreService) {
+        console.warn('⚠️ Firebase services not properly loaded');
+        return false;
+      }
+      
+      const currentUser = AuthService.getCurrentUser();
+      if (!currentUser) {
+        console.log('ℹ️ Cannot sync: User not authenticated');
+        return false;
+      }
+      
+      // Check if data already exists in Firebase
+      const existingProfile = await FirestoreService.getUserProfile();
+      if (existingProfile?.completed) {
+        console.log('ℹ️ Onboarding data already exists in Firebase');
+        return true;
+      }
+      
+      // Sync local data to Firebase
+      await FirestoreService.saveOnboardingData(state.data);
+      console.log('✅ Local onboarding data synced to Firebase');
+      return true;
+    } catch (error) {
+      console.warn('⚠️ Failed to sync onboarding data to Firebase:', error);
+      return false;
+    }
+  },
 
   resetOnboarding: () =>
     set((state) => {

@@ -232,6 +232,16 @@ export const createAuthSlice: StateCreator<
 
         await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
         authSlice.setUser(user);
+        
+        // Sync onboarding data to Firebase if user has completed onboarding locally
+        try {
+          const rootState = get();
+          if (rootState.syncOnboardingToFirebase) {
+            await rootState.syncOnboardingToFirebase();
+          }
+        } catch (error) {
+          console.warn('Failed to sync onboarding data after login:', error);
+        }
       } else {
         // User is signed out
         await AsyncStorage.removeItem(AUTH_STORAGE_KEY);

@@ -149,14 +149,14 @@ export default function LoginScreen() {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
       
-      // Success animation
+      // Success - let the auth flow handle navigation
       Alert.alert(
         'Success! 🎉',
         'Welcome back to CruxClimb!',
         [
           {
             text: 'Continue',
-            onPress: () => router.replace('/(tabs)'),
+            onPress: () => router.replace('/'),
           },
         ]
       );
@@ -178,7 +178,7 @@ export default function LoginScreen() {
         [
           {
             text: 'Continue',
-            onPress: () => router.replace('/(tabs)'),
+            onPress: () => router.replace('/'),
           },
         ]
       );

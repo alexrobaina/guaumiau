@@ -13,18 +13,19 @@ export default function IndexScreen() {
       return; // Wait for auth to initialize or prevent re-navigation
     }
 
-    // Navigate based on authentication and onboarding status
+    // Navigate based on onboarding and authentication status
     const navigate = async () => {
       setHasNavigated(true);
       
-      if (isAuthenticated) {
-        // Check if user has completed onboarding
-        if (!onboarding.data.completed) {
-          router.replace('/(onboarding)/experience');
-        } else {
-          router.replace('/(tabs)');
-        }
+      // Check if user has completed onboarding first
+      if (!onboarding.data.completed) {
+        // User hasn't completed onboarding - start onboarding flow
+        router.replace('/(onboarding)/experience');
+      } else if (isAuthenticated) {
+        // User completed onboarding and is authenticated - go to main app
+        router.replace('/(tabs)');
       } else {
+        // User completed onboarding but not authenticated - ask to login
         router.replace('/(auth)/login');
       }
     };
@@ -33,7 +34,7 @@ export default function IndexScreen() {
     const timeoutId = setTimeout(navigate, 100);
     
     return () => clearTimeout(timeoutId);
-  }, [isAuthenticated, isInitialized, hasNavigated]);
+  }, [isAuthenticated, isInitialized, hasNavigated, onboarding.data.completed]);
 
   // Show loading screen while determining auth state
   return (
