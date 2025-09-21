@@ -11,13 +11,14 @@ export interface UserProfile {
   email: string;
   avatar?: string;
   experience: 'beginner' | 'intermediate' | 'advanced' | 'elite';
-  preferredStyle: 'boulder' | 'sport' | 'trad' | 'all';
+  preferredStyle: 'boulder' | 'sport' | 'trad' | 'gym' | 'all';
   currentGrade: {
     boulder: string;
     sport: string;
+    french?: string;
   };
   goals: string[];
-  equipment: string[];
+  equipment: Equipment[];
   trainingAvailability: {
     daysPerWeek: number;
     hoursPerSession: number;
@@ -39,105 +40,6 @@ export interface UserStats {
   averageGrade: string;
 }
 
-// Workout Types
-export interface Exercise {
-  id: string;
-  name: string;
-  description?: string;
-  category:
-    | 'fingerboard'
-    | 'campus'
-    | 'system'
-    | 'strength'
-    | 'mobility'
-    | 'endurance'
-    | 'power';
-  sets?: number;
-  reps?: number;
-  duration?: number; // in seconds
-  rest?: number; // in seconds
-  intensity?: 'light' | 'moderate' | 'hard' | 'maximal';
-  equipment: Equipment[];
-  videoUrl?: string;
-  imageUrl?: string;
-}
-
-export interface Workout extends BaseEntity {
-  name: string;
-  description?: string;
-  exercises: Exercise[];
-  duration: number; // estimated duration in minutes
-  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'elite';
-  equipment: Equipment[];
-  creator: User;
-  rating?: number;
-  tags: string[];
-  public: boolean;
-  completions: number;
-}
-
-export interface WorkoutSession extends BaseEntity {
-  workout: Workout;
-  user: User;
-  completedAt: Date;
-  duration: number; // actual duration in minutes
-  exercises: CompletedExercise[];
-  notes?: string;
-  rpe: number; // Rate of Perceived Exertion (1-10)
-  quality: 1 | 2 | 3 | 4 | 5; // 1-5 stars
-}
-
-export interface CompletedExercise {
-  exercise: Exercise;
-  sets: CompletedSet[];
-  notes?: string;
-  skipped?: boolean;
-}
-
-export interface CompletedSet {
-  reps?: number;
-  weight?: number;
-  duration?: number;
-  rest?: number;
-  rpe?: number;
-  completed: boolean;
-}
-
-// Climbing Log Types
-export interface ClimbingLog extends BaseEntity {
-  user: User;
-  date: Date;
-  type: 'boulder' | 'sport' | 'trad' | 'top-rope';
-  location: Location;
-  climbs: Climb[];
-  sessionNotes?: string;
-  conditions?: string;
-  partnerNames?: string[];
-}
-
-export interface Climb {
-  id: string;
-  name?: string;
-  grade: string;
-  attempts: number;
-  completed: boolean;
-  style: 'flash' | 'onsight' | 'redpoint' | 'repeat';
-  notes?: string;
-  rating?: 1 | 2 | 3 | 4 | 5;
-  photos?: string[];
-  videos?: string[];
-}
-
-export interface Location {
-  name: string;
-  type: 'indoor' | 'outdoor';
-  area?: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
-  };
-}
-
 // Equipment Types
 export type Equipment =
   | 'fingerboard'
@@ -151,22 +53,13 @@ export type Equipment =
   | 'foam-roller'
   | 'lacrosse-ball'
   | 'yoga-mat'
+  | 'weight-belt'
+  | 'pulley-system'
+  | 'gym'
   | 'none';
 
 // Subscription Types
 export type SubscriptionTier = 'free' | 'premium' | 'pro';
-
-// Filter Types
-export interface WorkoutFilters {
-  difficulty?: string[];
-  equipment?: Equipment[];
-  duration?: {
-    min: number;
-    max: number;
-  };
-  category?: string[];
-  search?: string;
-}
 
 // Form Types
 export interface LoginFormValues {
@@ -181,27 +74,11 @@ export interface RegisterFormValues {
   confirmPassword: string;
 }
 
-export interface WorkoutFormValues {
-  name: string;
-  description?: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'elite';
-  duration: number;
-  exercises: Exercise[];
-}
-
 // API Response Types
 export interface ApiResponse<T> {
   data: T;
   message?: string;
   success: boolean;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  hasMore: boolean;
 }
 
 // Error Types
@@ -214,8 +91,6 @@ export interface ApiError {
 // Navigation Types (for Expo Router)
 export type RootStackParamList = {
   '(tabs)': undefined;
-  'workout/[id]': { id: string };
-  'climb/[id]': { id: string };
   'profile/[id]': { id: string };
   login: undefined;
   register: undefined;

@@ -1,0 +1,217 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
+import { useWorkoutSessions } from '@/hooks/queries/useWorkoutSessions';
+import { useTrainingPlans } from '@/hooks/queries/useTrainingPlans';
+import { useAuth } from '@/hooks/useAuth';
+import { Colors } from '@/lib/colors';
+import { WorkoutSession } from '@/types/workout';
+import { WorkoutDetailModal } from '@/components/organisms/WorkoutDetailModal';
+import { makeStyles } from './schedule-tab.styles';
+
+export const ScheduleTabScreen: React.FC = () => {
+  const { user } = useAuth();
+  const { data: workoutSessions, isLoading } = useWorkoutSessions();
+  const { data: trainingPlans } = useTrainingPlans();
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutSession | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const styles = makeStyles();
+
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  // Get the most recently created active plan if multiple exist
+  const activePlan = trainingPlans?.filter(plan => plan.status === 'active')
+    .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())[0];
+
+  // Get workout sessions for each day
+  const getWorkoutForDay = (day: Date): WorkoutSession | undefined => {
+    return workoutSessions?.find(session =>
+      isSameDay(session.actualDate.toDate(), day) && session.status === 'completed'
+    );
+  };
+
+  const handleWorkoutPress = (workout: WorkoutSession) => {
+    setSelectedWorkout(workout);
+    setIsModalVisible(true);
+  };
+
+  const renderCalendarDay = (day: Date) => {
+    const workout = getWorkoutForDay(day);
+    const isWorkoutDay = !!workout;
+    const isTodayDate = isToday(day);
+
+    return (
+      <TouchableOpacity
+        key={day.toISOString()}
+        style={[
+          styles.calendarDay,
+          isWorkoutDay && styles.calendarDayWithWorkout,
+          isTodayDate && styles.calendarDayToday,
+        ]}
+        onPress={() => workout && handleWorkoutPress(workout)}
+        disabled={!workout}
+      >
+        <Text style={[
+          styles.calendarDayText,
+          isWorkoutDay && styles.calendarDayTextWithWorkout,
+          isTodayDate && styles.calendarDayTextToday,
+        ]}>
+          {format(day, 'd')}
+        </Text>
+        {isWorkoutDay && (
+          <View style={styles.workoutIndicator}>
+            <Ionicons
+              name="fitness"
+              size={12}
+              color={isTodayDate ? Colors.white : Colors.primary[600]}
+            />
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  const renderWorkoutHistory = () => {
+    const completedWorkouts = workoutSessions?.filter(session => session.status === 'completed')
+      .sort((a, b) => b.actualDate.toMillis() - a.actualDate.toMillis())
+      .slice(0, 10) || [];
+
+    return (
+      <View style={styles.historySection}>
+        <Text style={styles.sectionTitle}>Recent Workouts</Text>
+        {completedWorkouts.map((workout) => (
+          <TouchableOpacity
+            key={workout.id}
+            style={styles.workoutHistoryItem}
+            onPress={() => handleWorkoutPress(workout)}
+          >
+            <View style={styles.workoutHistoryHeader}>
+              <Text style={styles.workoutHistoryDate}>
+                {format(workout.actualDate.toDate(), 'MMM d, yyyy')}
+              </Text>
+              <View style={styles.workoutHistoryStats}>
+                <Text style={styles.workoutHistoryStat}>
+                  {workout.exercises?.length || 0} exercises
+                </Text>
+                {workout.totalDuration && (
+                  <Text style={styles.workoutHistoryStat}>
+                    {workout.totalDuration}min
+                  </Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.exerciseList}>
+              {workout.exercises?.slice(0, 3).map((exercise, index) => (
+                <Text key={index} style={styles.exerciseName}>
+                  • {exercise.exerciseName}
+                </Text>
+              ))}
+              {workout.exercises && workout.exercises.length > 3 && (
+                <Text style={styles.exerciseMore}>
+                  +{workout.exercises.length - 3} more
+                </Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        ))}
+        {completedWorkouts.length === 0 && (
+          <View style={styles.emptyState}>
+            <Ionicons name="fitness-outline" size={48} color={Colors.gray[400]} />
+            <Text style={styles.emptyStateText}>No completed workouts yet</Text>
+            <Text style={styles.emptyStateSubtext}>
+              Complete your first workout to see it here!
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary[600]} />
+        <Text style={styles.loadingText}>Loading schedule...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Training Schedule</Text>
+        {activePlan && (
+          <Text style={styles.planName}>{activePlan.name}</Text>
+        )}
+        <View style={styles.monthNavigation}>
+          <TouchableOpacity
+            style={styles.monthNavButton}
+            onPress={() => setCurrentMonth(subMonths(currentMonth, 1))}
+          >
+            <Ionicons name="chevron-back" size={20} color={Colors.gray[600]} />
+          </TouchableOpacity>
+          <Text style={styles.monthTitle}>
+            {format(currentMonth, 'MMMM yyyy')}
+          </Text>
+          <TouchableOpacity
+            style={styles.monthNavButton}
+            onPress={() => setCurrentMonth(addMonths(currentMonth, 1))}
+          >
+            <Ionicons name="chevron-forward" size={20} color={Colors.gray[600]} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Calendar View */}
+      <View style={styles.calendarSection}>
+        <Text style={styles.sectionTitle}>This Month</Text>
+
+        {/* Week days header */}
+        <View style={styles.weekDaysHeader}>
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+            <Text key={index} style={styles.weekDayText}>{day}</Text>
+          ))}
+        </View>
+
+        {/* Calendar grid */}
+        <View style={styles.calendarGrid}>
+          {daysInMonth.map(renderCalendarDay)}
+        </View>
+
+        <View style={styles.legend}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, styles.legendDotWorkout]} />
+            <Text style={styles.legendText}>Workout completed</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, styles.legendDotToday]} />
+            <Text style={styles.legendText}>Today</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Workout History */}
+      {renderWorkoutHistory()}
+
+      {/* Workout Detail Modal */}
+      <WorkoutDetailModal
+        visible={isModalVisible}
+        workout={selectedWorkout}
+        onClose={() => {
+          setIsModalVisible(false);
+          setSelectedWorkout(null);
+        }}
+      />
+    </ScrollView>
+  );
+};

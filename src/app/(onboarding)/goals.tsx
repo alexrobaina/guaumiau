@@ -5,6 +5,7 @@ import { OnboardingScreen } from '@/components/organisms/OnboardingScreen';
 import { SelectableCard } from '@/components/molecules/SelectableCard';
 import { Text, Input } from '@/components/atoms';
 import { useStore } from '@/store';
+import { useOnboardingNavigation } from '@/hooks/business/useOnboardingNavigation';
 import { Colors } from '@/lib/colors';
 
 const predefinedGoals = [
@@ -47,6 +48,7 @@ const predefinedGoals = [
 
 export default function GoalsScreen() {
   const { data, currentStep, totalSteps, setGoals, nextStep, previousStep } = useStore();
+  const { navigateToLogin, shouldShowLoginOption } = useOnboardingNavigation();
   const selectedGoals = data.goals;
   const [customGoal, setCustomGoal] = useState('');
 
@@ -87,6 +89,8 @@ export default function GoalsScreen() {
       onNext={canProceed ? handleNext : undefined}
       onPrevious={handlePrevious}
       nextDisabled={!canProceed}
+      showLoginOption={shouldShowLoginOption}
+      onLogin={navigateToLogin}
     >
       <View style={styles.container}>
         <View style={styles.goalsContainer}>

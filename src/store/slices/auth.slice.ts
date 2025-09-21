@@ -19,6 +19,7 @@ export interface AuthSlice {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendEmailVerification: () => Promise<void>;
+  debugAutoLogin: () => Promise<void>;
   
   // State management
   setUser: (user: AuthUser | null) => void;
@@ -44,6 +45,17 @@ export const createAuthSlice: StateCreator<
   isLoading: false,
   isInitialized: false,
   error: null,
+
+  // DEBUG: Auto-login function
+  debugAutoLogin: async () => {
+    console.log('🔧 DEBUG: Auto-login attempt with stored credentials...');
+    try {
+      await get().login('alexrobainaph@gmail.com', 'salsamora3000');
+      console.log('✅ DEBUG: Auto-login successful!');
+    } catch (error) {
+      console.error('❌ DEBUG: Auto-login failed:', error);
+    }
+  },
 
   // Actions
   login: async (email: string, password: string) => {
@@ -214,8 +226,24 @@ export const createAuthSlice: StateCreator<
     }),
 
   // Auth state listener
-  initializeAuth: () => {
+  initializeAuth: async () => {
     const authSlice = get();
+    
+    // First, try to restore user from AsyncStorage
+    try {
+      const storedUser = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
+      if (storedUser) {
+        const user = JSON.parse(storedUser) as AuthUser;
+        authSlice.setUser(user);
+        console.log('✅ User restored from AsyncStorage:', user.email);
+        
+        // 🔧 DEBUG: Check Firebase Auth current user
+        console.log('🔍 Firebase Auth current user:', auth.currentUser?.email || 'null');
+        console.log('⚠️ WARNING: User in AsyncStorage but not in Firebase Auth - need to login!');
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to restore user from AsyncStorage:', error);
+    }
     
     // Set up Firebase auth state listener
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {

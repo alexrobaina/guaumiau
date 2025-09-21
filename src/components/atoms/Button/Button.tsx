@@ -39,10 +39,8 @@ export const Button: React.FC<ButtonProps> = ({
         <ActivityIndicator
           color={variant === 'tertiary' ? Colors.black : Colors.white}
         />
-      ) : typeof children === 'string' ? (
-        <Text style={textStyleComputed}>{children}</Text>
       ) : (
-        children
+        <Text style={textStyleComputed}>{children}</Text>
       )}
     </Pressable>
   );

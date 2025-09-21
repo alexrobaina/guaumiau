@@ -15,7 +15,7 @@ export interface OnboardingData {
     hoursPerSession: number;
   };
   injuries: string[];
-  preferredStyle: 'boulder' | 'sport' | 'trad' | 'all' | null;
+  preferredStyle: 'boulder' | 'sport' | 'trad' | 'gym' | 'all' | null;
   completed: boolean;
 }
 
@@ -39,7 +39,7 @@ export interface OnboardingSlice {
   setCurrentStep: (step: number) => void;
   
   // Persistence
-  completeOnboarding: () => Promise<void>;
+  markOnboardingCompleted: () => void;
   syncOnboardingToFirebase: () => Promise<boolean>;
   resetOnboarding: () => void;
 }
@@ -128,49 +128,11 @@ export const createOnboardingSlice: StateCreator<
     }),
 
   // Persistence
-  completeOnboarding: async () => {
-    const state = get();
-    
-    // Always complete onboarding locally first
-    set((draft) => {
-      draft.data.completed = true;
-      draft.currentStep = 0; // Reset step counter for potential future use
-    });
-    
-    try {
-      // Try to save to Firebase (only works if user is authenticated)
-      const { isFirebaseConfigured } = await import('@/lib/firebase/config');
-      if (!isFirebaseConfigured()) {
-        console.log('ℹ️ Firebase not configured, data saved locally only');
-        return;
-      }
-
-      const authModule = await import('@/lib/firebase/auth');
-      const firestoreModule = await import('@/lib/firebase/firestore');
-      
-      const AuthService = authModule.AuthService || authModule.default;
-      const FirestoreService = firestoreModule.FirestoreService || firestoreModule.default;
-      
-      if (!AuthService || !FirestoreService) {
-        console.warn('⚠️ Firebase services not properly loaded');
-        return;
-      }
-      
-      const currentUser = AuthService.getCurrentUser();
-      if (currentUser) {
-        // User is authenticated - save to Firebase
-        await FirestoreService.saveOnboardingData(state.data);
-        console.log('✅ Onboarding data saved to Firebase');
-      } else {
-        // User not authenticated - save locally only
-        console.log('ℹ️ User not authenticated. Onboarding data saved locally only.');
-        console.log('💡 Data will sync to Firebase when user logs in.');
-      }
-    } catch (error) {
-      console.warn('⚠️ Failed to save onboarding data to Firebase:', error);
-      // Onboarding still completed locally, just log the warning
-    }
-  },
+  markOnboardingCompleted: () =>
+    set((state) => {
+      state.data.completed = true;
+      state.currentStep = 0; // Reset step counter for potential future use
+    }),
 
   // Sync local onboarding data to Firebase (called after login)
   syncOnboardingToFirebase: async () => {

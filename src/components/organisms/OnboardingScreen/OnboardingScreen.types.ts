@@ -14,4 +14,7 @@ export interface OnboardingScreenProps {
   nextDisabled?: boolean;
   showProgress?: boolean;
   contentStyle?: ViewStyle;
+  showLoginOption?: boolean;
+  onLogin?: () => void;
+  loginButtonText?: string;
 }

@@ -167,24 +167,24 @@ export default function ProfileScreen() {
           />
         </View>
 
-        {/* Account Settings */}
+        {/* Training Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Settings</Text>
-          
+          <Text style={styles.sectionTitle}>Training Settings</Text>
+
           <ProfileCard
-            icon="shield-outline"
-            title="Privacy & Security"
-            value="Manage your account security"
-            onPress={() => console.log('Privacy settings')}
+            icon="target-outline"
+            title="Goals Training"
+            value="Manage your training goals"
+            onPress={() => router.push('/training-goals')}
           />
-          
+
           <ProfileCard
             icon="notifications-outline"
             title="Notifications"
             value="Manage notifications"
             onPress={() => console.log('Notification settings')}
           />
-          
+
           <ProfileCard
             icon="help-circle-outline"
             title="Help & Support"

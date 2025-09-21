@@ -3,11 +3,8 @@ import {
   setDoc,
   getDoc,
   updateDoc,
-  collection,
-  addDoc,
   serverTimestamp,
   Timestamp,
-  DocumentReference,
   FirestoreError,
 } from 'firebase/firestore';
 import { firestore } from './config';
@@ -19,32 +16,6 @@ export interface UserProfileData extends OnboardingData {
   email?: string;
   displayName?: string;
   photoURL?: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-
-export interface TrainingSession {
-  id?: string;
-  userId: string;
-  type: 'workout' | 'climb' | 'training';
-  date: Timestamp;
-  duration: number; // minutes
-  exercises?: Array<{
-    name: string;
-    sets?: number;
-    reps?: number;
-    weight?: number;
-    duration?: number;
-    notes?: string;
-  }>;
-  routes?: Array<{
-    grade: string;
-    style: 'boulder' | 'sport' | 'trad';
-    attempts: number;
-    completed: boolean;
-    notes?: string;
-  }>;
-  notes?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -80,7 +51,6 @@ const getErrorMessage = (error: FirestoreError): string => {
     case 'unauthenticated':
       return 'You must be logged in to perform this action.';
     default:
-      // Log network-related warnings but don't treat them as critical errors
       if (error.message && error.message.includes('WebChannelConnection')) {
         console.warn('Firestore network connection warning (non-critical):', error.message);
         return 'Network connection issue. Data will be saved when connection is restored.';
@@ -94,7 +64,7 @@ export class FirestoreService {
   static async testConnection(): Promise<boolean> {
     try {
       const testDocRef = doc(firestore, 'test', 'connection');
-      await getDoc(testDocRef); // This will test if we can connect
+      await getDoc(testDocRef);
       console.log('✅ Firestore connection test successful');
       return true;
     } catch (error) {
@@ -115,11 +85,12 @@ export class FirestoreService {
       const userProfileData: UserProfileData = {
         ...onboardingData,
         userId: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
         createdAt: now,
         updatedAt: now,
+        // Only include these fields if they have non-null values
+        ...(user.email && { email: user.email }),
+        ...(user.displayName && { displayName: user.displayName }),
+        ...(user.photoURL && { photoURL: user.photoURL }),
       };
 
       const userDocRef = doc(firestore, 'users', user.uid);
@@ -141,7 +112,7 @@ export class FirestoreService {
     try {
       const user = AuthService.getCurrentUser();
       const targetUserId = userId || user?.uid;
-      
+
       if (!targetUserId) {
         throw new Error('User ID is required to get profile data');
       }
@@ -174,7 +145,7 @@ export class FirestoreService {
     try {
       const user = AuthService.getCurrentUser();
       const targetUserId = userId || user?.uid;
-      
+
       if (!targetUserId) {
         throw new Error('User ID is required to update profile data');
       }
@@ -188,36 +159,6 @@ export class FirestoreService {
       console.log('✅ User profile updated successfully for user:', targetUserId);
     } catch (error) {
       console.error('❌ Error updating user profile:', error);
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error(getErrorMessage(error as FirestoreError));
-    }
-  }
-
-  // Save training session
-  static async saveTrainingSession(sessionData: Omit<TrainingSession, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
-    try {
-      const user = AuthService.getCurrentUser();
-      if (!user) {
-        throw new Error('User must be authenticated to save training session');
-      }
-
-      const now = serverTimestamp() as Timestamp;
-      const fullSessionData: Omit<TrainingSession, 'id'> = {
-        ...sessionData,
-        userId: user.uid,
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      const sessionsCollectionRef = collection(firestore, 'trainingSessions');
-      const docRef: DocumentReference = await addDoc(sessionsCollectionRef, fullSessionData);
-
-      console.log('✅ Training session saved successfully with ID:', docRef.id);
-      return docRef.id;
-    } catch (error) {
-      console.error('❌ Error saving training session:', error);
       if (error instanceof Error) {
         throw error;
       }
@@ -247,12 +188,13 @@ export class FirestoreService {
       const now = serverTimestamp() as Timestamp;
       const initialUserData: Partial<UserProfileData> = {
         userId: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
         completed: false,
         createdAt: now,
         updatedAt: now,
+        // Only include these fields if they have non-null values
+        ...(user.email && { email: user.email }),
+        ...(user.displayName && { displayName: user.displayName }),
+        ...(user.photoURL && { photoURL: user.photoURL }),
       };
 
       const userDocRef = doc(firestore, 'users', user.uid);

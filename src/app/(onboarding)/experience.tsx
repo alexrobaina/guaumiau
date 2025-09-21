@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { OnboardingScreen } from '@/components/organisms/OnboardingScreen';
 import { SelectableCard } from '@/components/molecules/SelectableCard';
 import { useStore } from '@/store';
+import { useOnboardingNavigation } from '@/hooks/business/useOnboardingNavigation';
 
 const experienceOptions = [
   {
@@ -30,6 +31,7 @@ const experienceOptions = [
 
 export default function ExperienceScreen() {
   const { data, currentStep, totalSteps, setExperience, nextStep } = useStore();
+  const { navigateToLogin, shouldShowLoginOption } = useOnboardingNavigation();
   const selectedExperience = data.experience;
 
   const handleSelectExperience = (experience: typeof selectedExperience) => {
@@ -51,6 +53,8 @@ export default function ExperienceScreen() {
       totalSteps={totalSteps}
       onNext={canProceed ? handleNext : undefined}
       nextDisabled={!canProceed}
+      showLoginOption={shouldShowLoginOption}
+      onLogin={navigateToLogin}
     >
       <View style={{ gap: 12 }}>
         {experienceOptions.map((option) => (

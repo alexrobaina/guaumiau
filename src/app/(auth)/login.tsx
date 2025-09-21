@@ -25,13 +25,13 @@ import { useStore } from '@/store';
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('alexrobainaph@gmail.com');
+  const [password, setPassword] = useState('salsamora3000');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  
+
   const { login, loginWithGoogle, isLoading, error } = useStore();
-  
+
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -104,7 +104,7 @@ export default function LoginScreen() {
     if (!isEmailValid || !isPasswordValid) {
       return;
     }
-    
+
     // Button press animation
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -122,14 +122,14 @@ export default function LoginScreen() {
     try {
       // Check if Firebase is properly configured
       const { isFirebaseConfigured } = await import('@/lib/firebase/config');
-      
+
       if (isFirebaseConfigured()) {
         // Use real Firebase authentication
         await login(email, password);
       } else {
         // Fallback for development - simulate successful login
         console.warn('Firebase not configured, using demo mode');
-        
+
         // Create a mock user for development
         const mockUser = {
           uid: 'demo-user-' + Date.now(),
@@ -139,31 +139,29 @@ export default function LoginScreen() {
           emailVerified: true,
           phoneNumber: null,
         };
-        
+
         // Set the user in the store
         const { setUser, setInitialized } = useStore.getState();
         setUser(mockUser);
         setInitialized(true);
-        
+
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
-      
+
       // Success - let the auth flow handle navigation
-      Alert.alert(
-        'Success! 🎉',
-        'Welcome back to CruxClimb!',
-        [
-          {
-            text: 'Continue',
-            onPress: () => router.replace('/'),
-          },
-        ]
-      );
+      Alert.alert('Success! 🎉', 'Welcome back to CruxClimb!', [
+        {
+          text: 'Continue',
+          onPress: () => router.replace('/'),
+        },
+      ]);
     } catch (error) {
       Alert.alert(
-        'Login Failed', 
-        error instanceof Error ? error.message : 'Please check your credentials and try again.'
+        'Login Failed',
+        error instanceof Error
+          ? error.message
+          : 'Please check your credentials and try again.'
       );
     }
   };
@@ -171,20 +169,16 @@ export default function LoginScreen() {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
-      
-      Alert.alert(
-        'Success! 🎉',
-        'Welcome to CruxClimb!',
-        [
-          {
-            text: 'Continue',
-            onPress: () => router.replace('/'),
-          },
-        ]
-      );
+
+      Alert.alert('Success! 🎉', 'Welcome to CruxClimb!', [
+        {
+          text: 'Continue',
+          onPress: () => router.replace('/'),
+        },
+      ]);
     } catch (error) {
       Alert.alert(
-        'Google Sign-In Failed', 
+        'Google Sign-In Failed',
         error instanceof Error ? error.message : 'Please try again.'
       );
     }
@@ -193,10 +187,14 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
-      
+
       {/* Background Gradient */}
       <LinearGradient
-        colors={[Colors.primary[500], Colors.primary[600], Colors.secondary[500]]}
+        colors={[
+          Colors.primary[500],
+          Colors.primary[600],
+          Colors.secondary[500],
+        ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
@@ -234,7 +232,7 @@ export default function LoginScreen() {
                   <Ionicons name="trending-up" size={40} color={Colors.white} />
                 </View>
               </View>
-              
+
               <Text style={styles.title}>Welcome Back</Text>
               <Text style={styles.subtitle}>
                 Ready to crush your next climb?
@@ -270,7 +268,9 @@ export default function LoginScreen() {
 
                 <TouchableOpacity style={styles.forgotPasswordContainer}>
                   <Link href="/(auth)/forgot-password">
-                    <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                    <Text style={styles.forgotPasswordText}>
+                      Forgot Password?
+                    </Text>
                   </Link>
                 </TouchableOpacity>
 
@@ -309,8 +309,14 @@ export default function LoginScreen() {
                   activeOpacity={0.8}
                 >
                   <View style={styles.googleButtonContent}>
-                    <Ionicons name="logo-google" size={20} color={Colors.gray[700]} />
-                    <Text style={styles.googleButtonText}>Continue with Google</Text>
+                    <Ionicons
+                      name="logo-google"
+                      size={20}
+                      color={Colors.gray[700]}
+                    />
+                    <Text style={styles.googleButtonText}>
+                      Continue with Google
+                    </Text>
                   </View>
                 </TouchableOpacity>
               </View>

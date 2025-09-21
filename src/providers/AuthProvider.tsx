@@ -19,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         if (isFirebaseConfigured()) {
           // Use real Firebase authentication
           const { initializeAuth } = useStore.getState();
-          return initializeAuth();
+          return await initializeAuth();
         } else {
           // In development mode without Firebase, just mark as initialized
           console.warn('Firebase not configured, running in demo mode');

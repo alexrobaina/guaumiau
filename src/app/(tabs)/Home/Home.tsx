@@ -24,11 +24,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = () => {
       </Text>
 
       <Text variant="body" style={styles.description}>
-        CruxClimb is a personalized climbing training app that creates custom workout plans based on your experience level, climbing style, and goals. Track your progress, learn new techniques, and build strength systematically.
+        CruxClimb is your climbing training companion. Set up your profile to get started with your climbing journey.
       </Text>
 
       <Text variant="body" style={styles.howToUse}>
-        <Text style={{ fontWeight: 'bold' }}>How to use:</Text> Complete the quick setup to tell us about your climbing background, then access personalized training routines, track your sessions, and monitor your improvement over time.
+        <Text style={{ fontWeight: 'bold' }}>Getting started:</Text> Complete the onboarding to tell us about your climbing background and preferences.
       </Text>
 
       {user?.displayName && (
@@ -39,7 +39,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = () => {
 
       <RNView style={styles.buttonContainer}>
         <Button onPress={() => router.push('/(onboarding)/experience')} variant="primary">
-          Start Training
+          Get Started
         </Button>
       </RNView>
 

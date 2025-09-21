@@ -4,12 +4,10 @@
     "slug": "cruxclimb",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "com.wayex.cruxclimb",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#FF6B35"
     },
@@ -24,7 +22,6 @@
     "android": {
       "package": "app.cruxclimb.mobile",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FF6B35"
       },
       "edgeToEdgeEnabled": true,
@@ -36,8 +33,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "static"
     },
     "plugins": [
       [

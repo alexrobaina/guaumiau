@@ -64,6 +64,11 @@ const equipmentOptions: { id: Equipment; title: string; description: string }[] 
     title: 'Yoga Mat',
     description: 'For stretching and mobility routines',
   },
+  {
+    id: 'gym',
+    title: 'Gym Access',
+    description: 'Access to commercial gym with weights, machines, and cardio equipment',
+  },
 ];
 
 export default function EquipmentScreen() {

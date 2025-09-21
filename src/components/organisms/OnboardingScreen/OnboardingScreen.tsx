@@ -18,6 +18,9 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   nextDisabled = false,
   showProgress = true,
   contentStyle,
+  showLoginOption = false,
+  onLogin,
+  loginButtonText = 'Login Instead',
 }) => {
   const styles = makeStyles();
   const progress = ((currentStep + 1) / totalSteps) * 100;
@@ -59,6 +62,20 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
         </ScrollView>
 
         <View style={styles.buttonContainer}>
+          {showLoginOption && onLogin && (
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginPrompt}>Already have an account?</Text>
+              <Button
+                variant="secondary"
+                buttonStyle="text"
+                style={styles.loginButton}
+                onPress={onLogin}
+              >
+                {loginButtonText}
+              </Button>
+            </View>
+          )}
+
           <View style={styles.buttonRow}>
             {currentStep > 0 && onPrevious && (
               <Button
@@ -70,7 +87,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
                 {previousButtonText}
               </Button>
             )}
-            
+
             {onNext && (
               <Button
                 variant="primary"

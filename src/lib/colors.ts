@@ -50,6 +50,21 @@ export const Colors = {
   error: '#EF4444',
   info: '#3B82F6',
 
+  // Green semantic palette
+  green: {
+    50: '#F0FDF4',
+    100: '#DCFCE7',
+    200: '#BBF7D0',
+    300: '#86EFAC',
+    400: '#4ADE80',
+    500: '#22C55E',
+    600: '#16A34A',
+    700: '#15803D',
+    800: '#166534',
+    900: '#14532D',
+    950: '#052E16',
+  },
+
   // Climbing Hold Colors
   hold: {
     yellow: '#FFD700',

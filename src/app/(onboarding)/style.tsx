@@ -27,6 +27,12 @@ const climbingStyles = [
     emoji: '⚙️',
   },
   {
+    id: 'gym' as const,
+    title: 'Gym & Fitness',
+    description: 'Focus on strength training and fitness for climbing performance',
+    emoji: '🏋️',
+  },
+  {
     id: 'all' as const,
     title: 'All Styles',
     description: 'I enjoy all types of climbing equally',

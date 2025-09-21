@@ -39,6 +39,7 @@ export const makeStyles = () =>
       paddingHorizontal: 24,
     },
     titleContainer: {
+      marginTop: 4,
       marginBottom: 32,
     },
     title: {
@@ -74,5 +75,17 @@ export const makeStyles = () =>
     },
     nextButton: {
       flex: 2,
+    },
+    loginContainer: {
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    loginPrompt: {
+      fontSize: 14,
+      color: Colors.gray[600],
+      marginBottom: 8,
+    },
+    loginButton: {
+      paddingHorizontal: 16,
     },
   });

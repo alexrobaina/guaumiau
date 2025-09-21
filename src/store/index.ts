@@ -3,9 +3,6 @@ import { devtools, subscribeWithSelector, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAuthSlice } from './slices/auth.slice';
-import { createUISlice } from './slices/ui.slice';
-import { createWorkoutSlice } from './slices/workout.slice';
-import { createThemeSlice } from './slices/theme.slice';
 import { createOnboardingSlice } from './slices/onboarding.slice';
 import { RootState } from './types';
 
@@ -17,9 +14,6 @@ export const useStore = create<RootState>()(
       subscribeWithSelector(
         immer((set, get, api) => ({
           ...createAuthSlice(set, get, api),
-          ...createUISlice(set, get, api),
-          ...createWorkoutSlice(set, get, api),
-          ...createThemeSlice(set, get, api),
           ...createOnboardingSlice(set, get, api),
         }))
       ),
@@ -27,14 +21,27 @@ export const useStore = create<RootState>()(
         name: 'cruxclimb-storage',
         storage: {
           getItem: async name => {
-            const value = await AsyncStorage.getItem(name);
-            return value ? JSON.parse(value) : null;
+            try {
+              const value = await AsyncStorage.getItem(name);
+              return value ? JSON.parse(value) : null;
+            } catch (error) {
+              console.warn('⚠️ Failed to get item from storage:', name, error);
+              return null;
+            }
           },
           setItem: async (name, value) => {
-            await AsyncStorage.setItem(name, JSON.stringify(value));
+            try {
+              await AsyncStorage.setItem(name, JSON.stringify(value));
+            } catch (error) {
+              console.warn('⚠️ Failed to set item in storage:', name, error);
+            }
           },
           removeItem: async name => {
-            await AsyncStorage.removeItem(name);
+            try {
+              await AsyncStorage.removeItem(name);
+            } catch (error) {
+              console.warn('⚠️ Failed to remove item from storage:', name, error);
+            }
           },
         },
       }
@@ -44,3 +51,4 @@ export const useStore = create<RootState>()(
     }
   )
 );
+

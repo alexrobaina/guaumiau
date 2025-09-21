@@ -1,42 +1,24 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { router } from 'expo-router';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { OnboardingScreen } from '@/components/organisms/OnboardingScreen';
 import { Text } from '@/components/atoms';
 import { useStore } from '@/store';
+import { useCompleteOnboarding } from '@/hooks/mutations/useCompleteOnboarding';
 import { Colors } from '@/lib/colors';
 
 export default function CompleteScreen() {
-  const { data, currentStep, totalSteps, completeOnboarding } = useStore();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleComplete = async () => {
-    setIsLoading(true);
-    
-    try {
-      // Mark onboarding as complete (handles both local and Firebase saving)
-      await completeOnboarding();
-      
-      // Navigate to main app
-      router.replace('/(tabs)');
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      // Since we always complete locally, we can still navigate
-      router.replace('/(tabs)');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data, currentStep, totalSteps } = useStore();
+  const { completeOnboarding, isCompleting } = useCompleteOnboarding();
 
   return (
     <OnboardingScreen
-      title="🎉 You're All Set!"
-      subtitle="We've created a personalized training plan based on your preferences"
+      title="🎉 Welcome to CruxClimb!"
+      subtitle="Your climbing journey starts here. Let's create a personalized training plan based on your profile."
       currentStep={currentStep}
       totalSteps={totalSteps}
-      onNext={handleComplete}
-      nextButtonText={isLoading ? "Saving..." : "Start Training"}
-      nextDisabled={isLoading}
+      onNext={completeOnboarding}
+      nextButtonText={isCompleting ? "Saving..." : "Create Your Plan"}
+      nextDisabled={isCompleting}
       showProgress={false}
     >
       <View style={styles.container}>
@@ -106,27 +88,27 @@ export default function CompleteScreen() {
         <View style={styles.nextSteps}>
           <Text style={styles.nextStepsTitle}>What's Next?</Text>
           <View style={styles.nextStepItem}>
-            <Text style={styles.nextStepBullet}>•</Text>
+            <Text style={styles.nextStepBullet}>🤖</Text>
             <Text style={styles.nextStepText}>
-              Browse personalized workouts tailored to your goals
+              AI will generate a personalized training plan based on your profile
             </Text>
           </View>
           <View style={styles.nextStepItem}>
-            <Text style={styles.nextStepBullet}>•</Text>
+            <Text style={styles.nextStepBullet}>📅</Text>
             <Text style={styles.nextStepText}>
-              Start logging your training sessions and climbing
+              Get weekly workouts with progressive overload and auto-deload weeks
             </Text>
           </View>
           <View style={styles.nextStepItem}>
-            <Text style={styles.nextStepBullet}>•</Text>
+            <Text style={styles.nextStepBullet}>📈</Text>
             <Text style={styles.nextStepText}>
-              Track your progress and see improvements over time
+              Track your progress with RPE logging and session notes
             </Text>
           </View>
           <View style={styles.nextStepItem}>
-            <Text style={styles.nextStepBullet}>•</Text>
+            <Text style={styles.nextStepBullet}>🏆</Text>
             <Text style={styles.nextStepText}>
-              Adjust your profile anytime in settings
+              Plan for competitions with peaking and taper strategies
             </Text>
           </View>
         </View>
