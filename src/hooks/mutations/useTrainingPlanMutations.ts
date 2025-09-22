@@ -104,6 +104,40 @@ export const useCompleteTrainingPlan = () => {
   });
 };
 
+export const useRepeatTrainingPlan = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: (planId: string) => TrainingPlanService.repeatTrainingPlan(planId, user?.uid || ''),
+    onSuccess: (newPlanId) => {
+      queryClient.invalidateQueries({ queryKey: ['training-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['training-plan', newPlanId] });
+      console.log('✅ Training plan repeated successfully with new ID:', newPlanId);
+    },
+    onError: (error) => {
+      console.error('❌ Failed to repeat training plan:', error);
+    },
+  });
+};
+
+export const useResetTrainingPlan = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: (planId: string) => TrainingPlanService.resetTrainingPlan(planId, user?.uid || ''),
+    onSuccess: (_, planId) => {
+      queryClient.invalidateQueries({ queryKey: ['training-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['training-plan', planId] });
+      console.log('✅ Training plan reset successfully');
+    },
+    onError: (error) => {
+      console.error('❌ Failed to reset training plan:', error);
+    },
+  });
+};
+
 // Custom Exercise Mutations
 export const useCreateCustomExercise = () => {
   const queryClient = useQueryClient();

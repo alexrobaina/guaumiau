@@ -9,14 +9,15 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useCreateTrainingPlan } from '@/hooks/mutations/useTrainingPlanMutations';
+import { useCreateTrainingPlan, useUpdateTrainingPlan } from '@/hooks/mutations/useTrainingPlanMutations';
+import { useTrainingPlan } from '@/hooks/queries/useTrainingPlanQueries';
 import {
   TrainingPlan,
   TrainingDay,
@@ -83,6 +84,9 @@ interface TrainingPlanFormData {
 }
 
 export default function TrainingPlanCreatorScreen() {
+  const { planId } = useLocalSearchParams<{ planId?: string }>();
+  const isEditMode = !!planId;
+
   const [currentStep, setCurrentStep] = useState(1);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
   const [showCustomExerciseForm, setShowCustomExerciseForm] = useState(false);
@@ -95,6 +99,8 @@ export default function TrainingPlanCreatorScreen() {
   const formikRef = React.useRef<any>(null);
 
   const createTrainingPlan = useCreateTrainingPlan();
+  const updateTrainingPlan = useUpdateTrainingPlan();
+  const { data: existingPlan, isLoading: isLoadingPlan } = useTrainingPlan(planId || '');
 
   // Sync formData with formik values when formData changes
   React.useEffect(() => {
@@ -110,22 +116,43 @@ export default function TrainingPlanCreatorScreen() {
     }
   }, [formData]);
 
-  const initialValues: TrainingPlanFormData = {
-    name: '',
-    description: '',
-    duration: 4,
-    daysPerWeek: 3,
-    goals: [],
-    difficulty: 'beginner',
-    equipment: [],
-    trainingDays: daysOfWeek.map(day => ({
-      day: day.key,
-      name: day.label,
-      exercises: [],
-      isRestDay: true,
-      notes: '',
-    })),
-  };
+  const initialValues = React.useMemo((): TrainingPlanFormData => {
+    if (isEditMode && existingPlan) {
+      return {
+        name: existingPlan.name || '',
+        description: existingPlan.description || '',
+        duration: existingPlan.duration || 4,
+        daysPerWeek: existingPlan.daysPerWeek || 3,
+        goals: existingPlan.goals || [],
+        difficulty: existingPlan.difficulty || 'beginner',
+        equipment: existingPlan.equipment || [],
+        trainingDays: existingPlan.trainingDays || daysOfWeek.map(day => ({
+          day: day.key,
+          name: day.label,
+          exercises: [],
+          isRestDay: true,
+          notes: '',
+        })),
+      };
+    }
+
+    return {
+      name: '',
+      description: '',
+      duration: 4,
+      daysPerWeek: 3,
+      goals: [],
+      difficulty: 'beginner',
+      equipment: [],
+      trainingDays: daysOfWeek.map(day => ({
+        day: day.key,
+        name: day.label,
+        exercises: [],
+        isRestDay: true,
+        notes: '',
+      })),
+    };
+  }, [isEditMode, existingPlan]);
 
   const goalOptions = [
     'Strength Building',
@@ -178,7 +205,8 @@ export default function TrainingPlanCreatorScreen() {
 
   const handleSubmit = async (values: TrainingPlanFormData) => {
     try {
-      console.log('🚀 Creating training plan with data:', {
+      console.log(`🚀 ${isEditMode ? 'Updating' : 'Creating'} training plan with data:`, {
+        planId: planId,
         name: values.name,
         duration: values.duration,
         daysPerWeek: values.daysPerWeek,
@@ -210,7 +238,7 @@ export default function TrainingPlanCreatorScreen() {
         targetLevel: values.difficulty,
         equipment: values.equipment,
         difficulty: values.difficulty,
-        status: trainingPlansStatus.active,
+        status: isEditMode ? (existingPlan?.status || trainingPlansStatus.active) : trainingPlansStatus.active,
         isTemplate: false,
         tags: [],
       };
@@ -219,32 +247,51 @@ export default function TrainingPlanCreatorScreen() {
       const planData = cleanFirebaseData(rawPlanData);
 
       console.log('💾 Saving to Firebase...');
-      const planId = await createTrainingPlan.mutateAsync(planData);
-      console.log('✅ Training plan created with ID:', planId);
 
-      Alert.alert(
-        'Success! 🎉',
-        `Your training plan "${values.name}" has been created successfully and saved to your account.`,
-        [
-          {
-            text: 'View Plans',
-            onPress: () => router.push('/(tabs)/training-plan-tab'),
-          },
-          {
-            text: 'Create Another',
-            onPress: () => {
-              // Reset form
-              setCurrentStep(1);
-              setFormData(null);
+      if (isEditMode && planId) {
+        // Update existing plan
+        await updateTrainingPlan.mutateAsync({ planId, updates: planData });
+        console.log('✅ Training plan updated with ID:', planId);
+
+        Alert.alert(
+          'Success! 🎉',
+          `Your training plan "${values.name}" has been updated successfully.`,
+          [
+            {
+              text: 'View Plans',
+              onPress: () => router.push('/training-plans'),
             },
-          },
-        ]
-      );
+          ]
+        );
+      } else {
+        // Create new plan
+        const newPlanId = await createTrainingPlan.mutateAsync(planData);
+        console.log('✅ Training plan created with ID:', newPlanId);
+
+        Alert.alert(
+          'Success! 🎉',
+          `Your training plan "${values.name}" has been created successfully and saved to your account.`,
+          [
+            {
+              text: 'View Plans',
+              onPress: () => router.push('/training-plans'),
+            },
+            {
+              text: 'Create Another',
+              onPress: () => {
+                // Reset form
+                setCurrentStep(1);
+                setFormData(null);
+              },
+            },
+          ]
+        );
+      }
     } catch (error) {
-      console.error('❌ Error creating training plan:', error);
+      console.error(`❌ Error ${isEditMode ? 'updating' : 'creating'} training plan:`, error);
       Alert.alert(
         'Error',
-        'Failed to create training plan. Please check your internet connection and try again.',
+        `Failed to ${isEditMode ? 'update' : 'create'} training plan. Please check your internet connection and try again.`,
         [{ text: 'OK' }]
       );
     }
@@ -902,6 +949,18 @@ export default function TrainingPlanCreatorScreen() {
     </View>
   );
 
+  // Show loading screen when loading existing plan in edit mode
+  if (isEditMode && isLoadingPlan) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading training plan...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -922,9 +981,9 @@ export default function TrainingPlanCreatorScreen() {
           </TouchableOpacity>
 
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>Create Training Plan</Text>
+            <Text style={styles.headerTitle}>{isEditMode ? 'Edit Training Plan' : 'Create Training Plan'}</Text>
             <Text style={styles.headerSubtitle}>
-              Design your perfect workout
+              {isEditMode ? 'Modify your training plan' : 'Design your perfect workout'}
             </Text>
           </View>
 
@@ -947,6 +1006,7 @@ export default function TrainingPlanCreatorScreen() {
         initialValues={initialValues}
         validationSchema={trainingPlanSchema}
         onSubmit={handleSubmit}
+        enableReinitialize={true}
       >
         {formik => {
           // Set formik reference for state synchronization
@@ -1036,11 +1096,11 @@ export default function TrainingPlanCreatorScreen() {
                     variant="primary"
                     loading={createTrainingPlan.isPending}
                     style={styles.navButton}
-                    disabled={createTrainingPlan.isPending}
+                    disabled={isEditMode ? updateTrainingPlan.isPending : createTrainingPlan.isPending}
                   >
-                    {createTrainingPlan.isPending
-                      ? 'Creating...'
-                      : 'Create Plan'}
+                    {(isEditMode ? updateTrainingPlan.isPending : createTrainingPlan.isPending)
+                      ? (isEditMode ? 'Updating...' : 'Creating...')
+                      : (isEditMode ? 'Update Plan' : 'Create Plan')}
                   </Button>
                 )}
               </View>
@@ -1501,5 +1561,16 @@ const styles = StyleSheet.create({
     color: Colors.gray[700],
     marginLeft: 8,
     marginBottom: 2,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.gray[50],
+  },
+  loadingText: {
+    fontSize: 16,
+    color: Colors.gray[600],
+    textAlign: 'center',
   },
 });

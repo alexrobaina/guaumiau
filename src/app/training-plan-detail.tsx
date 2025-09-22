@@ -17,6 +17,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { TrainingPlanService } from '@/lib/services/trainingPlanService';
 import { WorkoutSessionService } from '@/lib/services/workoutSessionService';
+import { useRepeatTrainingPlan } from '@/hooks/mutations/useTrainingPlanMutations';
 import { Button } from '@/components/atoms/Button';
 import { Colors } from '@/lib/colors';
 import { formatDistanceToNow, format, isToday, isYesterday } from 'date-fns';
@@ -299,33 +300,8 @@ export default function TrainingPlanDetail() {
     },
   });
 
-  // Mutation to restart a completed plan
-  const restartPlanMutation = useMutation({
-    mutationFn: async () => {
-      if (!trainingPlan || !planId || !user?.uid) {
-        throw new Error('Training plan, plan ID, and user are required');
-      }
-
-      console.log('🔄 Restarting training plan:', planId);
-      return await TrainingPlanService.restartTrainingPlan(planId, user.uid);
-    },
-    onSuccess: (restartedPlanId) => {
-      console.log('✅ Plan restarted successfully:', restartedPlanId);
-      // Invalidate and refetch the plan data
-      queryClient.invalidateQueries({ queryKey: ['training-plan', planId] });
-      queryClient.invalidateQueries({ queryKey: ['training-plans', user?.uid] });
-
-      Alert.alert(
-        'Plan Restarted!',
-        'Your training plan has been reset and is ready to start again. All your previous progress has been preserved.',
-        [{ text: 'OK' }]
-      );
-    },
-    onError: (error) => {
-      console.error('❌ Error restarting plan:', error);
-      Alert.alert('Error', error.message || 'Failed to restart training plan. Please try again.');
-    },
-  });
+  // Use the repeat training plan mutation
+  const repeatPlanMutation = useRepeatTrainingPlan();
 
   const handleActivatePlan = async () => {
     if (!trainingPlan || !planId) return;
@@ -351,18 +327,33 @@ export default function TrainingPlanDetail() {
     );
   };
 
-  const handleRestartPlan = async () => {
+  const handleRepeatPlan = async () => {
     if (!trainingPlan || !planId) return;
 
     Alert.alert(
-      'Restart Training Plan',
-      `Are you sure you want to restart "${trainingPlan.name}"? This will reset your progress and start the plan from the beginning.`,
+      'Repeat Training Plan',
+      `Are you sure you want to repeat "${trainingPlan.name}"? This will create a new active copy of this plan while keeping your completed progress intact.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Restart',
-          style: 'destructive',
-          onPress: () => restartPlanMutation.mutate(),
+          text: 'Repeat Plan',
+          style: 'default',
+          onPress: () => {
+            repeatPlanMutation.mutate(planId, {
+              onSuccess: (newPlanId) => {
+                Alert.alert(
+                  'Plan Repeated!',
+                  'A new copy of your training plan has been created and is now active. Your previous progress has been preserved.',
+                  [
+                    { text: 'OK', onPress: () => router.push(`/training-plan-detail?planId=${newPlanId}`) }
+                  ]
+                );
+              },
+              onError: (error) => {
+                Alert.alert('Error', error.message || 'Failed to repeat training plan. Please try again.');
+              }
+            });
+          },
         },
       ]
     );
@@ -948,15 +939,15 @@ export default function TrainingPlanDetail() {
               🎉 Congratulations! You've completed this training plan!
             </Text>
             <Button
-              onPress={handleRestartPlan}
+              onPress={handleRepeatPlan}
               variant="primary"
               size="lg"
-              style={[styles.actionButton, styles.restartButton]}
-              loading={restartPlanMutation.isPending}
+              style={[styles.actionButton, styles.repeatButton]}
+              loading={repeatPlanMutation.isPending}
             >
               <View style={styles.buttonContent}>
-                <Ionicons name="refresh-outline" size={20} color={Colors.white} />
-                <Text style={styles.buttonText}>Restart Plan</Text>
+                <Ionicons name="copy-outline" size={20} color={Colors.white} />
+                <Text style={styles.buttonText}>Repeat Plan</Text>
               </View>
             </Button>
           </View>
@@ -1387,7 +1378,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
   },
-  restartButton: {
+  repeatButton: {
     backgroundColor: Colors.primary[500],
   },
   // New styles for enhanced progress tab

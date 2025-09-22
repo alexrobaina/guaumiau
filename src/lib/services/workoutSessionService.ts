@@ -821,4 +821,36 @@ export class WorkoutSessionService {
       throw error;
     }
   }
+
+  // Get completed training days for a specific plan
+  static async getCompletedDays(planId: string, userId: string): Promise<DayOfWeek[]> {
+    try {
+      console.log('🔍 Getting completed days for plan:', planId);
+
+      const sessionsRef = this.getWorkoutSessionsCollection(userId);
+      const q = query(
+        sessionsRef,
+        where('planId', '==', planId),
+        where('status', '==', 'completed')
+      );
+
+      const snapshot = await getDocs(q);
+      const completedDays = new Set<DayOfWeek>();
+
+      snapshot.docs.forEach(doc => {
+        const session = doc.data() as WorkoutSession;
+        if (session.scheduledDay) {
+          completedDays.add(session.scheduledDay);
+        }
+      });
+
+      const completedDaysArray = Array.from(completedDays);
+      console.log('✅ Found completed days:', completedDaysArray);
+
+      return completedDaysArray;
+    } catch (error) {
+      console.error('❌ Error getting completed days:', error);
+      throw error;
+    }
+  }
 }

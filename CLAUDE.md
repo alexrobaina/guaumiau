@@ -4,8 +4,8 @@ After finishing your changes:
 2. Resolve the terminal problems
 3. Open the IOS simulator yo compile the project
 4. If have error try to fix
-5. When you finish, kill the port 8082.
-6. Every time I will run the app in 8081 to test. Please don't kill
+5. Don't kill the port 8081 the idea is you can debug etc...
+6. Don't make aleatory changes, just work in that i tell you in the prompt
 
 - use this architector for all components in the app: \
   Button/
@@ -128,3 +128,4 @@ Don't couple hooks to components - Keep them independent
   \
   Asegurate de que no rompes nada de lo anterior cuando creas algo nuevo y las redirecciones funcionen correctamente.
 - use the expo ncp to debug
+- don't add nothing in spanish in the app

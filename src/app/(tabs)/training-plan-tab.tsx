@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -15,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingPlans } from '@/hooks/queries/useTrainingPlans';
 import { useInitializeProgress } from '@/hooks/mutations/useInitializeProgress';
+import { useResetTrainingPlan, useDeleteTrainingPlan } from '@/hooks/mutations/useTrainingPlanMutations';
 import { Button } from '@/components/atoms/Button';
 import { Colors } from '@/lib/colors';
 import { formatDistanceToNow } from 'date-fns';
@@ -23,6 +25,8 @@ export const TrainingPlanTabScreen = () => {
   const { isAuthenticated } = useAuth();
   const { data: trainingPlans, isLoading, error } = useTrainingPlans();
   const initializeProgress = useInitializeProgress();
+  const resetPlanMutation = useResetTrainingPlan();
+  const deletePlanMutation = useDeleteTrainingPlan();
   const [selectedView, setSelectedView] = useState<'current' | 'history' | 'create'>('current');
 
   // Initialize progress data for plans that don't have it
@@ -35,6 +39,61 @@ export const TrainingPlanTabScreen = () => {
       }
     }
   }, [trainingPlans]);
+
+  // Handle edit plan (only if plan not started)
+  const handleEditPlan = (plan: any) => {
+    router.push(`/training-plan-creator?planId=${plan.id}`);
+  };
+
+  // Handle reset plan
+  const handleResetPlan = (plan: any) => {
+    Alert.alert(
+      'Reset Training Plan',
+      `Are you sure you want to reset "${plan.name}"? This will remove all your progress and start the plan from the beginning.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => {
+            resetPlanMutation.mutate(plan.id, {
+              onSuccess: () => {
+                Alert.alert('Success', 'Training plan has been reset successfully.');
+              },
+              onError: (error) => {
+                Alert.alert('Error', error.message || 'Failed to reset training plan. Please try again.');
+              }
+            });
+          },
+        },
+      ]
+    );
+  };
+
+  // Handle delete plan
+  const handleDeletePlan = (plan: any) => {
+    Alert.alert(
+      'Delete Training Plan',
+      `Are you sure you want to delete "${plan.name}"? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            deletePlanMutation.mutate(plan.id, {
+              onSuccess: () => {
+                Alert.alert('Success', 'Training plan has been deleted successfully.');
+              },
+              onError: (error) => {
+                Alert.alert('Error', error.message || 'Failed to delete training plan. Please try again.');
+              }
+            });
+          },
+        },
+      ]
+    );
+  };
 
   const ActionCard = ({
     icon,
@@ -79,67 +138,106 @@ export const TrainingPlanTabScreen = () => {
     const completionPercentage = plan.progress?.completionRate ||
       Math.round(totalDays > 0 ? (daysCompleted / totalDays) * 100 : 0);
 
+    // Determine if plan can be edited (only if draft or no progress)
+    const canEdit = plan.status === 'draft' || completionPercentage === 0;
+
     return (
-      <TouchableOpacity
-        style={styles.planCard}
-        onPress={() => router.push(`/training-plan-detail?planId=${plan.id}`)}
-        activeOpacity={0.7}
-      >
-        <View style={styles.planHeader}>
-          <View style={styles.planTitleContainer}>
-            <Text style={styles.planTitle}>{plan.name}</Text>
-            <Text style={styles.planSubtitle}>
-              {plan.duration} week plan • {plan.daysPerWeek} days/week
-            </Text>
-          </View>
-          <View style={[
-            styles.planStatus,
-            plan.status === 'active'
-              ? styles.planStatusActive
-              : plan.status === 'completed'
-              ? styles.planStatusCompleted
-              : styles.planStatusInactive
-          ]}>
-            <Text style={[
-              styles.planStatusText,
+      <View style={styles.planCard}>
+        <TouchableOpacity
+          style={styles.planMainContent}
+          onPress={() => router.push(`/training-plan-detail?planId=${plan.id}`)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.planHeader}>
+            <View style={styles.planTitleContainer}>
+              <Text style={styles.planTitle}>{plan.name}</Text>
+              <Text style={styles.planSubtitle}>
+                {plan.duration} week plan • {plan.daysPerWeek} days/week
+              </Text>
+            </View>
+            <View style={[
+              styles.planStatus,
               plan.status === 'active'
-                ? styles.planStatusTextActive
+                ? styles.planStatusActive
                 : plan.status === 'completed'
-                ? styles.planStatusTextCompleted
-                : styles.planStatusTextInactive
+                ? styles.planStatusCompleted
+                : styles.planStatusInactive
             ]}>
-              {plan.status === 'active' ? 'Active' :
-               plan.status === 'completed' ? 'Completed' :
-               plan.status === 'draft' ? 'Draft' : 'Paused'}
+              <Text style={[
+                styles.planStatusText,
+                plan.status === 'active'
+                  ? styles.planStatusTextActive
+                  : plan.status === 'completed'
+                  ? styles.planStatusTextActive
+                  : styles.planStatusTextInactive
+              ]}>
+                {plan.status === 'active' ? 'Active' :
+                 plan.status === 'completed' ? 'Completed' :
+                 plan.status === 'draft' ? 'Draft' : 'Paused'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.planProgress}>
+            <View style={styles.progressBar}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${completionPercentage}%` }
+                ]}
+              />
+            </View>
+            <Text style={styles.progressText}>
+              {completionPercentage}% complete
             </Text>
           </View>
-        </View>
 
-        <View style={styles.planProgress}>
-          <View style={styles.progressBar}>
-            <View
-              style={[
-                styles.progressFill,
-                { width: `${completionPercentage}%` }
-              ]}
-            />
+          <View style={styles.planFooter}>
+            <Text style={styles.planDate}>
+              Created {plan.createdAt && plan.createdAt.toDate
+                ? formatDistanceToNow(plan.createdAt.toDate()) + ' ago'
+                : 'Unknown'}
+            </Text>
+            <Text style={styles.planType}>
+              {plan.isTemplate ? 'Template' : 'Custom'}
+            </Text>
           </View>
-          <Text style={styles.progressText}>
-            {completionPercentage}% complete
-          </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.planFooter}>
-          <Text style={styles.planDate}>
-            Created {plan.createdAt && plan.createdAt.toDate
-              ? formatDistanceToNow(plan.createdAt.toDate()) + ' ago'
-              : 'Unknown'}
-          </Text>
-          <Text style={styles.planType}>
-            {plan.isTemplate ? 'Template' : 'Custom'}
-          </Text>
-        </View>
-      </TouchableOpacity>
+        {/* Action Buttons - Only show for current plans (active/draft) */}
+        {(plan.status === 'active' || plan.status === 'draft') && (
+          <View style={styles.planActions}>
+            {canEdit && (
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => handleEditPlan(plan)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="create-outline" size={18} color={Colors.primary[600]} />
+                <Text style={styles.actionButtonText}>Edit</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleResetPlan(plan)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="refresh-outline" size={18} color={Colors.warning} />
+              <Text style={[styles.actionButtonText, { color: Colors.warning }]}>Reset</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleDeletePlan(plan)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="trash-outline" size={18} color={Colors.error} />
+              <Text style={[styles.actionButtonText, { color: Colors.error }]}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     );
   };
 
@@ -502,13 +600,15 @@ const styles = StyleSheet.create({
   planCard: {
     backgroundColor: Colors.white,
     borderRadius: 12,
-    padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+  },
+  planMainContent: {
+    padding: 16,
   },
   planHeader: {
     flexDirection: 'row',
@@ -605,4 +705,33 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontStyle: 'italic',
   },
+  planActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.gray[50],
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.gray[100],
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.white,
+    gap: 6,
+    minWidth: 70,
+    justifyContent: 'center',
+  },
+  actionButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.primary[600],
+  },
 });
+
+export default TrainingPlanTabScreen;

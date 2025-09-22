@@ -79,6 +79,30 @@ export class TrainingPlanService {
   private static trainingPlansCollection = 'training_plans';
   private static customExercisesCollection = 'custom_exercises';
 
+  // Helper function to remove undefined values from objects
+  private static cleanFirebaseData(obj: any): any {
+    if (obj === null || obj === undefined) {
+      return null;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(this.cleanFirebaseData.bind(this));
+    }
+
+    if (typeof obj === 'object') {
+      const cleaned: any = {};
+      Object.keys(obj).forEach(key => {
+        const value = obj[key];
+        if (value !== undefined) {
+          cleaned[key] = this.cleanFirebaseData(value);
+        }
+      });
+      return cleaned;
+    }
+
+    return obj;
+  }
+
   // Training Plan CRUD Operations
   static async createTrainingPlan(planData: Omit<TrainingPlan, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     try {
@@ -89,7 +113,9 @@ export class TrainingPlanService {
         updatedAt: now,
       };
 
-      const docRef = await addDoc(collection(db, this.trainingPlansCollection), plan);
+      // Clean undefined values before sending to Firebase
+      const cleanPlan = this.cleanFirebaseData(plan);
+      const docRef = await addDoc(collection(db, this.trainingPlansCollection), cleanPlan);
       console.log('✅ Training plan created with ID:', docRef.id);
       return docRef.id;
     } catch (error) {
@@ -521,8 +547,6 @@ export class TrainingPlanService {
         name: newPlanName,
         status: 'active' as const,
         startDate: now,
-        endDate: undefined,
-        completedAt: undefined,
         progress: {
           completedDays: 0,
           totalDays: originalPlan.duration * originalPlan.daysPerWeek,
@@ -543,6 +567,8 @@ export class TrainingPlanService {
       delete (newPlan as any).id;
       delete (newPlan as any).createdAt;
       delete (newPlan as any).updatedAt;
+      delete (newPlan as any).endDate;
+      delete (newPlan as any).completedAt;
 
       const newPlanId = await this.createTrainingPlan(newPlan);
       console.log('✅ New cycle created with ID:', newPlanId);
@@ -584,6 +610,112 @@ export class TrainingPlanService {
     } catch (error) {
       console.error('❌ Error getting plan cycles:', error);
       return [];
+    }
+  }
+
+  // Repeat a completed training plan (create a new active copy)
+  static async repeatTrainingPlan(planId: string, userId: string): Promise<string> {
+    try {
+      console.log('🔄 Repeating training plan:', planId);
+
+      const originalPlan = await this.getTrainingPlan(planId);
+      if (!originalPlan) {
+        throw new Error('Training plan not found');
+      }
+
+      // Ensure user owns this plan
+      if (originalPlan.userId !== userId) {
+        throw new Error('Unauthorized to repeat this plan');
+      }
+
+      // Ensure the plan is completed
+      if (originalPlan.status !== 'completed') {
+        throw new Error('Only completed plans can be repeated');
+      }
+
+      const now = Timestamp.now();
+      const totalDays = originalPlan.duration * originalPlan.daysPerWeek;
+
+      // Create a new active copy of the plan
+      const newPlan = {
+        ...originalPlan,
+        name: `${originalPlan.name} (Repeated)`,
+        status: 'active' as const,
+        startDate: now,
+        progress: {
+          completedDays: 0,
+          totalDays,
+          completedWorkouts: [],
+          currentWeek: 1,
+          streakDays: 0,
+          totalVolume: 0,
+          totalExercises: 0,
+          completionRate: 0
+        } as TrainingPlanProgress,
+        isTemplate: false
+      };
+
+      // Remove fields that shouldn't be copied
+      delete (newPlan as any).id;
+      delete (newPlan as any).createdAt;
+      delete (newPlan as any).updatedAt;
+      delete (newPlan as any).endDate;
+      delete (newPlan as any).completedAt;
+
+      // Clean undefined values from the plan data
+      const cleanedPlan = this.cleanFirebaseData(newPlan);
+
+      const newPlanId = await this.createTrainingPlan(cleanedPlan);
+      console.log('✅ Training plan repeated with new ID:', newPlanId);
+      return newPlanId;
+    } catch (error) {
+      console.error('❌ Error repeating training plan:', error);
+      throw error;
+    }
+  }
+
+  // Reset a training plan's progress to start over
+  static async resetTrainingPlan(planId: string, userId: string): Promise<void> {
+    try {
+      console.log('🔄 Resetting training plan:', planId);
+
+      const plan = await this.getTrainingPlan(planId);
+      if (!plan) {
+        throw new Error('Training plan not found');
+      }
+
+      // Ensure user owns this plan
+      if (plan.userId !== userId) {
+        throw new Error('Unauthorized to reset this plan');
+      }
+
+      const now = Timestamp.now();
+      const totalDays = plan.duration * plan.daysPerWeek;
+
+      // Reset the plan progress
+      const resetProgress: TrainingPlanProgress = {
+        completedDays: 0,
+        totalDays,
+        completedWorkouts: [],
+        currentWeek: 1,
+        streakDays: 0,
+        totalVolume: 0,
+        totalExercises: 0,
+        completionRate: 0
+      };
+
+      // Update the plan with reset progress and active status
+      await this.updateTrainingPlan(planId, {
+        status: 'active',
+        startDate: now,
+        progress: resetProgress,
+        updatedAt: now
+      });
+
+      console.log('✅ Training plan reset successfully:', planId);
+    } catch (error) {
+      console.error('❌ Error resetting training plan:', error);
+      throw error;
     }
   }
 }
