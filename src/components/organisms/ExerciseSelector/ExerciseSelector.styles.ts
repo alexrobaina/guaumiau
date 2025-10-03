@@ -106,6 +106,14 @@ export const makeStyles = () => StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: Colors.gray[200],
+    overflow: 'hidden',
+  },
+  exerciseImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    marginBottom: 12,
+    backgroundColor: Colors.gray[100],
   },
   exerciseHeader: {
     flexDirection: 'row',

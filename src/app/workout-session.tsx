@@ -9,6 +9,7 @@ import {
   Alert,
   TextInput,
   Modal,
+  Image,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -24,6 +25,7 @@ import { WorkoutSession, ExerciseSession, DayOfWeek } from '@/types/workout';
 import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
 import { Timestamp } from 'firebase/firestore';
+import { exerciseDatabase } from '@/lib/data/exerciseDatabase';
 
 type WorkoutPhase = 'pre-workout' | 'exercise' | 'rest' | 'complete';
 
@@ -277,6 +279,19 @@ export default function WorkoutSessionScreen() {
     return currentExercises[currentExerciseIndex];
   };
 
+  const getExerciseImage = (exerciseId: string): string | number | null => {
+    // Search through all categories and subcategories for the exercise
+    for (const category of Object.values(exerciseDatabase.exerciseCategories)) {
+      for (const subcategory of Object.values(category.subcategories)) {
+        const exercise = subcategory.exercises.find(ex => ex.id === exerciseId);
+        if (exercise && exercise.image) {
+          return exercise.image;
+        }
+      }
+    }
+    return null;
+  };
+
   const completeSet = async (reps: number) => {
     const currentExercise = getCurrentExercise();
     if (!currentExercise) return;
@@ -415,7 +430,9 @@ export default function WorkoutSessionScreen() {
       return (
         <View style={styles.content}>
           <View style={styles.preWorkoutCard}>
-            <Text style={styles.preWorkoutTitle}>Unable to load training days</Text>
+            <Text style={styles.preWorkoutTitle}>
+              Unable to load training days
+            </Text>
             <Text style={styles.workoutDate}>
               This training plan has invalid data. Please contact support.
             </Text>
@@ -436,9 +453,11 @@ export default function WorkoutSessionScreen() {
       new Set(currentExercises.map(ex => ex.exerciseCategory))
     );
 
-    const availableDays = trainingPlan?.trainingDays?.filter?.(
-      day => day && !day.isRestDay && day.exercises && day.exercises.length > 0
-    ) || [];
+    const availableDays =
+      trainingPlan?.trainingDays?.filter?.(
+        day =>
+          day && !day.isRestDay && day.exercises && day.exercises.length > 0
+      ) || [];
 
     const dayNames = {
       monday: 'Monday',
@@ -606,6 +625,8 @@ export default function WorkoutSessionScreen() {
       set => set.completed
     ).length;
 
+    const exerciseImage = getExerciseImage(currentExercise.exerciseId);
+
     return (
       <ScrollView style={styles.content}>
         <View style={styles.exerciseHeader}>
@@ -625,6 +646,18 @@ export default function WorkoutSessionScreen() {
         </View>
 
         <View style={styles.exerciseCard}>
+          {exerciseImage && (
+            <Image
+              source={
+                typeof exerciseImage === 'number'
+                  ? exerciseImage
+                  : { uri: exerciseImage }
+              }
+              style={styles.exerciseImage}
+              resizeMode="contain"
+            />
+          )}
+
           <Text style={styles.exerciseTitle}>
             {currentExercise.exerciseName}
           </Text>
@@ -1329,6 +1362,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 24,
+    overflow: 'hidden',
+  },
+  exerciseImage: {
+    width: '100%',
+    height: 280,
+    marginBottom: 20,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
   },
   exerciseTitle: {
     fontSize: 24,

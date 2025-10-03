@@ -6,6 +6,7 @@ import {
   ScrollView,
   TextInput,
   FlatList,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { exerciseDatabase, Exercise } from '@/lib/data/exerciseDatabase';
@@ -127,6 +128,14 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
 
     return (
       <View style={styles.exerciseCard}>
+        {exercise.image && (
+          <Image
+            source={typeof exercise.image === 'number' ? exercise.image : { uri: exercise.image }}
+            style={styles.exerciseImage}
+            resizeMode="cover"
+          />
+        )}
+
         <View style={styles.exerciseHeader}>
           <View style={styles.exerciseInfo}>
             <Text style={styles.exerciseName}>{exercise.name}</Text>
