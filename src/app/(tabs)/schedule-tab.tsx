@@ -17,6 +17,7 @@ import { WorkoutDetailModal } from '@/components/organisms/WorkoutDetailModal';
 import { makeStyles } from './schedule-tab.styles';
 
 export const ScheduleTabScreen: React.FC = () => {
+  console.log('📅 ScheduleTabScreen component mounted');
   const { user } = useAuth();
   const { data: workoutSessions, isLoading } = useWorkoutSessions();
   const { data: trainingPlans } = useTrainingPlans();
@@ -25,19 +26,31 @@ export const ScheduleTabScreen: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const styles = makeStyles();
 
+  console.log('📅 Schedule data:', {
+    hasUser: !!user,
+    workoutSessionsCount: workoutSessions?.length || 0,
+    isLoading,
+    trainingPlansCount: trainingPlans?.length || 0
+  });
+
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   // Get the most recently created active plan if multiple exist
   const activePlan = trainingPlans?.filter(plan => plan.status === 'active')
-    .sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis())[0];
+    .sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    })[0];
 
   // Get workout sessions for each day
   const getWorkoutForDay = (day: Date): WorkoutSession | undefined => {
-    return workoutSessions?.find(session =>
-      isSameDay(session.actualDate.toDate(), day) && session.status === 'completed'
-    );
+    return workoutSessions?.find(session => {
+      if (!session.actualDate || !session.actualDate.toDate) return false;
+      return isSameDay(session.actualDate.toDate(), day) && session.status === 'completed';
+    });
   };
 
   const handleWorkoutPress = (workout: WorkoutSession) => {
@@ -83,7 +96,11 @@ export const ScheduleTabScreen: React.FC = () => {
 
   const renderWorkoutHistory = () => {
     const completedWorkouts = workoutSessions?.filter(session => session.status === 'completed')
-      .sort((a, b) => b.actualDate.toMillis() - a.actualDate.toMillis())
+      .sort((a, b) => {
+        const aTime = a.actualDate?.toMillis?.() || 0;
+        const bTime = b.actualDate?.toMillis?.() || 0;
+        return bTime - aTime;
+      })
       .slice(0, 10) || [];
 
     return (
@@ -97,7 +114,7 @@ export const ScheduleTabScreen: React.FC = () => {
           >
             <View style={styles.workoutHistoryHeader}>
               <Text style={styles.workoutHistoryDate}>
-                {format(workout.actualDate.toDate(), 'MMM d, yyyy')}
+                {workout.actualDate?.toDate ? format(workout.actualDate.toDate(), 'MMM d, yyyy') : 'Unknown date'}
               </Text>
               <View style={styles.workoutHistoryStats}>
                 <Text style={styles.workoutHistoryStat}>

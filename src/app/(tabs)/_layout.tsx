@@ -9,12 +9,14 @@ export default function TabLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const renderContent = () => {
+    console.log('🎯 Rendering content for tab:', activeTab);
     switch (activeTab) {
       case 'user':
         return <UserTabScreen />;
       case 'training-plan':
         return <TrainingPlanTabScreen />;
       case 'schedule':
+        console.log('📅 Rendering ScheduleTabScreen');
         return <ScheduleTabScreen />;
       default:
         return <UserTabScreen />;

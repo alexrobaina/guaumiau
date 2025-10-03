@@ -89,6 +89,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const styles = makeStyles();
 
   const handleTabSelect = (tabId: 'user' | 'training-plan' | 'schedule') => {
+    console.log('📱 Sidebar tab selected:', tabId);
     onTabChange(tabId);
     onToggle(); // Close sidebar after selection
   };
