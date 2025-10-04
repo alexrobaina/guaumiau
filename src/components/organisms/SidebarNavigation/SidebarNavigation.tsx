@@ -96,19 +96,6 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Menu Button */}
-      <TouchableOpacity
-        style={styles.menuButton}
-        onPress={onToggle}
-        activeOpacity={0.8}
-      >
-        <Ionicons
-          name={isOpen ? 'close' : 'menu'}
-          size={24}
-          color={Colors.gray[700]}
-        />
-      </TouchableOpacity>
-
       {/* Overlay */}
       {isOpen && (
         <TouchableWithoutFeedback onPress={onToggle}>

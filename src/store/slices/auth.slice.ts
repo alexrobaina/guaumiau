@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthUser, AuthService } from '@/lib/firebase/auth';
 import { auth } from '@/lib/firebase/config';
 import { RootState } from '../types';
+import { queryClient } from '@/lib/query/queryClient';
 
 export interface AuthSlice {
   user: AuthUser | null;
@@ -67,7 +68,11 @@ export const createAuthSlice: StateCreator<
     try {
       const user = await AuthService.login({ email, password });
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      
+
+      // 🔧 Invalidate React Query cache to force refetch of user profile
+      console.log('🔄 Invalidating React Query cache after login...');
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
+
       set((state) => {
         state.user = user;
         state.isAuthenticated = true;
@@ -92,7 +97,11 @@ export const createAuthSlice: StateCreator<
     try {
       const user = await AuthService.register({ email, password, name });
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      
+
+      // 🔧 Invalidate React Query cache to force refetch of user profile
+      console.log('🔄 Invalidating React Query cache after registration...');
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
+
       set((state) => {
         state.user = user;
         state.isAuthenticated = true;
@@ -117,7 +126,11 @@ export const createAuthSlice: StateCreator<
     try {
       const user = await AuthService.signInWithGoogle();
       await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-      
+
+      // 🔧 Invalidate React Query cache to force refetch of user profile
+      console.log('🔄 Invalidating React Query cache after Google login...');
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
+
       set((state) => {
         state.user = user;
         state.isAuthenticated = true;
@@ -142,7 +155,11 @@ export const createAuthSlice: StateCreator<
     try {
       await AuthService.logout();
       await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-      
+
+      // 🔧 Clear React Query cache on logout
+      console.log('🗑️ Clearing React Query cache after logout...');
+      queryClient.clear();
+
       set((state) => {
         state.user = null;
         state.isAuthenticated = false;

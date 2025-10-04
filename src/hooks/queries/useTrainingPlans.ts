@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { TrainingPlanService } from '@/lib/services/trainingPlanService';
+import { AuthService } from '@/lib/firebase/auth';
 import { useAuth } from '../useAuth';
 
 export const useTrainingPlans = () => {
@@ -41,5 +42,54 @@ export const useTrainingPlans = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 10, // 10 minutes
     retry: 2,
+  });
+};
+
+export const useTrainingPlanTemplates = () => {
+  const currentUser = AuthService.getCurrentUser();
+
+  return useQuery({
+    queryKey: ['training-plan-templates', currentUser?.uid],
+    queryFn: async () => {
+      try {
+        console.log('🔍 Fetching training plan templates');
+
+        // Fetch both user's templates and shared templates
+        const [userTemplates, sharedTemplates] = await Promise.all([
+          TrainingPlanService.getTrainingPlanTemplates(),
+          currentUser?.uid
+            ? TrainingPlanService.getSharedTemplates(currentUser.uid)
+            : Promise.resolve([])
+        ]);
+
+        // Combine and deduplicate templates
+        const allTemplates = [...userTemplates, ...sharedTemplates];
+        const uniqueTemplates = allTemplates.filter(
+          (template, index, self) =>
+            index === self.findIndex(t => t.id === template.id)
+        );
+
+        console.log('📚 Templates data:', {
+          userTemplates: userTemplates?.length || 0,
+          sharedTemplates: sharedTemplates?.length || 0,
+          total: uniqueTemplates?.length || 0,
+          templates: uniqueTemplates?.map(template => ({
+            id: template.id,
+            name: template.name,
+            difficulty: template.difficulty,
+            isShared: template.sharedWith?.includes(currentUser?.uid || '') || false,
+          })),
+        });
+
+        return uniqueTemplates || [];
+      } catch (error) {
+        console.error('❌ Error fetching templates:', error);
+        throw error;
+      }
+    },
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 20, // 20 minutes
+    retry: 2,
+    enabled: !!currentUser?.uid,
   });
 };

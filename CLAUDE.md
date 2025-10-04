@@ -130,3 +130,4 @@ Don't couple hooks to components - Keep them independent
 - use the expo ncp to debug
 - don't add nothing in spanish in the app
 - Run the app on port 9082 in the background and read the logs. If you detect an error, fix it. (Dont kill the port)
+- Check the console every time and fix the erros

@@ -40,6 +40,21 @@ export const useUpdateTrainingPlan = () => {
   });
 };
 
+export const useArchiveTrainingPlan = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (planId: string) => TrainingPlanService.archiveTrainingPlan(planId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['training-plans'] });
+      console.log('✅ Training plan archived successfully');
+    },
+    onError: (error) => {
+      console.error('❌ Failed to archive training plan:', error);
+    },
+  });
+};
+
 export const useDeleteTrainingPlan = () => {
   const queryClient = useQueryClient();
 

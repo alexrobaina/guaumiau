@@ -3,7 +3,15 @@ import { Colors } from '@/lib/colors';
 
 export const makeStyles = () => {
   return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: Colors.gray[50],
+    },
     container: {
+      flex: 1,
+      backgroundColor: Colors.gray[50],
+    },
+    content: {
       flex: 1,
       backgroundColor: Colors.gray[50],
     },
@@ -20,44 +28,54 @@ export const makeStyles = () => {
       fontWeight: '500',
     },
     header: {
-      padding: 20,
-      paddingBottom: 16,
-      backgroundColor: Colors.white,
-      borderBottomWidth: 1,
-      borderBottomColor: Colors.gray[200],
+      paddingBottom: 24,
     },
-    title: {
-      fontSize: 28,
+    headerTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingTop: 12,
+      marginBottom: 12,
+      gap: 12,
+    },
+    menuButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerContent: {
+      flex: 1,
+    },
+    headerTitle: {
+      fontSize: 20,
       fontWeight: 'bold',
-      color: Colors.gray[900],
-      marginBottom: 4,
+      color: Colors.white,
+      marginBottom: 2,
     },
-    subtitle: {
-      fontSize: 16,
-      color: Colors.gray[600],
-      fontWeight: '500',
-    },
-    planName: {
+    headerSubtitle: {
       fontSize: 14,
-      color: Colors.primary[600],
-      fontWeight: '600',
-      marginTop: 4,
+      color: Colors.white,
+      opacity: 0.9,
     },
     monthNavigation: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginTop: 12,
+      paddingHorizontal: 24,
+      paddingBottom: 16,
     },
     monthNavButton: {
       padding: 8,
       borderRadius: 8,
-      backgroundColor: Colors.gray[100],
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
     monthTitle: {
       fontSize: 18,
       fontWeight: '600',
-      color: Colors.gray[900],
+      color: Colors.white,
     },
     calendarSection: {
       backgroundColor: Colors.white,

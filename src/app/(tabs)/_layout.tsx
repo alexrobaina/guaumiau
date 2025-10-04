@@ -12,14 +12,14 @@ export default function TabLayout() {
     console.log('🎯 Rendering content for tab:', activeTab);
     switch (activeTab) {
       case 'user':
-        return <UserTabScreen />;
+        return <UserTabScreen onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />;
       case 'training-plan':
-        return <TrainingPlanTabScreen />;
+        return <TrainingPlanTabScreen onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />;
       case 'schedule':
         console.log('📅 Rendering ScheduleTabScreen');
-        return <ScheduleTabScreen />;
+        return <ScheduleTabScreen onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />;
       default:
-        return <UserTabScreen />;
+        return <UserTabScreen onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />;
     }
   };
 

@@ -54,6 +54,7 @@ export interface TrainingPlan {
   targetLevel: string;
   equipment: string[];
   status: 'draft' | 'active' | 'completed' | 'paused';
+  isArchived: boolean;
   createdAt: Timestamp;
   updatedAt: Timestamp;
   startDate?: Timestamp;
@@ -62,8 +63,10 @@ export interface TrainingPlan {
   isTemplate: boolean;
   templateCategory?: string;
   createdBy?: string;
+  createdByName?: string; // Name of the user who created the template
   tags?: string[];
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'elite';
+  sharedWith?: string[]; // Array of user IDs who have access to this template
   // Progress tracking fields
   progress?: TrainingPlanProgress;
 }
@@ -109,6 +112,7 @@ export class TrainingPlanService {
       const now = Timestamp.now();
       const plan: Omit<TrainingPlan, 'id'> = {
         ...planData,
+        isArchived: false, // Default to not archived
         createdAt: now,
         updatedAt: now,
       };
@@ -149,6 +153,7 @@ export class TrainingPlanService {
       let q = query(
         collection(db, this.trainingPlansCollection),
         where('userId', '==', userId),
+        where('isArchived', '==', false),
         orderBy('updatedAt', 'desc')
       );
 
@@ -160,7 +165,8 @@ export class TrainingPlanService {
         // If orderBy fails (likely due to missing index), try without it
         q = query(
           collection(db, this.trainingPlansCollection),
-          where('userId', '==', userId)
+          where('userId', '==', userId),
+          where('isArchived', '==', false)
         );
         querySnapshot = await getDocs(q);
       }
@@ -169,7 +175,7 @@ export class TrainingPlanService {
 
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        console.log('📄 Found training plan document:', { id: doc.id, name: data.name, status: data.status });
+        console.log('📄 Found training plan document:', { id: doc.id, name: data.name, status: data.status, isArchived: data.isArchived });
         plans.push({ id: doc.id, ...data } as TrainingPlan);
       });
 
@@ -206,6 +212,20 @@ export class TrainingPlanService {
     }
   }
 
+  static async archiveTrainingPlan(planId: string): Promise<void> {
+    try {
+      const docRef = doc(db, this.trainingPlansCollection, planId);
+      await updateDoc(docRef, {
+        isArchived: true,
+        updatedAt: Timestamp.now(),
+      });
+      console.log('✅ Training plan archived:', planId);
+    } catch (error) {
+      console.error('❌ Error archiving training plan:', error);
+      throw error;
+    }
+  }
+
   static async deleteTrainingPlan(planId: string): Promise<void> {
     try {
       const docRef = doc(db, this.trainingPlansCollection, planId);
@@ -219,23 +239,104 @@ export class TrainingPlanService {
 
   static async getTrainingPlanTemplates(): Promise<TrainingPlan[]> {
     try {
+      console.log('🔍 Fetching training plan templates');
+
+      // Query only for templates (without orderBy to avoid composite index requirement)
       const q = query(
         collection(db, this.trainingPlansCollection),
-        where('isTemplate', '==', true),
-        orderBy('createdAt', 'desc')
+        where('isTemplate', '==', true)
       );
 
       const querySnapshot = await getDocs(q);
-      const templates: TrainingPlan[] = [];
 
+      const templates: TrainingPlan[] = [];
       querySnapshot.forEach((doc) => {
         templates.push({ id: doc.id, ...doc.data() } as TrainingPlan);
       });
 
-      console.log('✅ Retrieved training plan templates:', templates.length);
+      // Sort by createdAt in JavaScript
+      templates.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() || 0;
+        const bTime = b.createdAt?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
+
+      console.log('✅ Retrieved training plan templates:', {
+        templates: templates.length,
+        templateNames: templates.map(t => t.name)
+      });
       return templates;
     } catch (error) {
       console.error('❌ Error getting training plan templates:', error);
+      throw error;
+    }
+  }
+
+  // Get templates shared with a specific user
+  static async getSharedTemplates(userId: string): Promise<TrainingPlan[]> {
+    try {
+      console.log('🔍 Fetching shared templates for user:', userId);
+
+      // Query templates where the user is in the sharedWith array
+      const q = query(
+        collection(db, this.trainingPlansCollection),
+        where('isTemplate', '==', true),
+        where('sharedWith', 'array-contains', userId)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      const templates: TrainingPlan[] = [];
+      querySnapshot.forEach((doc) => {
+        templates.push({ id: doc.id, ...doc.data() } as TrainingPlan);
+      });
+
+      // Sort by createdAt in JavaScript
+      templates.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() || 0;
+        const bTime = b.createdAt?.toMillis?.() || 0;
+        return bTime - aTime;
+      });
+
+      console.log('✅ Retrieved shared templates:', templates.length);
+      return templates;
+    } catch (error) {
+      console.error('❌ Error getting shared templates:', error);
+      throw error;
+    }
+  }
+
+  // Add a user to the sharedWith array of a template
+  static async addUserToSharedTemplate(templateId: string, userId: string): Promise<void> {
+    try {
+      console.log('👥 Adding user to shared template:', { templateId, userId });
+
+      const template = await this.getTrainingPlan(templateId);
+      if (!template) {
+        throw new Error('Template not found');
+      }
+
+      if (!template.isTemplate) {
+        throw new Error('This is not a template');
+      }
+
+      // Check if user is already in sharedWith array
+      const sharedWith = template.sharedWith || [];
+      if (sharedWith.includes(userId)) {
+        console.log('ℹ️ User already has access to this template');
+        return;
+      }
+
+      // Add user to sharedWith array
+      const docRef = doc(db, this.trainingPlansCollection, templateId);
+      await updateDoc(docRef, {
+        sharedWith: [...sharedWith, userId],
+        updatedAt: Timestamp.now(),
+      });
+
+      console.log('✅ User added to shared template successfully');
+    } catch (error) {
+      console.error('❌ Error adding user to shared template:', error);
       throw error;
     }
   }
@@ -262,10 +363,10 @@ export class TrainingPlanService {
 
   static async getUserCustomExercises(userId: string): Promise<CustomExercise[]> {
     try {
+      // Query without orderBy to avoid composite index requirement
       const q = query(
         collection(db, this.customExercisesCollection),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', userId)
       );
 
       const querySnapshot = await getDocs(q);
@@ -273,6 +374,13 @@ export class TrainingPlanService {
 
       querySnapshot.forEach((doc) => {
         exercises.push({ id: doc.id, ...doc.data() } as CustomExercise);
+      });
+
+      // Sort in JavaScript instead of Firestore
+      exercises.sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() || 0;
+        const bTime = b.createdAt?.toMillis?.() || 0;
+        return bTime - aTime; // desc
       });
 
       console.log('✅ Retrieved custom exercises for user:', userId, exercises.length);
@@ -324,6 +432,7 @@ export class TrainingPlanService {
         name: newName || `${originalPlan.name} (Copy)`,
         status: 'draft' as const,
         isTemplate: false,
+        isArchived: false,
       };
 
       // Remove the original ID and timestamps
@@ -334,6 +443,60 @@ export class TrainingPlanService {
       return await this.createTrainingPlan(duplicatedPlan);
     } catch (error) {
       console.error('❌ Error duplicating training plan:', error);
+      throw error;
+    }
+  }
+
+  // Create a new training plan from a template
+  static async createPlanFromTemplate(templateId: string, userId: string, customName?: string): Promise<string> {
+    try {
+      console.log('📋 Creating training plan from template:', templateId);
+
+      const template = await this.getTrainingPlan(templateId);
+      if (!template) {
+        throw new Error('Template not found');
+      }
+
+      if (!template.isTemplate) {
+        throw new Error('This is not a template');
+      }
+
+      const now = Timestamp.now();
+      const totalDays = template.duration * template.daysPerWeek;
+
+      // Create new plan from template with user's data
+      const newPlan = {
+        ...template,
+        userId,
+        name: customName || template.name,
+        status: 'draft' as const,
+        isTemplate: false,
+        isArchived: false,
+        startDate: undefined,
+        endDate: undefined,
+        completedAt: undefined,
+        progress: {
+          completedDays: 0,
+          totalDays,
+          completedWorkouts: [],
+          currentWeek: 1,
+          streakDays: 0,
+          totalVolume: 0,
+          totalExercises: 0,
+          completionRate: 0
+        } as TrainingPlanProgress,
+      };
+
+      // Remove the original template ID and timestamps
+      delete (newPlan as any).id;
+      delete (newPlan as any).createdAt;
+      delete (newPlan as any).updatedAt;
+
+      const newPlanId = await this.createTrainingPlan(newPlan);
+      console.log('✅ Training plan created from template:', newPlanId);
+      return newPlanId;
+    } catch (error) {
+      console.error('❌ Error creating plan from template:', error);
       throw error;
     }
   }
@@ -560,7 +723,8 @@ export class TrainingPlanService {
         // Add cycle metadata
         originalPlanId: planId,
         cycleNumber,
-        isTemplate: false
+        isTemplate: false,
+        isArchived: false
       };
 
       // Remove fields that shouldn't be copied
@@ -652,7 +816,8 @@ export class TrainingPlanService {
           totalExercises: 0,
           completionRate: 0
         } as TrainingPlanProgress,
-        isTemplate: false
+        isTemplate: false,
+        isArchived: false
       };
 
       // Remove fields that shouldn't be copied

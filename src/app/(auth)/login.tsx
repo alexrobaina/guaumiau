@@ -25,8 +25,8 @@ import { useStore } from '@/store';
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('alexrobainaph@gmail.com');
-  const [password, setPassword] = useState('salsamora3000');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 

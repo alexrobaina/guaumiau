@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		1A57178A99268E80B995403D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78AC4944879AE252DE44DE26 /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		B638CE2830FD3519404BE727 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A88C88F4A7F84504008EED36 /* PrivacyInfo.xcprivacy */; };
+		7F3F4569FC94E439B9871CD3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D25DB5205F0E46319A687BD9 /* PrivacyInfo.xcprivacy */; };
+		80735F2639ACCE301D0F5F86 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CBDD0F77611F7D001F7D1CF /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		CD3A09DA70BC8868DD67A3AA /* libPods-CruxClimb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40375521C9442BDD3EDE1A00 /* libPods-CruxClimb.a */; };
+		D37A843849C003A91FAFC1E5 /* libPods-CruxClimb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A731995C59EAE2372C8361C8 /* libPods-CruxClimb.a */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -20,13 +20,13 @@
 		13B07F961A680F5B00A75B9A /* CruxClimb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CruxClimb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = CruxClimb/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CruxClimb/Info.plist; sourceTree = "<group>"; };
-		40375521C9442BDD3EDE1A00 /* libPods-CruxClimb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CruxClimb.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6BBDC57E6487883541B63771 /* Pods-CruxClimb.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CruxClimb.debug.xcconfig"; path = "Target Support Files/Pods-CruxClimb/Pods-CruxClimb.debug.xcconfig"; sourceTree = "<group>"; };
-		78AC4944879AE252DE44DE26 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-CruxClimb/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		A88C88F4A7F84504008EED36 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = CruxClimb/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1CBDD0F77611F7D001F7D1CF /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-CruxClimb/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		5D74A6C6550B1965F6E96793 /* Pods-CruxClimb.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CruxClimb.release.xcconfig"; path = "Target Support Files/Pods-CruxClimb/Pods-CruxClimb.release.xcconfig"; sourceTree = "<group>"; };
+		74D96B510B4A774575BA789F /* Pods-CruxClimb.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CruxClimb.debug.xcconfig"; path = "Target Support Files/Pods-CruxClimb/Pods-CruxClimb.debug.xcconfig"; sourceTree = "<group>"; };
+		A731995C59EAE2372C8361C8 /* libPods-CruxClimb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CruxClimb.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = CruxClimb/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B7CA07E0FC5F6B1FB2A51562 /* Pods-CruxClimb.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CruxClimb.release.xcconfig"; path = "Target Support Files/Pods-CruxClimb/Pods-CruxClimb.release.xcconfig"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		D25DB5205F0E46319A687BD9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = CruxClimb/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CruxClimb/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* CruxClimb-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CruxClimb-Bridging-Header.h"; path = "CruxClimb/CruxClimb-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CD3A09DA70BC8868DD67A3AA /* libPods-CruxClimb.a in Frameworks */,
+				D37A843849C003A91FAFC1E5 /* libPods-CruxClimb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,7 +53,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				A88C88F4A7F84504008EED36 /* PrivacyInfo.xcprivacy */,
+				D25DB5205F0E46319A687BD9 /* PrivacyInfo.xcprivacy */,
 			);
 			name = CruxClimb;
 			sourceTree = "<group>";
@@ -62,7 +62,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				40375521C9442BDD3EDE1A00 /* libPods-CruxClimb.a */,
+				A731995C59EAE2372C8361C8 /* libPods-CruxClimb.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -81,8 +81,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				A6E85A6A6D353CEA6746F655 /* Pods */,
-				BB7EDF2E90DDF72256E9C583 /* ExpoModulesProviders */,
+				88989F3A3E54AE7936C8FEC7 /* Pods */,
+				96B59957E50ECC2E34949D18 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -97,22 +97,30 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		97F16D6749CD086740928F02 /* CruxClimb */ = {
+		88989F3A3E54AE7936C8FEC7 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				78AC4944879AE252DE44DE26 /* ExpoModulesProvider.swift */,
-			);
-			name = CruxClimb;
-			sourceTree = "<group>";
-		};
-		A6E85A6A6D353CEA6746F655 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				6BBDC57E6487883541B63771 /* Pods-CruxClimb.debug.xcconfig */,
-				B7CA07E0FC5F6B1FB2A51562 /* Pods-CruxClimb.release.xcconfig */,
+				74D96B510B4A774575BA789F /* Pods-CruxClimb.debug.xcconfig */,
+				5D74A6C6550B1965F6E96793 /* Pods-CruxClimb.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		96B59957E50ECC2E34949D18 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				B370F2E6A8017C63FF3C95FD /* CruxClimb */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		B370F2E6A8017C63FF3C95FD /* CruxClimb */ = {
+			isa = PBXGroup;
+			children = (
+				1CBDD0F77611F7D001F7D1CF /* ExpoModulesProvider.swift */,
+			);
+			name = CruxClimb;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -124,14 +132,6 @@
 			path = CruxClimb/Supporting;
 			sourceTree = "<group>";
 		};
-		BB7EDF2E90DDF72256E9C583 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				97F16D6749CD086740928F02 /* CruxClimb */,
-			);
-			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -140,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "CruxClimb" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				5F1699A5F422B4A2834CC76D /* [Expo] Configure project */,
+				ACD1F949E5C8C9C4D6281030 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				9020F12E93DC86855618ED15 /* [CP] Embed Pods Frameworks */,
+				9AE75A89B6AB929B80FF6700 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -196,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				B638CE2830FD3519404BE727 /* PrivacyInfo.xcprivacy in Resources */,
+				7F3F4569FC94E439B9871CD3 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,25 +240,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5F1699A5F422B4A2834CC76D /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-CruxClimb/expo-configure-project.sh\"\n";
-		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -299,7 +280,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CruxClimb/Pods-CruxClimb-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9020F12E93DC86855618ED15 /* [CP] Embed Pods Frameworks */ = {
+		9AE75A89B6AB929B80FF6700 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -317,6 +298,25 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CruxClimb/Pods-CruxClimb-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		ACD1F949E5C8C9C4D6281030 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-CruxClimb/expo-configure-project.sh\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -325,7 +325,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				1A57178A99268E80B995403D /* ExpoModulesProvider.swift in Sources */,
+				80735F2639ACCE301D0F5F86 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,7 +334,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6BBDC57E6487883541B63771 /* Pods-CruxClimb.debug.xcconfig */;
+			baseConfigurationReference = 74D96B510B4A774575BA789F /* Pods-CruxClimb.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -370,7 +370,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B7CA07E0FC5F6B1FB2A51562 /* Pods-CruxClimb.release.xcconfig */;
+			baseConfigurationReference = 5D74A6C6550B1965F6E96793 /* Pods-CruxClimb.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

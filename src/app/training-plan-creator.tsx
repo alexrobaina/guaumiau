@@ -70,6 +70,7 @@ const trainingPlanSchema = Yup.object().shape({
   equipment: Yup.array()
     .of(Yup.string())
     .min(1, 'At least one equipment type is required'),
+  isTemplate: Yup.boolean(),
 });
 
 interface TrainingPlanFormData {
@@ -81,6 +82,7 @@ interface TrainingPlanFormData {
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'elite';
   equipment: string[];
   trainingDays: TrainingDay[];
+  isTemplate: boolean;
 }
 
 export default function TrainingPlanCreatorScreen() {
@@ -133,6 +135,7 @@ export default function TrainingPlanCreatorScreen() {
           isRestDay: true,
           notes: '',
         })),
+        isTemplate: existingPlan.isTemplate || false,
       };
     }
 
@@ -151,6 +154,7 @@ export default function TrainingPlanCreatorScreen() {
         isRestDay: true,
         notes: '',
       })),
+      isTemplate: false,
     };
   }, [isEditMode, existingPlan]);
 
@@ -239,7 +243,7 @@ export default function TrainingPlanCreatorScreen() {
         equipment: values.equipment,
         difficulty: values.difficulty,
         status: isEditMode ? (existingPlan?.status || trainingPlansStatus.active) : trainingPlansStatus.active,
-        isTemplate: false,
+        isTemplate: values.isTemplate || false,
         tags: [],
       };
 
@@ -688,6 +692,29 @@ export default function TrainingPlanCreatorScreen() {
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      <View style={styles.inputGroup}>
+        <TouchableOpacity
+          style={styles.checkboxContainer}
+          onPress={() => formik.setFieldValue('isTemplate', !formik.values.isTemplate)}
+          activeOpacity={0.7}
+        >
+          <View style={[
+            styles.checkbox,
+            formik.values.isTemplate && styles.checkboxChecked
+          ]}>
+            {formik.values.isTemplate && (
+              <Ionicons name="checkmark" size={18} color={Colors.white} />
+            )}
+          </View>
+          <View style={styles.checkboxLabelContainer}>
+            <Text style={styles.checkboxLabel}>Save as Template</Text>
+            <Text style={styles.checkboxDescription}>
+              Templates can be reused to create new training plans
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -1572,5 +1599,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.gray[600],
     textAlign: 'center',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.gray[300],
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: Colors.gray[400],
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary[500],
+    borderColor: Colors.primary[500],
+  },
+  checkboxLabelContainer: {
+    flex: 1,
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.gray[900],
+    marginBottom: 2,
+  },
+  checkboxDescription: {
+    fontSize: 13,
+    color: Colors.gray[600],
+    lineHeight: 18,
   },
 });

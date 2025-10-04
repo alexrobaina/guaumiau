@@ -6,6 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, addMonths, subMonths } from 'date-fns';
 import { useWorkoutSessions } from '@/hooks/queries/useWorkoutSessions';
@@ -16,7 +19,11 @@ import { WorkoutSession } from '@/types/workout';
 import { WorkoutDetailModal } from '@/components/organisms/WorkoutDetailModal';
 import { makeStyles } from './schedule-tab.styles';
 
-export const ScheduleTabScreen: React.FC = () => {
+interface ScheduleTabScreenProps {
+  onToggleSidebar?: () => void;
+}
+
+export const ScheduleTabScreen: React.FC<ScheduleTabScreenProps> = ({ onToggleSidebar }) => {
   console.log('📅 ScheduleTabScreen component mounted');
   const { user } = useAuth();
   const { data: workoutSessions, isLoading } = useWorkoutSessions();
@@ -164,18 +171,40 @@ export const ScheduleTabScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Training Schedule</Text>
-        {activePlan && (
-          <Text style={styles.planName}>{activePlan.name}</Text>
-        )}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar style="light" />
+
+      {/* Header */}
+      <LinearGradient
+        colors={[Colors.primary[500], Colors.primary[600]]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerTop}>
+          {onToggleSidebar && (
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={onToggleSidebar}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="menu" size={24} color={Colors.white} />
+            </TouchableOpacity>
+          )}
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>Training Schedule</Text>
+            {activePlan && (
+              <Text style={styles.headerSubtitle}>{activePlan.name}</Text>
+            )}
+          </View>
+        </View>
+
         <View style={styles.monthNavigation}>
           <TouchableOpacity
             style={styles.monthNavButton}
             onPress={() => setCurrentMonth(subMonths(currentMonth, 1))}
           >
-            <Ionicons name="chevron-back" size={20} color={Colors.gray[600]} />
+            <Ionicons name="chevron-back" size={20} color={Colors.white} />
           </TouchableOpacity>
           <Text style={styles.monthTitle}>
             {format(currentMonth, 'MMMM yyyy')}
@@ -184,10 +213,12 @@ export const ScheduleTabScreen: React.FC = () => {
             style={styles.monthNavButton}
             onPress={() => setCurrentMonth(addMonths(currentMonth, 1))}
           >
-            <Ionicons name="chevron-forward" size={20} color={Colors.gray[600]} />
+            <Ionicons name="chevron-forward" size={20} color={Colors.white} />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
       {/* Calendar View */}
       <View style={styles.calendarSection}>
@@ -221,6 +252,8 @@ export const ScheduleTabScreen: React.FC = () => {
       {renderWorkoutHistory()}
 
       {/* Workout Detail Modal */}
+      </ScrollView>
+
       <WorkoutDetailModal
         visible={isModalVisible}
         workout={selectedWorkout}
@@ -229,6 +262,6 @@ export const ScheduleTabScreen: React.FC = () => {
           setSelectedWorkout(null);
         }}
       />
-    </ScrollView>
+    </SafeAreaView>
   );
 };

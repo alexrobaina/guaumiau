@@ -16,25 +16,41 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingPlans } from '@/hooks/queries/useTrainingPlans';
 import { useInitializeProgress } from '@/hooks/mutations/useInitializeProgress';
-import { useResetTrainingPlan, useDeleteTrainingPlan } from '@/hooks/mutations/useTrainingPlanMutations';
+import {
+  useResetTrainingPlan,
+  useArchiveTrainingPlan,
+} from '@/hooks/mutations/useTrainingPlanMutations';
 import { Button } from '@/components/atoms/Button';
 import { Colors } from '@/lib/colors';
 import { formatDistanceToNow } from 'date-fns';
 
-export const TrainingPlanTabScreen = () => {
+interface TrainingPlanTabScreenProps {
+  initialView?: 'current' | 'history' | 'create';
+  onToggleSidebar?: () => void;
+}
+
+export const TrainingPlanTabScreen: React.FC<TrainingPlanTabScreenProps> = ({
+  initialView,
+  onToggleSidebar,
+}) => {
   const { isAuthenticated } = useAuth();
   const { data: trainingPlans, isLoading, error } = useTrainingPlans();
   const initializeProgress = useInitializeProgress();
   const resetPlanMutation = useResetTrainingPlan();
-  const deletePlanMutation = useDeleteTrainingPlan();
-  const [selectedView, setSelectedView] = useState<'current' | 'history' | 'create'>('current');
+  const archivePlanMutation = useArchiveTrainingPlan();
+  const [selectedView, setSelectedView] = useState<
+    'current' | 'history' | 'create'
+  >(initialView || 'current');
 
   // Initialize progress data for plans that don't have it
   useEffect(() => {
     if (trainingPlans && trainingPlans.length > 0) {
       const plansWithoutProgress = trainingPlans.filter(plan => !plan.progress);
       if (plansWithoutProgress.length > 0) {
-        console.log('🔄 Found plans without progress data, initializing...', plansWithoutProgress.length);
+        console.log(
+          '🔄 Found plans without progress data, initializing...',
+          plansWithoutProgress.length
+        );
         initializeProgress.mutate();
       }
     }
@@ -58,11 +74,18 @@ export const TrainingPlanTabScreen = () => {
           onPress: () => {
             resetPlanMutation.mutate(plan.id, {
               onSuccess: () => {
-                Alert.alert('Success', 'Training plan has been reset successfully.');
+                Alert.alert(
+                  'Success',
+                  'Training plan has been reset successfully.'
+                );
               },
-              onError: (error) => {
-                Alert.alert('Error', error.message || 'Failed to reset training plan. Please try again.');
-              }
+              onError: error => {
+                Alert.alert(
+                  'Error',
+                  error.message ||
+                    'Failed to reset training plan. Please try again.'
+                );
+              },
             });
           },
         },
@@ -70,24 +93,31 @@ export const TrainingPlanTabScreen = () => {
     );
   };
 
-  // Handle delete plan
-  const handleDeletePlan = (plan: any) => {
+  // Handle archive plan (instead of delete)
+  const handleArchivePlan = (plan: any) => {
     Alert.alert(
-      'Delete Training Plan',
-      `Are you sure you want to delete "${plan.name}"? This action cannot be undone.`,
+      'Archive Training Plan',
+      `Are you sure you want to archive "${plan.name}"? You can restore it later if needed.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Archive',
           style: 'destructive',
           onPress: () => {
-            deletePlanMutation.mutate(plan.id, {
+            archivePlanMutation.mutate(plan.id, {
               onSuccess: () => {
-                Alert.alert('Success', 'Training plan has been deleted successfully.');
+                Alert.alert(
+                  'Success',
+                  'Training plan has been archived successfully.'
+                );
               },
-              onError: (error) => {
-                Alert.alert('Error', error.message || 'Failed to delete training plan. Please try again.');
-              }
+              onError: error => {
+                Alert.alert(
+                  'Error',
+                  error.message ||
+                    'Failed to archive training plan. Please try again.'
+                );
+              },
             });
           },
         },
@@ -134,8 +164,10 @@ export const TrainingPlanTabScreen = () => {
   const TrainingPlanCard = ({ plan }: { plan: any }) => {
     // Calculate completion from Firebase progress data
     const daysCompleted = plan.progress?.completedDays || 0;
-    const totalDays = plan.progress?.totalDays || (plan.duration * plan.daysPerWeek); // use progress total or calculate
-    const completionPercentage = plan.progress?.completionRate ||
+    const totalDays =
+      plan.progress?.totalDays || plan.duration * plan.daysPerWeek; // use progress total or calculate
+    const completionPercentage =
+      plan.progress?.completionRate ||
       Math.round(totalDays > 0 ? (daysCompleted / totalDays) * 100 : 0);
 
     // Determine if plan can be edited (only if draft or no progress)
@@ -155,25 +187,33 @@ export const TrainingPlanTabScreen = () => {
                 {plan.duration} week plan • {plan.daysPerWeek} days/week
               </Text>
             </View>
-            <View style={[
-              styles.planStatus,
-              plan.status === 'active'
-                ? styles.planStatusActive
-                : plan.status === 'completed'
-                ? styles.planStatusCompleted
-                : styles.planStatusInactive
-            ]}>
-              <Text style={[
-                styles.planStatusText,
+            <View
+              style={[
+                styles.planStatus,
                 plan.status === 'active'
-                  ? styles.planStatusTextActive
+                  ? styles.planStatusActive
                   : plan.status === 'completed'
-                  ? styles.planStatusTextActive
-                  : styles.planStatusTextInactive
-              ]}>
-                {plan.status === 'active' ? 'Active' :
-                 plan.status === 'completed' ? 'Completed' :
-                 plan.status === 'draft' ? 'Draft' : 'Paused'}
+                    ? styles.planStatusCompleted
+                    : styles.planStatusInactive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.planStatusText,
+                  plan.status === 'active'
+                    ? styles.planStatusTextActive
+                    : plan.status === 'completed'
+                      ? styles.planStatusTextActive
+                      : styles.planStatusTextInactive,
+                ]}
+              >
+                {plan.status === 'active'
+                  ? 'Active'
+                  : plan.status === 'completed'
+                    ? 'Completed'
+                    : plan.status === 'draft'
+                      ? 'Draft'
+                      : 'Paused'}
               </Text>
             </View>
           </View>
@@ -183,7 +223,7 @@ export const TrainingPlanTabScreen = () => {
               <View
                 style={[
                   styles.progressFill,
-                  { width: `${completionPercentage}%` }
+                  { width: `${completionPercentage}%` },
                 ]}
               />
             </View>
@@ -194,7 +234,8 @@ export const TrainingPlanTabScreen = () => {
 
           <View style={styles.planFooter}>
             <Text style={styles.planDate}>
-              Created {plan.createdAt && plan.createdAt.toDate
+              Created{' '}
+              {plan.createdAt && plan.createdAt.toDate
                 ? formatDistanceToNow(plan.createdAt.toDate()) + ' ago'
                 : 'Unknown'}
             </Text>
@@ -213,7 +254,11 @@ export const TrainingPlanTabScreen = () => {
                 onPress={() => handleEditPlan(plan)}
                 activeOpacity={0.7}
               >
-                <Ionicons name="create-outline" size={18} color={Colors.primary[600]} />
+                <Ionicons
+                  name="create-outline"
+                  size={18}
+                  color={Colors.primary[600]}
+                />
                 <Text style={styles.actionButtonText}>Edit</Text>
               </TouchableOpacity>
             )}
@@ -223,17 +268,27 @@ export const TrainingPlanTabScreen = () => {
               onPress={() => handleResetPlan(plan)}
               activeOpacity={0.7}
             >
-              <Ionicons name="refresh-outline" size={18} color={Colors.warning} />
-              <Text style={[styles.actionButtonText, { color: Colors.warning }]}>Reset</Text>
+              <Ionicons
+                name="refresh-outline"
+                size={18}
+                color={Colors.warning}
+              />
+              <Text
+                style={[styles.actionButtonText, { color: Colors.warning }]}
+              >
+                Reset
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() => handleDeletePlan(plan)}
+              onPress={() => handleArchivePlan(plan)}
               activeOpacity={0.7}
             >
-              <Ionicons name="trash-outline" size={18} color={Colors.error} />
-              <Text style={[styles.actionButtonText, { color: Colors.error }]}>Delete</Text>
+              <Ionicons name="archive-outline" size={18} color={Colors.error} />
+              <Text style={[styles.actionButtonText, { color: Colors.error }]}>
+                Archive
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -242,9 +297,10 @@ export const TrainingPlanTabScreen = () => {
   };
 
   const renderCurrentPlans = () => {
-    const currentPlans = trainingPlans?.filter(plan =>
-      plan.status === 'active' || plan.status === 'draft'
-    ) || [];
+    const currentPlans =
+      trainingPlans?.filter(
+        plan => plan.status === 'active' || plan.status === 'draft'
+      ) || [];
 
     if (currentPlans.length === 0) {
       return (
@@ -252,7 +308,8 @@ export const TrainingPlanTabScreen = () => {
           <Ionicons name="fitness-outline" size={64} color={Colors.gray[400]} />
           <Text style={styles.emptyStateTitle}>No Training Plans</Text>
           <Text style={styles.emptyStateDescription}>
-            Create your first training plan to get started with your climbing journey.
+            Create your first training plan to get started with your climbing
+            journey.
           </Text>
           <Button
             onPress={() => router.push('/plan-generation')}
@@ -272,18 +329,20 @@ export const TrainingPlanTabScreen = () => {
 
     return (
       <View>
-        {currentPlans.map((plan) => (
+        {currentPlans.map(plan => (
           <TrainingPlanCard key={plan.id} plan={plan} />
         ))}
         <Text style={styles.debugInfo}>
-          Showing {currentPlans.length} current plans out of {trainingPlans?.length || 0} total
+          Showing {currentPlans.length} current plans out of{' '}
+          {trainingPlans?.length || 0} total
         </Text>
       </View>
     );
   };
 
   const renderHistory = () => {
-    const completedPlans = trainingPlans?.filter(plan => plan.status === 'completed') || [];
+    const completedPlans =
+      trainingPlans?.filter(plan => plan.status === 'completed') || [];
 
     if (completedPlans.length === 0) {
       return (
@@ -299,7 +358,7 @@ export const TrainingPlanTabScreen = () => {
 
     return (
       <View>
-        {completedPlans.map((plan) => (
+        {completedPlans.map(plan => (
           <TrainingPlanCard key={plan.id} plan={plan} />
         ))}
       </View>
@@ -308,13 +367,13 @@ export const TrainingPlanTabScreen = () => {
 
   const renderCreateOptions = () => (
     <View>
-      <ActionCard
+      {/* <ActionCard
         icon="sparkles"
         title="AI-Generated Plan"
         description="Create a personalized plan using AI based on your goals"
         onPress={() => router.push('/plan-generation')}
         color={Colors.primary[500]}
-      />
+      /> */}
 
       <ActionCard
         icon="create-outline"
@@ -328,7 +387,7 @@ export const TrainingPlanTabScreen = () => {
         icon="library-outline"
         title="Template Library"
         description="Choose from pre-made training templates"
-        onPress={() => console.log('Browse templates')}
+        onPress={() => router.push('/template-library')}
         color={Colors.tertiary[500]}
       />
     </View>
@@ -339,7 +398,9 @@ export const TrainingPlanTabScreen = () => {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.notLoggedIn}>
           <Ionicons name="fitness-outline" size={64} color={Colors.gray[400]} />
-          <Text style={styles.notLoggedInText}>Please login to access training plans</Text>
+          <Text style={styles.notLoggedInText}>
+            Please login to access training plans
+          </Text>
           <Button
             onPress={() => router.push('/(auth)/login')}
             variant="primary"
@@ -363,54 +424,64 @@ export const TrainingPlanTabScreen = () => {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Training Plans</Text>
-          <Text style={styles.headerSubtitle}>Manage your climbing training</Text>
+        <View style={styles.headerTop}>
+          {onToggleSidebar && (
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={onToggleSidebar}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="menu" size={24} color={Colors.white} />
+            </TouchableOpacity>
+          )}
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>Training Plans</Text>
+            <Text style={styles.headerSubtitle}>
+              Manage your climbing training
+            </Text>
+          </View>
         </View>
 
         {/* Tab Selector */}
         <View style={styles.tabSelector}>
           <TouchableOpacity
-            style={[
-              styles.tab,
-              selectedView === 'current' && styles.tabActive
-            ]}
+            style={[styles.tab, selectedView === 'current' && styles.tabActive]}
             onPress={() => setSelectedView('current')}
           >
-            <Text style={[
-              styles.tabText,
-              selectedView === 'current' && styles.tabTextActive
-            ]}>
+            <Text
+              style={[
+                styles.tabText,
+                selectedView === 'current' && styles.tabTextActive,
+              ]}
+            >
               Current
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.tab,
-              selectedView === 'history' && styles.tabActive
-            ]}
+            style={[styles.tab, selectedView === 'history' && styles.tabActive]}
             onPress={() => setSelectedView('history')}
           >
-            <Text style={[
-              styles.tabText,
-              selectedView === 'history' && styles.tabTextActive
-            ]}>
+            <Text
+              style={[
+                styles.tabText,
+                selectedView === 'history' && styles.tabTextActive,
+              ]}
+            >
               History
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.tab,
-              selectedView === 'create' && styles.tabActive
-            ]}
+            style={[styles.tab, selectedView === 'create' && styles.tabActive]}
             onPress={() => setSelectedView('create')}
           >
-            <Text style={[
-              styles.tabText,
-              selectedView === 'create' && styles.tabTextActive
-            ]}>
+            <Text
+              style={[
+                styles.tabText,
+                selectedView === 'create' && styles.tabTextActive,
+              ]}
+            >
               Create
             </Text>
           </TouchableOpacity>
@@ -450,19 +521,33 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: 24,
   },
-  headerContent: {
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 20,
-    marginBottom: 20,
+    paddingTop: 12,
+    marginBottom: 12,
+    gap: 12,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    flex: 1,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: Colors.white,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.white,
     opacity: 0.9,
   },

@@ -27,7 +27,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>cruxclimb</string>
+          <string>com.wayex.cruxclimb</string>
           <string>app.cruxclimb.mobile</string>
         </array>
       </dict>

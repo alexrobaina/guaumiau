@@ -21,40 +21,40 @@ import { Colors } from '@/lib/colors';
 
 const { width } = Dimensions.get('window');
 
-export const UserTabScreen = () => {
+interface UserTabScreenProps {
+  onToggleSidebar?: () => void;
+}
+
+export const UserTabScreen: React.FC<UserTabScreenProps> = ({ onToggleSidebar }) => {
   const { user, logout } = useStore();
   const { data: userProfile } = useUserProfile();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            setIsLoggingOut(true);
+            await logout();
+            router.replace('/(auth)/login');
+          } catch (error) {
+            Alert.alert(
+              'Logout Failed',
+              error instanceof Error ? error.message : 'Please try again.'
+            );
+          } finally {
+            setIsLoggingOut(false);
+          }
         },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsLoggingOut(true);
-              await logout();
-              router.replace('/(auth)/login');
-            } catch (error) {
-              Alert.alert(
-                'Logout Failed',
-                error instanceof Error ? error.message : 'Please try again.'
-              );
-            } finally {
-              setIsLoggingOut(false);
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const QuickActionCard = ({
@@ -62,7 +62,7 @@ export const UserTabScreen = () => {
     title,
     description,
     onPress,
-    color = Colors.primary[500]
+    color = Colors.primary[500],
   }: {
     icon: string;
     title: string;
@@ -107,7 +107,8 @@ export const UserTabScreen = () => {
         {userProfile?.experience && (
           <View style={styles.experienceBadge}>
             <Text style={styles.experienceText}>
-              {userProfile.experience.charAt(0).toUpperCase() + userProfile.experience.slice(1)}
+              {userProfile.experience.charAt(0).toUpperCase() +
+                userProfile.experience.slice(1)}
             </Text>
           </View>
         )}
@@ -120,7 +121,9 @@ export const UserTabScreen = () => {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.notLoggedIn}>
           <Ionicons name="person-outline" size={64} color={Colors.gray[400]} />
-          <Text style={styles.notLoggedInText}>Please login to access your profile</Text>
+          <Text style={styles.notLoggedInText}>
+            Please login to access your profile
+          </Text>
           <Button
             onPress={() => router.push('/(auth)/login')}
             variant="primary"
@@ -144,9 +147,20 @@ export const UserTabScreen = () => {
         end={{ x: 1, y: 1 }}
         style={styles.header}
       >
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Welcome back!</Text>
-          <Text style={styles.headerSubtitle}>Ready to train?</Text>
+        <View style={styles.headerTop}>
+          {onToggleSidebar && (
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={onToggleSidebar}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="menu" size={24} color={Colors.white} />
+            </TouchableOpacity>
+          )}
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>Welcome back!</Text>
+            <Text style={styles.headerSubtitle}>Ready to train?</Text>
+          </View>
         </View>
 
         <ProfileSection />
@@ -161,23 +175,23 @@ export const UserTabScreen = () => {
             icon="fitness-outline"
             title="Start Training"
             description="Begin your workout session"
-            onPress={() => router.push('/plan-generation')}
+            onPress={() => router.push('/training-plans')}
             color={Colors.success}
           />
-
+          {/* 
           <QuickActionCard
             icon="analytics-outline"
             title="View Progress"
             description="Check your training progress"
             onPress={() => router.push('/(tabs)/progress')}
             color={Colors.primary[500]}
-          />
+          /> */}
 
           <QuickActionCard
             icon="time-outline"
             title="Training History"
             description="Review past sessions"
-            onPress={() => router.push('/(tabs)/history')}
+            onPress={() => router.push('/training-plans?view=history')}
             color={Colors.warning}
           />
         </View>
@@ -194,7 +208,7 @@ export const UserTabScreen = () => {
             color={Colors.primary[500]}
           />
 
-          <QuickActionCard
+          {/* <QuickActionCard
             icon="person-outline"
             title="Edit Profile"
             description="Update your information"
@@ -208,11 +222,11 @@ export const UserTabScreen = () => {
             description="Manage notifications"
             onPress={() => console.log('Notification settings')}
             color={Colors.gray[600]}
-          />
+          /> */}
         </View>
 
         {/* Climbing Stats */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Your Stats</Text>
 
           <View style={styles.statsContainer}>
@@ -229,7 +243,7 @@ export const UserTabScreen = () => {
               <Text style={styles.statLabel}>Hours</Text>
             </View>
           </View>
-        </View>
+        </View> */}
 
         {/* Logout Button */}
         <View style={styles.logoutSection}>
@@ -261,10 +275,24 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: 32,
   },
-  headerContent: {
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 20,
-    marginBottom: 20,
+    paddingTop: 12,
+    marginBottom: 12,
+    gap: 12,
+  },
+  menuButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    flex: 1,
   },
   headerTitle: {
     fontSize: 28,
