@@ -26,10 +26,10 @@ export const makeStyles = () =>
     } as TextStyle,
 
     secondarysolid: {
-      backgroundColor: Colors.secondary[500],
+      backgroundColor: Colors.gray[100],
     } as ViewStyle,
     secondaryText: {
-      color: Colors.primary[500],
+      color: Colors.gray[700],
     } as TextStyle,
 
     tertiarysolid: {

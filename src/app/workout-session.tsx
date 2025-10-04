@@ -10,6 +10,7 @@ import {
   TextInput,
   Modal,
   Image,
+  Vibration,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -26,6 +27,7 @@ import { format } from 'date-fns';
 import { useAuth } from '@/hooks/useAuth';
 import { Timestamp } from 'firebase/firestore';
 import { exerciseDatabase } from '@/lib/data/exerciseDatabase';
+import { Audio } from 'expo-av';
 
 type WorkoutPhase = 'pre-workout' | 'exercise' | 'rest' | 'complete';
 
@@ -245,6 +247,63 @@ export default function WorkoutSessionScreen() {
     }
   }, [trainingPlan, selectedDay, workoutSession]);
 
+  const playAlertSound = async () => {
+    try {
+      // Configure audio mode for playback
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+      });
+
+      // Create and play a beep sound using a data URL (simple 440Hz beep)
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg' },
+        { shouldPlay: true, volume: 1.0 }
+      );
+
+      // Unload sound after playing
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+
+      // Also vibrate the device (pattern: wait 0ms, vibrate 200ms, wait 100ms, vibrate 200ms)
+      Vibration.vibrate([0, 200, 100, 200]);
+    } catch (error) {
+      console.log('Error playing alert sound:', error);
+      // Fallback to vibration only if sound fails
+      Vibration.vibrate([0, 200, 100, 200]);
+    }
+  };
+
+  const playCountdownBeep = async () => {
+    try {
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+        shouldDuckAndroid: true,
+      });
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: 'https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg' },
+        { shouldPlay: true, volume: 0.5 }
+      );
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+
+      Vibration.vibrate(100);
+    } catch (error) {
+      console.log('Error playing countdown beep:', error);
+      Vibration.vibrate(100);
+    }
+  };
+
   const startRestTimer = (duration: number) => {
     setRestTimeRemaining(duration);
     setCurrentPhase('rest');
@@ -253,8 +312,13 @@ export default function WorkoutSessionScreen() {
       setRestTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
+          playAlertSound(); // Play sound when timer finishes
           setCurrentPhase('exercise');
           return 0;
+        }
+        // Play countdown beeps for last 3 seconds
+        if (prev <= 3 && prev > 1) {
+          playCountdownBeep();
         }
         return prev - 1;
       });

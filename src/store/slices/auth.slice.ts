@@ -12,7 +12,7 @@ export interface AuthSlice {
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
-  
+
   // Actions
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
@@ -20,15 +20,14 @@ export interface AuthSlice {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendEmailVerification: () => Promise<void>;
-  debugAutoLogin: () => Promise<void>;
-  
+
   // State management
   setUser: (user: AuthUser | null) => void;
   setAuthLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setInitialized: (initialized: boolean) => void;
   clearError: () => void;
-  
+
   // Auth state listener
   initializeAuth: () => void;
 }
@@ -47,20 +46,9 @@ export const createAuthSlice: StateCreator<
   isInitialized: false,
   error: null,
 
-  // DEBUG: Auto-login function
-  debugAutoLogin: async () => {
-    console.log('🔧 DEBUG: Auto-login attempt with stored credentials...');
-    try {
-      await get().login('alexrobainaph@gmail.com', 'salsamora3000');
-      console.log('✅ DEBUG: Auto-login successful!');
-    } catch (error) {
-      console.error('❌ DEBUG: Auto-login failed:', error);
-    }
-  },
-
   // Actions
   login: async (email: string, password: string) => {
-    set((state) => {
+    set(state => {
       state.isLoading = true;
       state.error = null;
     });
@@ -73,14 +61,14 @@ export const createAuthSlice: StateCreator<
       console.log('🔄 Invalidating React Query cache after login...');
       await queryClient.invalidateQueries({ queryKey: ['user'] });
 
-      set((state) => {
+      set(state => {
         state.user = user;
         state.isAuthenticated = true;
         state.isLoading = false;
         state.error = null;
       });
     } catch (error) {
-      set((state) => {
+      set(state => {
         state.error = error instanceof Error ? error.message : 'Login failed';
         state.isLoading = false;
       });
@@ -89,7 +77,7 @@ export const createAuthSlice: StateCreator<
   },
 
   register: async (email: string, password: string, name: string) => {
-    set((state) => {
+    set(state => {
       state.isLoading = true;
       state.error = null;
     });
@@ -102,15 +90,16 @@ export const createAuthSlice: StateCreator<
       console.log('🔄 Invalidating React Query cache after registration...');
       await queryClient.invalidateQueries({ queryKey: ['user'] });
 
-      set((state) => {
+      set(state => {
         state.user = user;
         state.isAuthenticated = true;
         state.isLoading = false;
         state.error = null;
       });
     } catch (error) {
-      set((state) => {
-        state.error = error instanceof Error ? error.message : 'Registration failed';
+      set(state => {
+        state.error =
+          error instanceof Error ? error.message : 'Registration failed';
         state.isLoading = false;
       });
       throw error;
@@ -118,7 +107,7 @@ export const createAuthSlice: StateCreator<
   },
 
   loginWithGoogle: async () => {
-    set((state) => {
+    set(state => {
       state.isLoading = true;
       state.error = null;
     });
@@ -131,15 +120,16 @@ export const createAuthSlice: StateCreator<
       console.log('🔄 Invalidating React Query cache after Google login...');
       await queryClient.invalidateQueries({ queryKey: ['user'] });
 
-      set((state) => {
+      set(state => {
         state.user = user;
         state.isAuthenticated = true;
         state.isLoading = false;
         state.error = null;
       });
     } catch (error) {
-      set((state) => {
-        state.error = error instanceof Error ? error.message : 'Google sign-in failed';
+      set(state => {
+        state.error =
+          error instanceof Error ? error.message : 'Google sign-in failed';
         state.isLoading = false;
       });
       throw error;
@@ -147,7 +137,7 @@ export const createAuthSlice: StateCreator<
   },
 
   logout: async () => {
-    set((state) => {
+    set(state => {
       state.isLoading = true;
       state.error = null;
     });
@@ -160,14 +150,14 @@ export const createAuthSlice: StateCreator<
       console.log('🗑️ Clearing React Query cache after logout...');
       queryClient.clear();
 
-      set((state) => {
+      set(state => {
         state.user = null;
         state.isAuthenticated = false;
         state.isLoading = false;
         state.error = null;
       });
     } catch (error) {
-      set((state) => {
+      set(state => {
         state.error = error instanceof Error ? error.message : 'Logout failed';
         state.isLoading = false;
       });
@@ -176,19 +166,20 @@ export const createAuthSlice: StateCreator<
   },
 
   resetPassword: async (email: string) => {
-    set((state) => {
+    set(state => {
       state.isLoading = true;
       state.error = null;
     });
 
     try {
       await AuthService.resetPassword(email);
-      set((state) => {
+      set(state => {
         state.isLoading = false;
       });
     } catch (error) {
-      set((state) => {
-        state.error = error instanceof Error ? error.message : 'Password reset failed';
+      set(state => {
+        state.error =
+          error instanceof Error ? error.message : 'Password reset failed';
         state.isLoading = false;
       });
       throw error;
@@ -196,19 +187,22 @@ export const createAuthSlice: StateCreator<
   },
 
   resendEmailVerification: async () => {
-    set((state) => {
+    set(state => {
       state.isLoading = true;
       state.error = null;
     });
 
     try {
       await AuthService.resendEmailVerification();
-      set((state) => {
+      set(state => {
         state.isLoading = false;
       });
     } catch (error) {
-      set((state) => {
-        state.error = error instanceof Error ? error.message : 'Failed to resend verification email';
+      set(state => {
+        state.error =
+          error instanceof Error
+            ? error.message
+            : 'Failed to resend verification email';
         state.isLoading = false;
       });
       throw error;
@@ -217,35 +211,35 @@ export const createAuthSlice: StateCreator<
 
   // State management
   setUser: (user: AuthUser | null) =>
-    set((state) => {
+    set(state => {
       state.user = user;
       state.isAuthenticated = !!user;
     }),
 
   setAuthLoading: (loading: boolean) =>
-    set((state) => {
+    set(state => {
       state.isLoading = loading;
     }),
 
   setError: (error: string | null) =>
-    set((state) => {
+    set(state => {
       state.error = error;
     }),
 
   setInitialized: (initialized: boolean) =>
-    set((state) => {
+    set(state => {
       state.isInitialized = initialized;
     }),
 
   clearError: () =>
-    set((state) => {
+    set(state => {
       state.error = null;
     }),
 
   // Auth state listener
   initializeAuth: async () => {
     const authSlice = get();
-    
+
     // First, try to restore user from AsyncStorage
     try {
       const storedUser = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
@@ -253,17 +247,22 @@ export const createAuthSlice: StateCreator<
         const user = JSON.parse(storedUser) as AuthUser;
         authSlice.setUser(user);
         console.log('✅ User restored from AsyncStorage:', user.email);
-        
+
         // 🔧 DEBUG: Check Firebase Auth current user
-        console.log('🔍 Firebase Auth current user:', auth.currentUser?.email || 'null');
-        console.log('⚠️ WARNING: User in AsyncStorage but not in Firebase Auth - need to login!');
+        console.log(
+          '🔍 Firebase Auth current user:',
+          auth.currentUser?.email || 'null'
+        );
+        console.log(
+          '⚠️ WARNING: User in AsyncStorage but not in Firebase Auth - need to login!'
+        );
       }
     } catch (error) {
       console.warn('⚠️ Failed to restore user from AsyncStorage:', error);
     }
-    
+
     // Set up Firebase auth state listener
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async firebaseUser => {
       if (firebaseUser) {
         // User is signed in
         const user: AuthUser = {
@@ -277,7 +276,7 @@ export const createAuthSlice: StateCreator<
 
         await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
         authSlice.setUser(user);
-        
+
         // Sync onboarding data to Firebase if user has completed onboarding locally
         try {
           const rootState = get();
@@ -292,7 +291,7 @@ export const createAuthSlice: StateCreator<
         await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
         authSlice.setUser(null);
       }
-      
+
       authSlice.setInitialized(true);
       authSlice.setAuthLoading(false);
     });
