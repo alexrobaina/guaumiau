@@ -31,6 +31,7 @@ export const useUserOnboardingStatus = () => {
           exists: !!userProfile,
           completed: userProfile?.completed,
           userId: user.uid,
+          fullProfile: userProfile,
         });
 
         console.log('👤 Final onboarding status:', {
@@ -38,12 +39,22 @@ export const useUserOnboardingStatus = () => {
           userId: user.uid,
         });
 
+        // If profile exists but completed is undefined or false, log warning
+        if (userProfile && !hasCompletedOnboarding) {
+          console.warn('⚠️ User profile exists but completed field is:', userProfile.completed);
+        }
+
         return {
           hasCompletedOnboarding,
           userProfile,
         };
       } catch (error) {
         console.error('❌ Error checking user onboarding status for userId:', user.uid, error);
+        // In production, we want to be more lenient with errors
+        // Check if error is a permission issue or network issue
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('❌ Error details:', errorMessage);
+
         return {
           hasCompletedOnboarding: false,
           userProfile: null,

@@ -129,8 +129,11 @@ export default function TrainingGoalsScreen() {
           </TouchableOpacity>
 
           <View style={styles.headerTitleContainer}>
+            <View style={styles.headerIconContainer}>
+              <Ionicons name="trophy" size={28} color={Colors.white} />
+            </View>
             <Text style={styles.headerTitle}>Training Goals</Text>
-            <Text style={styles.headerSubtitle}>Your onboarding information</Text>
+            <Text style={styles.headerSubtitle}>Track your climbing journey</Text>
           </View>
 
           <TouchableOpacity
@@ -273,7 +276,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray[50],
   },
   header: {
-    paddingBottom: 24,
+    paddingBottom: 32,
+    paddingTop: 8,
   },
   headerContent: {
     flexDirection: 'row',
@@ -285,29 +289,41 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitleContainer: {
     flex: 1,
     alignItems: 'center',
+    gap: 8,
+  },
+  headerIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: Colors.white,
+    letterSpacing: 0.3,
   },
   headerSubtitle: {
     fontSize: 14,
     color: Colors.white,
-    opacity: 0.8,
+    opacity: 0.9,
+    fontWeight: '500',
   },
   editButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },

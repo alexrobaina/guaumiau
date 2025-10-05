@@ -5,18 +5,45 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyAkKnlXEhKoIU_acGVfYE6_psDvbazdecc",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "cruxclimb-a2431.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "cruxclimb-a2431",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "cruxclimb-a2431.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "844873469166",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:844873469166:web:31cb8e23b7f8cee1f1f7ff",
+        "EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID": "G-23G1CW2C5E"
+      }
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease"
+      },
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyAkKnlXEhKoIU_acGVfYE6_psDvbazdecc",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "cruxclimb-a2431.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "cruxclimb-a2431",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "cruxclimb-a2431.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "844873469166",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:844873469166:web:31cb8e23b7f8cee1f1f7ff",
+        "EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID": "G-23G1CW2C5E"
       }
     },
     "production": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyAkKnlXEhKoIU_acGVfYE6_psDvbazdecc",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "cruxclimb-a2431.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "cruxclimb-a2431",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "cruxclimb-a2431.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "844873469166",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:844873469166:web:31cb8e23b7f8cee1f1f7ff",
+        "EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID": "G-23G1CW2C5E"
       }
     }
   },

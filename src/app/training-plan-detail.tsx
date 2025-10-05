@@ -292,7 +292,7 @@ export default function TrainingPlanDetail() {
     },
     onSuccess: (sessionId) => {
       console.log('✅ Navigating to workout session:', sessionId);
-      router.push(`/workout-session?sessionId=${sessionId}`);
+      router.replace(`/workout-session?sessionId=${sessionId}`);
     },
     onError: (error) => {
       console.error('❌ Error starting training:', error);
@@ -921,18 +921,34 @@ export default function TrainingPlanDetail() {
             </View>
           </Button>
         ) : trainingPlan.status === 'active' ? (
-          <Button
-            onPress={() => startTrainingMutation.mutate()}
-            variant="primary"
-            size="lg"
-            style={styles.actionButton}
-            loading={startTrainingMutation.isPending}
-          >
-            <View style={styles.buttonContent}>
-              <Ionicons name="fitness-outline" size={20} color={Colors.white} />
-              <Text style={styles.buttonText}>Start Training</Text>
-            </View>
-          </Button>
+          (() => {
+            const trainingDaysArray = getTrainingDaysArray(trainingPlan);
+            const hasValidExercises = trainingDaysArray.some(day =>
+              !day.isRestDay && day.exercises && day.exercises.length > 0
+            );
+
+            return hasValidExercises ? (
+              <Button
+                onPress={() => startTrainingMutation.mutate()}
+                variant="primary"
+                size="lg"
+                style={styles.actionButton}
+                loading={startTrainingMutation.isPending}
+              >
+                <View style={styles.buttonContent}>
+                  <Ionicons name="fitness-outline" size={20} color={Colors.white} />
+                  <Text style={styles.buttonText}>Start Training</Text>
+                </View>
+              </Button>
+            ) : (
+              <View style={styles.warningContainer}>
+                <Ionicons name="warning-outline" size={24} color={Colors.warning} />
+                <Text style={styles.warningText}>
+                  This plan has no exercises configured. Please edit the plan to add exercises.
+                </Text>
+              </View>
+            );
+          })()
         ) : trainingPlan.status === 'completed' ? (
           <View style={styles.completedActions}>
             <Text style={styles.completedMessage}>
@@ -1642,5 +1658,19 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: Colors.gray[500],
     textAlign: 'center',
+  },
+  warningContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.warning + '20',
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+  warningText: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.warning,
+    fontWeight: '500',
   },
 });

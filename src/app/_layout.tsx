@@ -68,6 +68,7 @@ function RootLayoutNav() {
         <Stack.Screen name="training-plan-detail" options={{ headerShown: false }} />
         <Stack.Screen name="training-plans" options={{ headerShown: false }} />
         <Stack.Screen name="training-plan-creator" options={{ headerShown: false }} />
+        <Stack.Screen name="training-goals" options={{ headerShown: false }} />
         <Stack.Screen name="template-library" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>

@@ -114,26 +114,42 @@ export class FirestoreService {
       const targetUserId = userId || user?.uid;
 
       if (!targetUserId) {
+        console.error('❌ getUserProfile: No user ID provided');
         throw new Error('User ID is required to get profile data');
       }
 
+      console.log('🔍 getUserProfile: Fetching profile for userId:', targetUserId);
       const userDocRef = doc(firestore, 'users', targetUserId);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
         const data = userDoc.data() as UserProfileData;
-        console.log('✅ User profile retrieved successfully for user:', targetUserId);
+        console.log('✅ User profile retrieved successfully for user:', targetUserId, {
+          hasCompletedField: 'completed' in data,
+          completedValue: data.completed,
+        });
         return data;
       } else {
-        console.log('ℹ️ No profile found for user:', targetUserId);
+        console.warn('⚠️ No profile document found for user:', targetUserId);
         return null;
       }
     } catch (error) {
-      console.error('❌ Error getting user profile:', error);
-      if (error instanceof Error) {
-        throw error;
+      console.error('❌ Error getting user profile:', {
+        userId: userId || 'from auth',
+        error,
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+      });
+
+      // Don't throw in production - return null instead to prevent app crashes
+      if (__DEV__) {
+        if (error instanceof Error) {
+          throw error;
+        }
+        throw new Error(getErrorMessage(error as FirestoreError));
+      } else {
+        console.error('❌ PRODUCTION: Swallowing Firestore error to prevent crash');
+        return null;
       }
-      throw new Error(getErrorMessage(error as FirestoreError));
     }
   }
 

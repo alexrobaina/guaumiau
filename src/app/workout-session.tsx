@@ -248,6 +248,7 @@ export default function WorkoutSessionScreen() {
   }, [trainingPlan, selectedDay, workoutSession]);
 
   const playAlertSound = async () => {
+    console.log('🔊 Playing alert sound...');
     try {
       // Configure audio mode for playback
       await Audio.setAudioModeAsync({
@@ -256,29 +257,37 @@ export default function WorkoutSessionScreen() {
         shouldDuckAndroid: true,
       });
 
+      console.log('🔊 Audio mode configured');
+
       // Create and play a beep sound using a data URL (simple 440Hz beep)
       const { sound } = await Audio.Sound.createAsync(
         { uri: 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg' },
         { shouldPlay: true, volume: 1.0 }
       );
 
+      console.log('🔊 Sound created and playing');
+
       // Unload sound after playing
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
+          console.log('🔊 Sound finished playing, unloading');
           sound.unloadAsync();
         }
       });
 
       // Also vibrate the device (pattern: wait 0ms, vibrate 200ms, wait 100ms, vibrate 200ms)
       Vibration.vibrate([0, 200, 100, 200]);
+      console.log('📳 Vibration triggered');
     } catch (error) {
-      console.log('Error playing alert sound:', error);
+      console.log('❌ Error playing alert sound:', error);
       // Fallback to vibration only if sound fails
       Vibration.vibrate([0, 200, 100, 200]);
+      console.log('📳 Fallback vibration triggered');
     }
   };
 
   const playCountdownBeep = async () => {
+    console.log('⏱️ Playing countdown beep...');
     try {
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
@@ -298,19 +307,23 @@ export default function WorkoutSessionScreen() {
       });
 
       Vibration.vibrate(100);
+      console.log('📳 Countdown beep vibration triggered');
     } catch (error) {
-      console.log('Error playing countdown beep:', error);
+      console.log('❌ Error playing countdown beep:', error);
       Vibration.vibrate(100);
     }
   };
 
   const startRestTimer = (duration: number) => {
+    console.log(`⏲️ Starting rest timer for ${duration} seconds`);
     setRestTimeRemaining(duration);
     setCurrentPhase('rest');
 
     const timer = setInterval(() => {
       setRestTimeRemaining(prev => {
+        console.log(`⏲️ Rest time remaining: ${prev} seconds`);
         if (prev <= 1) {
+          console.log('⏲️ Timer finished! Calling playAlertSound...');
           clearInterval(timer);
           playAlertSound(); // Play sound when timer finishes
           setCurrentPhase('exercise');
@@ -318,6 +331,7 @@ export default function WorkoutSessionScreen() {
         }
         // Play countdown beeps for last 3 seconds
         if (prev <= 3 && prev > 1) {
+          console.log(`⏲️ Countdown: ${prev} seconds`);
           playCountdownBeep();
         }
         return prev - 1;

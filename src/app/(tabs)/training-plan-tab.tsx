@@ -425,15 +425,17 @@ export const TrainingPlanTabScreen: React.FC<TrainingPlanTabScreenProps> = ({
         style={styles.header}
       >
         <View style={styles.headerTop}>
-          {onToggleSidebar && (
-            <TouchableOpacity
-              style={styles.menuButton}
-              onPress={onToggleSidebar}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="menu" size={24} color={Colors.white} />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={onToggleSidebar || (() => router.back())}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={onToggleSidebar ? "menu" : "arrow-back"}
+              size={24}
+              color={Colors.white}
+            />
+          </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Training Plans</Text>
             <Text style={styles.headerSubtitle}>
@@ -533,7 +535,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
