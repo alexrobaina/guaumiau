@@ -3,25 +3,25 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cruxclimb-postgres
+    container_name: guaumiau-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: cruxclimb
-      POSTGRES_PASSWORD: cruxclimb123
-      POSTGRES_DB: cruxclimb_db
+      POSTGRES_USER: guaumiau
+      POSTGRES_PASSWORD: guaumiau123
+      POSTGRES_DB: guaumiau_db
     ports:
       - '5433:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U cruxclimb']
+      test: ['CMD-SHELL', 'pg_isready -U guaumiau']
       interval: 10s
       timeout: 5s
       retries: 5
 
   localstack:
     image: localstack/localstack:latest
-    container_name: cruxclimb-localstack
+    container_name: guaumiau-localstack
     restart: unless-stopped
     ports:
       - '4566:4566'

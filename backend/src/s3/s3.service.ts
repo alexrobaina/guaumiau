@@ -23,7 +23,7 @@ export class S3Service implements OnModuleInit {
     const endpoint = this.configService.get<string>('AWS_S3_ENDPOINT');
     const forcePathStyle = this.configService.get<boolean>('AWS_S3_FORCE_PATH_STYLE', false);
 
-    this.bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME', 'cruxclimb-bucket');
+    this.bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME', 'guaumiau-bucket');
 
     this.s3Client = new S3Client({
       region,

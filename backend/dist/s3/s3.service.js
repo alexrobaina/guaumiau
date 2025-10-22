@@ -27,7 +27,7 @@ let S3Service = S3Service_1 = class S3Service {
         const region = this.configService.get('AWS_REGION', 'us-east-1');
         const endpoint = this.configService.get('AWS_S3_ENDPOINT');
         const forcePathStyle = this.configService.get('AWS_S3_FORCE_PATH_STYLE', false);
-        this.bucketName = this.configService.get('AWS_S3_BUCKET_NAME', 'cruxclimb-bucket');
+        this.bucketName = this.configService.get('AWS_S3_BUCKET_NAME', 'guaumiau-bucket');
         this.s3Client = new client_s3_1.S3Client({
             region,
             endpoint,

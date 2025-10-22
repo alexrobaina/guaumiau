@@ -10,8 +10,8 @@ done
 echo "LocalStack is ready!"
 
 # Create S3 bucket
-echo "Creating S3 bucket: cruxclimb-bucket"
-aws --endpoint-url=http://localhost:4566 s3 mb s3://cruxclimb-bucket --region us-east-1
+echo "Creating S3 bucket: guaumiau-bucket"
+aws --endpoint-url=http://localhost:4566 s3 mb s3://guaumiau-bucket --region us-east-1
 
 # List buckets to confirm
 echo "Available S3 buckets:"
