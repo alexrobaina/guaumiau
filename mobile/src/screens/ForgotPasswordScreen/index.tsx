@@ -33,11 +33,11 @@ export const ForgotPasswordScreen = memo<IForgotPasswordScreenProps>(() => {
 
   const errorMessage = forgotPassword.error?.response?.data?.message ||
     (forgotPassword.isError
-      ? 'Unable to send reset instructions. Please check your email and try again.'
+      ? 'No se pudo enviar las instrucciones. Por favor, verifica tu email e intenta de nuevo.'
       : undefined);
 
   return (
-    <AuthLayout title="Reset Password" subtitle="Recover your account access">
+    <AuthLayout title="Restablecer Contraseña" subtitle="Recupera el acceso a tu cuenta">
       <ForgotPasswordForm
         onSubmit={handleForgotPassword}
         isLoading={forgotPassword.isPending}
@@ -45,7 +45,7 @@ export const ForgotPasswordScreen = memo<IForgotPasswordScreenProps>(() => {
         success={forgotPassword.isSuccess}
       />
       <TouchableOpacity style={styles.backToLogin} onPress={handleBackToLogin}>
-        <Text style={styles.backToLoginText}>Back to Login</Text>
+        <Text style={styles.backToLoginText}>Volver al Inicio de Sesión</Text>
       </TouchableOpacity>
     </AuthLayout>
   );

@@ -29,13 +29,13 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
   const errorMessage =
     register.error?.response?.data?.message ||
     (register.isError
-      ? 'Registration failed. Please try again.'
+      ? 'Registro fallido. Por favor, intenta de nuevo.'
       : undefined);
 
   return (
     <AuthLayout
-      title="Create Account"
-      subtitle="Join the climbing community">
+      title="Crear Cuenta"
+      subtitle="Únete a nuestra comunidad de cuidado de mascotas">
       <RegisterForm
         onSubmit={handleRegister}
         isLoading={register.isPending}

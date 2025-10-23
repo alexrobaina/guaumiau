@@ -9,23 +9,23 @@ import {styles} from './RegisterForm.styles';
 
 const validateEmail = (email: string): string | undefined => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email) return 'Email is required';
-  if (!emailRegex.test(email)) return 'Invalid email format';
+  if (!email) return 'El email es requerido';
+  if (!emailRegex.test(email)) return 'Formato de email inválido';
   return undefined;
 };
 
 const validateUsername = (username: string): string | undefined => {
-  if (!username) return 'Username is required';
-  if (username.length < 3) return 'Username must be at least 3 characters';
-  if (username.length > 20) return 'Username must be less than 20 characters';
+  if (!username) return 'El nombre de usuario es requerido';
+  if (username.length < 3) return 'El nombre de usuario debe tener al menos 3 caracteres';
+  if (username.length > 20) return 'El nombre de usuario debe tener menos de 20 caracteres';
   if (!/^[a-zA-Z0-9_]+$/.test(username))
-    return 'Username can only contain letters, numbers, and underscores';
+    return 'El nombre de usuario solo puede contener letras, números y guiones bajos';
   return undefined;
 };
 
 const validatePassword = (password: string): string | undefined => {
-  if (!password) return 'Password is required';
-  if (password.length < 6) return 'Password must be at least 6 characters';
+  if (!password) return 'La contraseña es requerida';
+  if (password.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
   return undefined;
 };
 
@@ -33,8 +33,8 @@ const validateConfirmPassword = (
   password: string,
   confirmPassword: string,
 ): string | undefined => {
-  if (!confirmPassword) return 'Please confirm your password';
-  if (password !== confirmPassword) return 'Passwords do not match';
+  if (!confirmPassword) return 'Por favor, confirma tu contraseña';
+  if (password !== confirmPassword) return 'Las contraseñas no coinciden';
   return undefined;
 };
 
@@ -129,7 +129,7 @@ export const RegisterForm = memo<IRegisterFormProps>(
 
         <FormField
           label="Email"
-          placeholder="Enter your email"
+          placeholder="Ingresa tu email"
           value={formState.email}
           onChangeText={handleEmailChange}
           error={formState.errors.email}
@@ -140,8 +140,8 @@ export const RegisterForm = memo<IRegisterFormProps>(
         />
 
         <FormField
-          label="Username"
-          placeholder="Choose a username"
+          label="Nombre de Usuario"
+          placeholder="Elige un nombre de usuario"
           value={formState.username}
           onChangeText={handleUsernameChange}
           error={formState.errors.username}
@@ -151,8 +151,8 @@ export const RegisterForm = memo<IRegisterFormProps>(
         />
 
         <FormField
-          label="Password"
-          placeholder="Create a password"
+          label="Contraseña"
+          placeholder="Crea una contraseña"
           value={formState.password}
           onChangeText={handlePasswordChange}
           error={formState.errors.password}
@@ -163,8 +163,8 @@ export const RegisterForm = memo<IRegisterFormProps>(
         />
 
         <FormField
-          label="Confirm Password"
-          placeholder="Confirm your password"
+          label="Confirmar Contraseña"
+          placeholder="Confirma tu contraseña"
           value={formState.confirmPassword}
           onChangeText={handleConfirmPasswordChange}
           error={formState.errors.confirmPassword}
@@ -175,7 +175,7 @@ export const RegisterForm = memo<IRegisterFormProps>(
         />
 
         <Button
-          title="Create Account"
+          title="Crear Cuenta"
           onPress={handleSubmit}
           loading={isLoading}
           disabled={isLoading}
@@ -185,8 +185,8 @@ export const RegisterForm = memo<IRegisterFormProps>(
         <TouchableOpacity
           style={styles.loginLink}
           onPress={handleNavigateToLogin}>
-          <Text style={styles.loginText}>Already have an account?</Text>
-          <Text style={styles.loginLinkText}>Sign In</Text>
+          <Text style={styles.loginText}>¿Ya tienes una cuenta?</Text>
+          <Text style={styles.loginLinkText}>Inicia Sesión</Text>
         </TouchableOpacity>
       </View>
     );

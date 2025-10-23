@@ -11,8 +11,8 @@ import {styles} from './ForgotPasswordForm.styles';
 
 const validateEmail = (email: string): string | undefined => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email) return 'Email is required';
-  if (!emailRegex.test(email)) return 'Invalid email format';
+  if (!email) return 'El email es requerido';
+  if (!emailRegex.test(email)) return 'Formato de email inválido';
   return undefined;
 };
 
@@ -51,8 +51,8 @@ export const ForgotPasswordForm = memo<IForgotPasswordFormProps>(
       <View style={styles.container}>
         {!success && (
           <Text style={styles.description}>
-            Enter your email address and we'll send you instructions to reset
-            your password.
+            Ingresa tu dirección de email y te enviaremos las instrucciones para
+            restablecer tu contraseña.
           </Text>
         )}
 
@@ -65,8 +65,8 @@ export const ForgotPasswordForm = memo<IForgotPasswordFormProps>(
         {success && (
           <View style={styles.successContainer}>
             <Text style={styles.successText}>
-              Password reset instructions have been sent to your email address.
-              Please check your inbox.
+              Las instrucciones para restablecer tu contraseña han sido enviadas
+              a tu email. Por favor, revisa tu bandeja de entrada.
             </Text>
           </View>
         )}
@@ -75,7 +75,7 @@ export const ForgotPasswordForm = memo<IForgotPasswordFormProps>(
           <>
             <FormField
               label="Email"
-              placeholder="Enter your email"
+              placeholder="Ingresa tu email"
               value={formState.email}
               onChangeText={handleEmailChange}
               error={formState.errors.email}
@@ -86,7 +86,7 @@ export const ForgotPasswordForm = memo<IForgotPasswordFormProps>(
             />
 
             <Button
-              title="Send Reset Instructions"
+              title="Enviar Instrucciones"
               onPress={handleSubmit}
               loading={isLoading}
               disabled={isLoading}

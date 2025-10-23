@@ -27,12 +27,12 @@ export const LoginScreen = memo<ILoginScreenProps>(() => {
   );
 
   const errorMessage = login.error?.response?.data?.message ||
-    (login.isError ? 'Invalid email or password. Please try again.' : undefined);
+    (login.isError ? 'Email o contraseña inválidos. Por favor, intenta de nuevo.' : undefined);
 
   return (
     <AuthLayout
-      title="Welcome Back"
-      subtitle="Sign in to continue climbing">
+      title="Bienvenido de Vuelta"
+      subtitle="Inicia sesión para cuidar de tus mascotas">
       <LoginForm
         onSubmit={handleLogin}
         isLoading={login.isPending}

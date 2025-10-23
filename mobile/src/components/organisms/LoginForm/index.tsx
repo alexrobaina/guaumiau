@@ -9,14 +9,14 @@ import {styles} from './LoginForm.styles';
 
 const validateEmail = (email: string): string | undefined => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email) return 'Email is required';
-  if (!emailRegex.test(email)) return 'Invalid email format';
+  if (!email) return 'El email es requerido';
+  if (!emailRegex.test(email)) return 'Formato de email inválido';
   return undefined;
 };
 
 const validatePassword = (password: string): string | undefined => {
-  if (!password) return 'Password is required';
-  if (password.length < 6) return 'Password must be at least 6 characters';
+  if (!password) return 'La contraseña es requerida';
+  if (password.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
   return undefined;
 };
 
@@ -81,7 +81,7 @@ export const LoginForm = memo<ILoginFormProps>(
 
         <FormField
           label="Email"
-          placeholder="Enter your email"
+          placeholder="Ingresa tu email"
           value={formState.email}
           onChangeText={handleEmailChange}
           error={formState.errors.email}
@@ -92,8 +92,8 @@ export const LoginForm = memo<ILoginFormProps>(
         />
 
         <FormField
-          label="Password"
-          placeholder="Enter your password"
+          label="Contraseña"
+          placeholder="Ingresa tu contraseña"
           value={formState.password}
           onChangeText={handlePasswordChange}
           error={formState.errors.password}
@@ -106,11 +106,11 @@ export const LoginForm = memo<ILoginFormProps>(
         <TouchableOpacity
           style={styles.forgotPassword}
           onPress={handleForgotPassword}>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
 
         <Button
-          title="Sign In"
+          title="Iniciar Sesión"
           onPress={handleSubmit}
           loading={isLoading}
           disabled={isLoading}
@@ -120,8 +120,8 @@ export const LoginForm = memo<ILoginFormProps>(
         <TouchableOpacity
           style={styles.registerLink}
           onPress={handleNavigateToRegister}>
-          <Text style={styles.registerText}>Don't have an account?</Text>
-          <Text style={styles.registerLinkText}>Sign Up</Text>
+          <Text style={styles.registerText}>¿No tienes una cuenta?</Text>
+          <Text style={styles.registerLinkText}>Regístrate</Text>
         </TouchableOpacity>
       </View>
     );
