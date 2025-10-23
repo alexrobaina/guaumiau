@@ -1,12 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,17 +10,751 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  avatar    String?
-  refreshToken String?
-  resetPasswordToken String?
-  resetPasswordExpires DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// ============================================================================
+// ENUMS
+// ============================================================================
 
+enum UserRole {
+  PET_OWNER
+  SERVICE_PROVIDER
+  ADMIN
+}
+
+enum ServiceType {
+  DOG_WALKING
+  DOG_RUNNING
+  DOG_SITTING
+  CAT_SITTING
+  PET_SITTING
+  DOG_BOARDING
+  CAT_BOARDING
+  PET_BOARDING
+  DOG_DAYCARE
+  PET_DAYCARE
+  HOME_VISITS
+  PET_TAXI
+}
+
+enum PetType {
+  DOG
+  CAT
+  BIRD
+  RABBIT
+  HAMSTER
+  FISH
+  REPTILE
+  OTHER
+}
+
+enum PetSize {
+  EXTRA_SMALL  // < 5kg
+  SMALL        // 5-10kg
+  MEDIUM       // 10-25kg
+  LARGE        // 25-45kg
+  EXTRA_LARGE  // > 45kg
+}
+
+enum PetGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum EnergyLevel {
+  LOW
+  MODERATE
+  HIGH
+  VERY_HIGH
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  MERCADO_PAGO
+  CASH
+  BANK_TRANSFER
+}
+
+enum TransactionType {
+  PAYMENT
+  REFUND
+  PAYOUT
+  COMMISSION
+}
+
+enum PricingUnit {
+  PER_HOUR
+  PER_WALK
+  PER_DAY
+  PER_NIGHT
+  PER_VISIT
+  FLAT_RATE
+}
+
+enum SubscriptionType {
+  FREE
+  PREMIUM_MONTHLY
+  PREMIUM_YEARLY
+}
+
+enum NotificationType {
+  BOOKING_REQUEST
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  BOOKING_REMINDER
+  PAYMENT_RECEIVED
+  PAYMENT_FAILED
+  NEW_MESSAGE
+  NEW_REVIEW
+  BADGE_EARNED
+  SYSTEM_ANNOUNCEMENT
+}
+
+enum NotificationChannel {
+  PUSH
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum DocumentType {
+  NATIONAL_ID
+  BACKGROUND_CHECK
+  INSURANCE_CERTIFICATE
+  VETERINARY_CERTIFICATE
+  PROOF_OF_ADDRESS
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  LOCATION
+  SYSTEM
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+model User {
+  id                   String    @id @default(uuid())
+  email                String    @unique
+  username             String    @unique
+  password             String
+
+  // Basic Profile
+  firstName            String
+  lastName             String
+  phone                String?   @unique
+  avatar               String?
+
+  // Roles - User can have multiple roles
+  roles                UserRole[]
+
+  // Location
+  address              String?
+  city                 String?
+  state                String?
+  postalCode           String?
+  country              String    @default("AR")
+  latitude             Float?
+  longitude            Float?
+
+  // Account Status
+  isEmailVerified      Boolean   @default(false)
+  isPhoneVerified      Boolean   @default(false)
+  isActive             Boolean   @default(true)
+
+  // Notifications
+  notificationSettings Json?     // {email: true, push: true, sms: false, bookingReminders: true, ...}
+  pushTokens           String[]  // Multiple devices
+
+  // Auth
+  refreshToken         String?
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
+
+  // Emergency Contact
+  emergencyContactName  String?
+  emergencyContactPhone String?
+
+  // Timestamps
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  serviceProvider      ServiceProviderProfile?
+  pets                 Pet[]
+  bookingsAsClient     Booking[]       @relation("BookingClient")
+  bookingsAsProvider   Booking[]       @relation("BookingProvider")
+  reviewsWritten       Review[]        @relation("ReviewAuthor")
+  reviewsReceived      Review[]        @relation("ReviewTarget")
+  conversationsAsUser1 Conversation[]  @relation("ConversationUser1")
+  conversationsAsUser2 Conversation[]  @relation("ConversationUser2")
+  messages             Message[]
+  notifications        Notification[]
+  savedProviders       SavedProvider[]
+
+  @@index([latitude, longitude])
+  @@index([roles])
+  @@index([city, country])
   @@map("users")
+}
+
+model ServiceProviderProfile {
+  id                   String    @id @default(uuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Professional Info
+  bio                  String?
+  experience           String?
+  servicesOffered      ServiceType[]
+
+  // Availability & Capacity
+  isAvailable          Boolean   @default(true)
+  maxPetsPerBooking    Int       @default(1)
+  acceptedPetTypes     PetType[]
+  acceptedPetSizes     PetSize[]
+  coverageRadiusKm     Float?    // For mobile services
+  hasHomeSpace         Boolean   @default(false)  // For boarding/sitting
+  homeSpaceDescription String?
+
+  // Pricing
+  currency             String    @default("ARS")
+
+  // Verification & Trust
+  isVerified           Boolean   @default(false)
+  isBackgroundChecked  Boolean   @default(false)
+  hasInsurance         Boolean   @default(false)
+  insuranceExpiryDate  DateTime?
+  verifiedAt           DateTime?
+
+  // Statistics
+  totalBookings        Int       @default(0)
+  completedBookings    Int       @default(0)
+  cancelledBookings    Int       @default(0)
+  averageRating        Float     @default(0.0)
+  totalReviews         Int       @default(0)
+  responseRate         Float     @default(0.0)    // Percentage
+  avgResponseTimeMin   Int       @default(0)      // In minutes
+
+  // Gamification
+  level                Int       @default(1)
+  points               Int       @default(0)
+  streak               Int       @default(0)      // Consecutive days active
+
+  // Subscription
+  subscriptionType     SubscriptionType  @default(FREE)
+  subscriptionExpiry   DateTime?
+  premiumFeatures      Json?     // {prioritySupport: true, unlimitedPhotos: true, ...}
+
+  // Timestamps
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  services             Service[]
+  availability         Availability[]
+  documents            Document[]
+  badges               UserBadge[]
+  savedByUsers         SavedProvider[]
+
+  @@index([isAvailable, isVerified])
+  @@map("service_provider_profiles")
+}
+
+model Pet {
+  id                   String    @id @default(uuid())
+  ownerId              String
+  owner                User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // Basic Info
+  name                 String
+  type                 PetType
+  breed                String?
+  size                 PetSize
+  weight               Float?    // in kg
+  age                  Int?      // in years
+  gender               PetGender
+  photos               String[]  // Array of image URLs
+
+  // Medical Info
+  isVaccinated         Boolean   @default(false)
+  vaccinationRecords   Json?     // [{name: "Rabies", date: "2024-01-15", nextDue: "2025-01-15"}, ...]
+  isNeutered           Boolean   @default(false)
+  microchipId          String?
+  allergies            String?
+  medications          String?
+  specialNeeds         String?
+
+  // Veterinary Contact
+  vetName              String?
+  vetPhone             String?
+  vetAddress           String?
+
+  // Behavior & Preferences
+  energyLevel          EnergyLevel?
+  isFriendlyWithDogs   Boolean   @default(true)
+  isFriendlyWithCats   Boolean   @default(true)
+  isFriendlyWithKids   Boolean   @default(true)
+  trainingLevel        String?   // "Basic", "Advanced", "None"
+  favoriteActivities   String?
+
+  // Walk Preferences
+  preferredWalkDuration Int?     // in minutes
+  preferredWalkFrequency String? // "Once daily", "Twice daily"
+
+  // Notes
+  specialInstructions  String?
+
+  // Timestamps
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  bookings             BookingPet[]
+
+  @@index([ownerId])
+  @@index([type, size])
+  @@map("pets")
+}
+
+model Service {
+  id                  String      @id @default(uuid())
+  providerId          String
+  provider            ServiceProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  serviceType         ServiceType
+
+  // Pricing
+  basePrice           Float
+  pricingUnit         PricingUnit
+
+  // Service Configuration
+  description         String?
+  duration            Int?         // Default duration in minutes
+  maxPets             Int          @default(1)
+  acceptedPetTypes    PetType[]
+  acceptedPetSizes    PetSize[]
+
+  // Availability
+  isActive            Boolean      @default(true)
+
+  // Additional Fees
+  extraPetFee         Float?       // Per additional pet
+  weekendSurcharge    Float?       // Percentage
+  holidaySurcharge    Float?       // Percentage
+
+  // Timestamps
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@unique([providerId, serviceType])
+  @@index([serviceType, isActive])
+  @@map("services")
+}
+
+model Availability {
+  id                  String      @id @default(uuid())
+  providerId          String
+  provider            ServiceProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  // Recurring Weekly Schedule
+  dayOfWeek           DayOfWeek
+  startTime           String      // "09:00"
+  endTime             String      // "18:00"
+  isActive            Boolean     @default(true)
+
+  // Or Specific Date Override
+  specificDate        DateTime?   // For exceptions/one-off availability
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([providerId, dayOfWeek])
+  @@index([specificDate])
+  @@map("availability")
+}
+
+model Booking {
+  id                  String        @id @default(uuid())
+
+  // Parties
+  clientId            String
+  client              User          @relation("BookingClient", fields: [clientId], references: [id])
+  providerId          String
+  provider            User          @relation("BookingProvider", fields: [providerId], references: [id])
+
+  // Service Details
+  serviceType         ServiceType
+  status              BookingStatus @default(PENDING)
+
+  // Schedule
+  startDate           DateTime
+  endDate             DateTime
+  duration            Int?          // Total duration in minutes/hours/days
+
+  // Location
+  pickupAddress       String?
+  pickupLatitude      Float?
+  pickupLongitude     Float?
+
+  // Pricing
+  basePrice           Float
+  extraPetFee         Float         @default(0)
+  additionalFees      Float         @default(0)
+  platformCommission  Float         // Platform's cut (e.g., 15%)
+  totalPrice          Float
+  currency            String        @default("ARS")
+
+  // Payment
+  paymentMethod       PaymentMethod?
+  paymentStatus       PaymentStatus @default(PENDING)
+  paymentTransactionId String?
+
+  // Special Instructions
+  specialInstructions String?
+
+  // Status Timestamps
+  confirmedAt         DateTime?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  cancellationReason  String?
+  cancelledBy         String?       // userId who cancelled
+
+  // Timestamps
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  // Relations
+  pets                BookingPet[]
+  reviews             Review[]
+  transactions        Transaction[]
+  tracking            Tracking[]
+
+  @@index([clientId, status])
+  @@index([providerId, status])
+  @@index([startDate, endDate])
+  @@index([status])
+  @@map("bookings")
+}
+
+// Junction table for many-to-many between Booking and Pet
+model BookingPet {
+  id        String   @id @default(uuid())
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  petId     String
+  pet       Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([bookingId, petId])
+  @@map("booking_pets")
+}
+
+model Review {
+  id                  String    @id @default(uuid())
+  bookingId           String
+  booking             Booking   @relation(fields: [bookingId], references: [id])
+
+  // Who wrote the review and who is being reviewed
+  authorId            String
+  author              User      @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetId            String
+  target              User      @relation("ReviewTarget", fields: [targetId], references: [id])
+
+  // Ratings (1-5 stars)
+  overallRating       Float
+  punctualityRating   Float?
+  communicationRating Float?
+  careQualityRating   Float?
+  trustworthinessRating Float?
+
+  // Feedback
+  comment             String?
+  photos              String[]  // Photo URLs
+
+  // Badges awarded
+  badgesAwarded       String[]  // ["Super Walker", "Great Communicator"]
+
+  // Visibility
+  isPublic            Boolean   @default(true)
+
+  // Provider Response
+  response            String?
+  respondedAt         DateTime?
+
+  // Timestamps
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([targetId])
+  @@index([bookingId])
+  @@index([overallRating])
+  @@map("reviews")
+}
+
+model Conversation {
+  id                  String    @id @default(uuid())
+
+  // Participants
+  user1Id             String
+  user1               User      @relation("ConversationUser1", fields: [user1Id], references: [id])
+  user2Id             String
+  user2               User      @relation("ConversationUser2", fields: [user2Id], references: [id])
+
+  // Status
+  isActive            Boolean   @default(true)
+
+  // Last Message Info (denormalized for performance)
+  lastMessageAt       DateTime?
+  lastMessagePreview  String?
+
+  // Unread counts
+  unreadCountUser1    Int       @default(0)
+  unreadCountUser2    Int       @default(0)
+
+  // Timestamps
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  // Relations
+  messages            Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("conversations")
+}
+
+model Message {
+  id              String       @id @default(uuid())
+  conversationId  String
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId        String
+  sender          User         @relation(fields: [senderId], references: [id])
+
+  // Content
+  messageType     MessageType  @default(TEXT)
+  content         String
+  attachmentUrl   String?
+
+  // Status
+  isRead          Boolean      @default(false)
+  readAt          DateTime?
+
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model Transaction {
+  id                  String          @id @default(uuid())
+  bookingId           String?
+  booking             Booking?        @relation(fields: [bookingId], references: [id])
+
+  // Transaction Details
+  type                TransactionType
+  amount              Float
+  currency            String          @default("ARS")
+
+  // Breakdown
+  serviceFee          Float           // What provider receives
+  platformCommission  Float           // Platform's cut
+  processingFee       Float           @default(0)
+
+  // Payment Provider
+  paymentProvider     String?         // "stripe", "mercadopago"
+  externalTransactionId String?
+
+  // Status
+  status              PaymentStatus   @default(PENDING)
+
+  // Notes
+  description         String?
+  metadata            Json?
+
+  // Timestamps
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  completedAt         DateTime?
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([type])
+  @@map("transactions")
+}
+
+model Notification {
+  id              String             @id @default(uuid())
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Notification Details
+  type            NotificationType
+  channel         NotificationChannel
+  title           String
+  message         String
+  data            Json?              // Additional data (bookingId, etc.)
+
+  // Status
+  isRead          Boolean            @default(false)
+  readAt          DateTime?
+  isSent          Boolean            @default(false)
+  sentAt          DateTime?
+
+  // Expiration
+  expiresAt       DateTime?
+
+  // Timestamps
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model Tracking {
+  id              String    @id @default(uuid())
+  bookingId       String
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  // GPS Data
+  latitude        Float
+  longitude       Float
+  accuracy        Float?    // in meters
+  altitude        Float?
+  speed           Float?    // in km/h
+
+  // Event Type
+  eventType       String?   // "start", "checkpoint", "pause", "resume", "end"
+  notes           String?
+
+  // Timestamp
+  recordedAt      DateTime  @default(now())
+
+  @@index([bookingId, recordedAt])
+  @@map("tracking")
+}
+
+model Badge {
+  id              String      @id @default(uuid())
+
+  // Badge Details
+  name            String      @unique
+  description     String
+  iconUrl         String?
+  category        String?     // "walker", "client", "achievement"
+
+  // Requirements
+  requirements    Json?       // {completedBookings: 10, avgRating: 4.5, ...}
+
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  userBadges      UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id              String                 @id @default(uuid())
+  providerId      String
+  provider        ServiceProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  badgeId         String
+  badge           Badge                  @relation(fields: [badgeId], references: [id])
+
+  // When earned
+  earnedAt        DateTime               @default(now())
+
+  @@unique([providerId, badgeId])
+  @@map("user_badges")
+}
+
+model Document {
+  id              String                 @id @default(uuid())
+  providerId      String
+  provider        ServiceProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  // Document Details
+  type            DocumentType
+  fileUrl         String
+  fileName        String?
+
+  // Status
+  status          DocumentStatus         @default(PENDING)
+
+  // Review
+  reviewedAt      DateTime?
+  reviewedBy      String?                // Admin userId
+  rejectionReason String?
+
+  // Expiry
+  expiresAt       DateTime?
+
+  // Timestamps
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@index([providerId, status])
+  @@map("documents")
+}
+
+model SavedProvider {
+  id              String                 @id @default(uuid())
+  userId          String
+  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerId      String
+  provider        ServiceProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  // Timestamps
+  createdAt       DateTime               @default(now())
+
+  @@unique([userId, providerId])
+  @@map("saved_providers")
 }

@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
-import { User } from '../../generated/prisma';
+import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 
@@ -18,7 +18,7 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
-  async register(email: string, username: string, password: string, avatar?: string) {
+  async register(email: string, username: string, password: string, firstName: string, lastName: string, avatar?: string) {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ email }, { username }],
@@ -36,6 +36,9 @@ export class AuthService {
         email,
         username,
         password: hashedPassword,
+        firstName,
+        lastName,
+        roles: ['PET_OWNER'], // Default role
         avatar,
       },
     });
