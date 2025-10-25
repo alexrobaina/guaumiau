@@ -20,8 +20,24 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
   });
 
   const handleRegister = useCallback(
-    (email: string, username: string, password: string) => {
-      register.mutate({email, username, password});
+    (
+      email: string,
+      username: string,
+      password: string,
+      firstName: string,
+      lastName: string,
+      userRole: 'PET_OWNER' | 'SERVICE_PROVIDER',
+      termsAccepted: boolean,
+    ) => {
+      register.mutate({
+        email,
+        username,
+        password,
+        firstName,
+        lastName,
+        userRole,
+        termsAccepted,
+      });
     },
     [register],
   );

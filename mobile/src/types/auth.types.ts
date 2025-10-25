@@ -3,7 +3,12 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  firstName: string;
+  lastName: string;
+  roles: string[];
   avatar: string | null;
+  termsAccepted: boolean;
+  termsAcceptedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,6 +18,10 @@ export interface RegisterRequest {
   email: string;
   username: string;
   password: string;
+  firstName: string;
+  lastName: string;
+  userRole: 'PET_OWNER' | 'SERVICE_PROVIDER';
+  termsAccepted: boolean;
   avatar?: string;
 }
 

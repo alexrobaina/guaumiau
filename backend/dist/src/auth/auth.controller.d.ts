@@ -31,6 +31,8 @@ export declare class AuthController {
             isEmailVerified: boolean;
             isPhoneVerified: boolean;
             isActive: boolean;
+            termsAccepted: boolean;
+            termsAcceptedAt: Date | null;
             notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
             pushTokens: string[];
             resetPasswordToken: string | null;
@@ -63,6 +65,8 @@ export declare class AuthController {
             isEmailVerified: boolean;
             isPhoneVerified: boolean;
             isActive: boolean;
+            termsAccepted: boolean;
+            termsAcceptedAt: Date | null;
             notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
             pushTokens: string[];
             resetPasswordToken: string | null;

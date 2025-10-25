@@ -1,14 +1,15 @@
-import {StyleSheet} from 'react-native';
+import { theme } from '@/theme';
+import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
-    gap: 16,
+    gap: theme.spacing.sm,
   },
   errorContainer: {
     padding: 12,
     backgroundColor: '#FEE2E2',
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   errorText: {
     color: '#DC2626',
@@ -28,6 +29,15 @@ export const styles = StyleSheet.create({
   loginLinkText: {
     color: '#2563EB',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: '#374151',
+    flex: 1,
+  },
+  checkboxLinkText: {
+    color: '#2563EB',
     fontWeight: '600',
   },
 });

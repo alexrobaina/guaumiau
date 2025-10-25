@@ -7,3 +7,4 @@ export {Spinner} from './Spinner';
 export {Spacer} from './Spacer';
 export {Divider} from './Divider';
 export {Badge} from './Badge';
+export {Checkbox} from './Checkbox';

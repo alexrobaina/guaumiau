@@ -63,7 +63,7 @@ let AuthService = AuthService_1 = class AuthService {
         this.configService = configService;
         this.emailService = emailService;
     }
-    async register(email, username, password, firstName, lastName, avatar) {
+    async register(email, username, password, firstName, lastName, userRole, termsAccepted, avatar) {
         const existingUser = await this.prisma.user.findFirst({
             where: {
                 OR: [{ email }, { username }],
@@ -71,6 +71,9 @@ let AuthService = AuthService_1 = class AuthService {
         });
         if (existingUser) {
             throw new common_1.BadRequestException('Email or username already exists');
+        }
+        if (!termsAccepted) {
+            throw new common_1.BadRequestException('You must accept the Terms & Conditions to register');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await this.prisma.user.create({
@@ -80,7 +83,9 @@ let AuthService = AuthService_1 = class AuthService {
                 password: hashedPassword,
                 firstName,
                 lastName,
-                roles: ['PET_OWNER'],
+                roles: [userRole],
+                termsAccepted,
+                termsAcceptedAt: new Date(),
                 avatar,
             },
         });

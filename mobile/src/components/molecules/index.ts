@@ -4,3 +4,4 @@ export {SearchBar} from './SearchBar';
 export {Avatar} from './Avatar';
 export {Chip} from './Chip';
 export {IconButton} from './IconButton';
+export {RadioGroup} from './RadioGroup';

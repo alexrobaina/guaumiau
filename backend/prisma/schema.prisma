@@ -198,6 +198,8 @@ model User {
   isEmailVerified      Boolean   @default(false)
   isPhoneVerified      Boolean   @default(false)
   isActive             Boolean   @default(true)
+  termsAccepted        Boolean   @default(false)
+  termsAcceptedAt      DateTime?
 
   // Notifications
   notificationSettings Json?     // {email: true, push: true, sms: false, bookingReminders: true, ...}

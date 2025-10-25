@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
+import { UserRole } from '@prisma/client';
 export declare class AuthService {
     private prisma;
     private jwtService;
@@ -9,7 +10,7 @@ export declare class AuthService {
     private emailService;
     private readonly logger;
     constructor(prisma: PrismaService, jwtService: JwtService, configService: ConfigService, emailService: EmailService);
-    register(email: string, username: string, password: string, firstName: string, lastName: string, avatar?: string): Promise<{
+    register(email: string, username: string, password: string, firstName: string, lastName: string, userRole: UserRole, termsAccepted: boolean, avatar?: string): Promise<{
         accessToken: string;
         refreshToken: string;
         user: {
@@ -33,6 +34,8 @@ export declare class AuthService {
             isEmailVerified: boolean;
             isPhoneVerified: boolean;
             isActive: boolean;
+            termsAccepted: boolean;
+            termsAcceptedAt: Date | null;
             notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
             pushTokens: string[];
             resetPasswordToken: string | null;
@@ -65,6 +68,8 @@ export declare class AuthService {
             isEmailVerified: boolean;
             isPhoneVerified: boolean;
             isActive: boolean;
+            termsAccepted: boolean;
+            termsAcceptedAt: Date | null;
             notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
             pushTokens: string[];
             resetPasswordToken: string | null;
@@ -100,6 +105,8 @@ export declare class AuthService {
         isEmailVerified: boolean;
         isPhoneVerified: boolean;
         isActive: boolean;
+        termsAccepted: boolean;
+        termsAcceptedAt: Date | null;
         notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
         pushTokens: string[];
         resetPasswordToken: string | null;
