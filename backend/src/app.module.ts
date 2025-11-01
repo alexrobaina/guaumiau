@@ -10,6 +10,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { S3Module } from './s3/s3.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
+import { PetsModule } from './pets/pets.module';
+import { UploadsModule } from './uploads/uploads.module';
 import { MorganMiddleware } from './common/middleware/morgan.middleware';
 import { winstonConfig } from './common/logger/winston.config';
 
@@ -44,6 +46,8 @@ import { winstonConfig } from './common/logger/winston.config';
     S3Module,
     AuthModule,
     EmailModule,
+    PetsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

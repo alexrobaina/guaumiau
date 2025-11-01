@@ -8,4 +8,5 @@ export declare class EmailService {
     private initializeTransporter;
     sendPasswordResetEmail(email: string, resetToken: string): Promise<void>;
     sendWelcomeEmail(email: string, username: string): Promise<void>;
+    sendEmailVerification(email: string, verificationToken: string, username: string): Promise<void>;
 }

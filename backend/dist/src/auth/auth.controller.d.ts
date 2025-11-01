@@ -1,9 +1,12 @@
+import type { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -37,6 +40,8 @@ export declare class AuthController {
             pushTokens: string[];
             resetPasswordToken: string | null;
             resetPasswordExpires: Date | null;
+            emailVerificationToken: string | null;
+            emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
         };
@@ -71,6 +76,8 @@ export declare class AuthController {
             pushTokens: string[];
             resetPasswordToken: string | null;
             resetPasswordExpires: Date | null;
+            emailVerificationToken: string | null;
+            emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
         };
@@ -91,4 +98,12 @@ export declare class AuthController {
     getProfile(user: any): Promise<{
         user: any;
     }>;
+    verifyEmail(verifyEmailDto: VerifyEmailDto): Promise<{
+        message: string;
+    }>;
+    resendVerification(resendVerificationDto: ResendVerificationDto): Promise<{
+        message: string;
+    }>;
+    verifyEmailPage(token: string, res: Response): Promise<Response<any, Record<string, any>>>;
+    private generateVerificationHtml;
 }

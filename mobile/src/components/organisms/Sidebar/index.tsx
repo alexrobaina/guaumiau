@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Home, Calendar, Trophy, User, Settings, LogOut, X, Dog } from 'lucide-react-native';
+import { Home, Calendar, Trophy, User, Settings, LogOut, X, Dog, Footprints } from 'lucide-react-native';
 import { Text } from '@/components/atoms/Text';
 import { useAuth } from '@/contexts/AuthContext';
 import { theme } from '@/theme';
@@ -65,6 +65,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       activeIcon: <Home size={24} color={theme.colors.primary} />,
       label: 'Home',
       routeName: 'Home',
+    },
+    {
+      icon: <Footprints size={24} color={theme.colors.textSecondary} />,
+      activeIcon: <Footprints size={24} color={theme.colors.primary} />,
+      label: 'Walker Home',
+      routeName: 'WalkerHome',
     },
     {
       icon: <Calendar size={24} color={theme.colors.textSecondary} />,

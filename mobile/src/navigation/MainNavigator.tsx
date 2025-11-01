@@ -8,6 +8,7 @@ import {AchievementsScreen} from '../screens/AchievementsScreen';
 import {ProfileScreen} from '../screens/ProfileScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {MyPetsScreen} from '../screens/MyPetsScreen';
+import {WalkerHomeScreen} from '../screens/WalkerHomeScreen';
 import {Sidebar} from '../components/organisms/Sidebar';
 import {theme} from '../theme';
 
@@ -81,6 +82,11 @@ export const MainNavigator = () => {
             name="Settings"
             component={SettingsScreen}
             options={{title: 'Settings'}}
+          />
+          <Stack.Screen
+            name="WalkerHome"
+            component={WalkerHomeScreen}
+            options={{title: 'Walker Home', headerShown: false}}
           />
         </Stack.Navigator>
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

@@ -40,6 +40,8 @@ export declare class AuthService {
             pushTokens: string[];
             resetPasswordToken: string | null;
             resetPasswordExpires: Date | null;
+            emailVerificationToken: string | null;
+            emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
         };
@@ -74,6 +76,8 @@ export declare class AuthService {
             pushTokens: string[];
             resetPasswordToken: string | null;
             resetPasswordExpires: Date | null;
+            emailVerificationToken: string | null;
+            emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
         };
@@ -111,6 +115,8 @@ export declare class AuthService {
         pushTokens: string[];
         resetPasswordToken: string | null;
         resetPasswordExpires: Date | null;
+        emailVerificationToken: string | null;
+        emailVerificationExpires: Date | null;
         emergencyContactName: string | null;
         emergencyContactPhone: string | null;
     } | null>;
@@ -119,6 +125,12 @@ export declare class AuthService {
         refreshToken: string;
     }>;
     logout(userId: string): Promise<{
+        message: string;
+    }>;
+    verifyEmail(token: string): Promise<{
+        message: string;
+    }>;
+    resendVerificationEmail(email: string): Promise<{
         message: string;
     }>;
     private generateTokens;

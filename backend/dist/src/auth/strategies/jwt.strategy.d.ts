@@ -35,6 +35,8 @@ export declare class JwtStrategy extends JwtStrategy_base {
         pushTokens: string[];
         resetPasswordToken: string | null;
         resetPasswordExpires: Date | null;
+        emailVerificationToken: string | null;
+        emailVerificationExpires: Date | null;
         emergencyContactName: string | null;
         emergencyContactPhone: string | null;
     }>;

@@ -40,6 +40,12 @@ Guaumiau is a full-stack application with a NestJS backend and React Native mobi
   - Path aliases via babel-plugin-module-resolver (`@`, `@components`, `@screens`, etc.)
   - API client in `src/services/api`
   - Screens: Home, Schedule, Achievements, Profile, Settings, Login, Register, ForgotPassword
+  - **Deep Linking**: Full support for custom URL schemes (`guaumiau://`) and universal links (`https://guaumiau.app`)
+    - Configuration in `src/navigation/linking.ts`
+    - Utilities in `src/utils/deepLinking.ts`
+    - Hooks in `src/hooks/useDeepLinking.ts`
+    - Testing script: `npm run deeplink:test:ios` or `npm run deeplink:test:android`
+    - Documentation: `docs/deep-linking-guide.md`
 
 ## Development Commands
 

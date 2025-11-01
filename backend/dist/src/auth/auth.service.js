@@ -76,6 +76,9 @@ let AuthService = AuthService_1 = class AuthService {
             throw new common_1.BadRequestException('You must accept the Terms & Conditions to register');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
+        const verificationToken = (0, crypto_1.randomBytes)(32).toString('hex');
+        const hashedVerificationToken = await bcrypt.hash(verificationToken, 10);
+        const verificationExpires = new Date(Date.now() + 24 * 3600000);
         const user = await this.prisma.user.create({
             data: {
                 email,
@@ -87,12 +90,14 @@ let AuthService = AuthService_1 = class AuthService {
                 termsAccepted,
                 termsAcceptedAt: new Date(),
                 avatar,
+                emailVerificationToken: hashedVerificationToken,
+                emailVerificationExpires: verificationExpires,
             },
         });
         const { password: _, refreshToken: __, ...userWithoutPassword } = user;
         const tokens = await this.generateTokens(user.id);
-        this.emailService.sendWelcomeEmail(email, username).catch((error) => {
-            this.logger.error(`Failed to send welcome email: ${error.message}`);
+        this.emailService.sendEmailVerification(email, verificationToken, username).catch((error) => {
+            this.logger.error(`Failed to send verification email: ${error.message}`);
         });
         return {
             user: userWithoutPassword,
@@ -206,6 +211,58 @@ let AuthService = AuthService_1 = class AuthService {
             data: { refreshToken: null },
         });
         return { message: 'Logged out successfully' };
+    }
+    async verifyEmail(token) {
+        const users = await this.prisma.user.findMany({
+            where: {
+                emailVerificationExpires: {
+                    gte: new Date(),
+                },
+                isEmailVerified: false,
+            },
+        });
+        let foundUser = null;
+        for (const u of users) {
+            if (u.emailVerificationToken && await bcrypt.compare(token, u.emailVerificationToken)) {
+                foundUser = u;
+                break;
+            }
+        }
+        if (!foundUser) {
+            throw new common_1.BadRequestException('Invalid or expired verification token');
+        }
+        await this.prisma.user.update({
+            where: { id: foundUser.id },
+            data: {
+                isEmailVerified: true,
+                emailVerificationToken: null,
+                emailVerificationExpires: null,
+            },
+        });
+        return { message: 'Email verified successfully' };
+    }
+    async resendVerificationEmail(email) {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            throw new common_1.BadRequestException('User not found');
+        }
+        if (user.isEmailVerified) {
+            throw new common_1.BadRequestException('Email already verified');
+        }
+        const verificationToken = (0, crypto_1.randomBytes)(32).toString('hex');
+        const hashedVerificationToken = await bcrypt.hash(verificationToken, 10);
+        const verificationExpires = new Date(Date.now() + 24 * 3600000);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                emailVerificationToken: hashedVerificationToken,
+                emailVerificationExpires: verificationExpires,
+            },
+        });
+        await this.emailService.sendEmailVerification(email, verificationToken, user.username);
+        return { message: 'Verification email sent' };
     }
     async generateTokens(userId) {
         const payload = { sub: userId };

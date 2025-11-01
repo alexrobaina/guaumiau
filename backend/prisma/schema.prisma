@@ -206,9 +206,11 @@ model User {
   pushTokens           String[]  // Multiple devices
 
   // Auth
-  refreshToken         String?
-  resetPasswordToken   String?
-  resetPasswordExpires DateTime?
+  refreshToken              String?
+  resetPasswordToken        String?
+  resetPasswordExpires      DateTime?
+  emailVerificationToken    String?
+  emailVerificationExpires  DateTime?
 
   // Emergency Contact
   emergencyContactName  String?

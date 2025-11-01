@@ -24,18 +24,18 @@
 
 ### Mobile App Setup
 
-- [ ] Initialize React Native project with TypeScript
-- [ ] Setup navigation (React Navigation v6)
-- [ ] Configure state management (Redux Toolkit/Zustand)
-- [ ] Setup React Query for API calls
+- [x] Initialize React Native project with TypeScript
+- [x] Setup navigation (React Navigation v6)
+- [x] Configure state management (Mobx)
+- [x] Setup React Query for API calls
 - [ ] Configure push notifications (FCM/APNS)
 - [ ] Setup development environments (dev/staging/prod)
 - [ ] Configure app icons and splash screens
-- [ ] Setup deep linking configuration
+- [x] Setup deep linking configuration
 
 ### DevOps & Infrastructure
 
-- [ ] Setup Git repository with branching strategy
+- [x] Setup Git repository with branching strategy
 - [ ] Configure CI/CD pipeline (GitHub Actions/CircleCI)
 - [ ] Setup AWS/Google Cloud infrastructure
 - [ ] Configure S3/Cloudinary for image storage
@@ -48,27 +48,28 @@
 
 ### Backend Tasks
 
-- [ ] Implement JWT authentication strategy
-- [ ] Create user registration endpoint with role selection
-- [ ] Implement email verification system
+- [x] Implement JWT authentication strategy
+- [x] Create user registration endpoint with role selection
+- [x] Implement email verification system
 - [ ] Setup phone number verification (Twilio/SMS)
-- [ ] Create login/logout endpoints
-- [ ] Implement password reset flow
+- [x] Create login/logout endpoints
+- [x] Implement password reset flow
 - [ ] Setup OAuth providers (Google/Facebook)
-- [ ] Create user profile CRUD endpoints
-- [ ] Implement role-based access control (RBAC)
-- [ ] Create address management endpoints with geocoding
+- [x] Create user profile CRUD endpoints
+- [] Implement role-based access control (RBAC)
+- [] Create address management endpoints with geocoding
 
 ### Mobile Tasks
 
 - [ ] Design and implement splash screen
-- [ ] Create login screen with validation
-- [ ] Implement registration flow (multi-step)
-- [ ] Build role selection UI (Pet Owner/Walker)
-- [ ] Implement OAuth login buttons
-- [ ] Create password reset flow
-- [ ] Build email/phone verification screens
-- [ ] Implement secure token storage (Keychain/Keystore)
+- [x] Create login screen with validation
+- [] Implement registration flow (multi-step)
+- [x] Build role selection UI (Pet Owner/Walker)
+- [x] Implement OAuth login buttons
+- [x] Create password reset flow
+- [x] Build email/phone verification screens
+- [] Build phone verification screens
+- [x] Implement secure token storage (Keychain/Keystore)
 - [ ] Create profile setup wizard
 - [ ] Implement biometric authentication
 
@@ -78,8 +79,8 @@
 
 ### Backend Tasks
 
-- [ ] Create pets table schema
-- [ ] Implement pet CRUD endpoints
+- [x] Create pets table schema
+- [] Implement pet CRUD endpoints
 - [ ] Setup pet photo upload with validation
 - [ ] Create pet medical information endpoints
 - [ ] Implement pet behavior tracking
