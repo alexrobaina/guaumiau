@@ -1,97 +1,201 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# GuauMiau Mobile App
 
-# Getting Started
+React Native mobile application for the GuauMiau pet services platform.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🚀 Quick Start
 
-## Step 1: Start Metro
+> **Note**: Make sure you have completed the [React Native Environment Setup](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### Prerequisites
+- Node.js >= 20
+- npm or pnpm (package manager)
+- iOS: Xcode and CocoaPods
+- Android: Android Studio and SDK
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### Installation
 
-```sh
-# Using npm
+```bash
+# Install dependencies
+npm install
+
+# iOS: Install CocoaPods dependencies
+cd ios && bundle install && bundle exec pod install && cd ..
+```
+
+### Running the App
+
+```bash
+# Start Metro bundler
 npm start
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# Run on iOS
 npm run ios
 
-# OR using Yarn
-yarn ios
+# Run on Android
+npm run android
+
+# View iOS logs
+npm run ios:logs
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 📱 Features
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+- ✅ User Authentication (Login, Register, Password Reset)
+- ✅ Profile Management
+- ✅ Schedule & Bookings
+- ✅ Achievements & Gamification
+- ✅ Settings & Preferences
+- ✅ **Deep Linking Support** (URL schemes & Universal Links)
 
-## Step 3: Modify your app
+## 🔗 Deep Linking
 
-Now that you have successfully run the app, let's make changes!
+The app supports deep linking for seamless navigation from external sources.
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### Quick Test
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+```bash
+# Test all deep links on iOS
+npm run deeplink:test:ios
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+# Test all deep links on Android
+npm run deeplink:test:android
 
-## Congratulations! :tada:
+# Test authentication links only
+npm run deeplink:ios:auth
+npm run deeplink:android:auth
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+### Supported URLs
 
-### Now what?
+**Authentication:**
+- `guaumiau://login`
+- `guaumiau://register`
+- `guaumiau://forgot-password`
+- `guaumiau://reset-password?token=xxx`
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+**Main Navigation:**
+- `guaumiau://home`
+- `guaumiau://schedule`
+- `guaumiau://achievements`
+- `guaumiau://profile`
+- `guaumiau://settings`
 
-# Troubleshooting
+**Dynamic Routes:**
+- `guaumiau://booking/:id`
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+**📚 Full Documentation**: [DEEP_LINKING_SETUP.md](./DEEP_LINKING_SETUP.md) | [Deep Linking Guide](../docs/deep-linking-guide.md)
 
-# Learn More
+## 🛠️ Available Scripts
 
-To learn more about React Native, take a look at the following resources:
+### Development
+- `npm start` - Start Metro bundler
+- `npm run dev` - Start with cache reset
+- `npm run ios` - Run on iOS simulator
+- `npm run android` - Run on Android emulator
+- `npm run ios:logs` - View iOS logs
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Deep Link Testing
+- `npm run deeplink:test:ios` - Test all iOS deep links
+- `npm run deeplink:test:android` - Test all Android deep links
+- `npm run deeplink:ios:auth` - Test iOS auth links
+- `npm run deeplink:android:auth` - Test Android auth links
+
+### Code Quality
+- `npm run lint` - Lint TypeScript files
+- `npm test` - Run tests
+
+## 🏗️ Project Architecture
+
+### Component Structure (Atomic Design)
+
+```
+src/components/
+├── atoms/          # Basic UI elements (Button, Text, Input)
+├── molecules/      # Simple combinations (FormField, Card)
+├── organisms/      # Complex components (Header, LoginForm, Sidebar)
+├── templates/      # Page layouts
+└── screens/        # Complete screens
+```
+
+### Path Aliases
+
+```typescript
+import { Component } from '@/components/atoms/Component';
+import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/services/api';
+```
+
+## 📁 Project Structure
+
+```
+mobile/
+├── src/
+│   ├── components/       # UI components (atoms, molecules, organisms)
+│   ├── screens/          # Screen components
+│   ├── navigation/       # Navigation configuration
+│   ├── hooks/            # Custom React hooks
+│   ├── services/         # API and external services
+│   ├── stores/           # MobX stores
+│   ├── contexts/         # React contexts
+│   ├── utils/            # Utility functions
+│   ├── theme/            # Theme configuration
+│   └── types/            # TypeScript types
+├── scripts/              # Development scripts
+├── android/              # Android native code
+├── ios/                  # iOS native code
+└── docs/                 # Documentation
+```
+
+## 🧪 Testing Deep Links
+
+### iOS Simulator
+
+```bash
+xcrun simctl openurl booted "guaumiau://home"
+xcrun simctl openurl booted "guaumiau://booking/123"
+```
+
+### Android Emulator
+
+```bash
+adb shell am start -W -a android.intent.action.VIEW -d "guaumiau://home"
+adb shell am start -W -a android.intent.action.VIEW -d "guaumiau://booking/123"
+```
+
+## 📚 Documentation
+
+- **Deep Linking Setup**: [DEEP_LINKING_SETUP.md](./DEEP_LINKING_SETUP.md)
+- **Deep Linking Guide**: [docs/deep-linking-guide.md](../docs/deep-linking-guide.md)
+- **Project Roadmap**: [docs/Steps by step app.md](../docs/Steps%20by%20step%20app.md)
+- **Main Project Docs**: [../CLAUDE.md](../CLAUDE.md)
+
+## 🔧 Tech Stack
+
+- **Framework**: React Native 0.81.4
+- **Language**: TypeScript 5.8
+- **State Management**: MobX 6.15
+- **Data Fetching**: TanStack React Query 5.90
+- **Navigation**: React Navigation 7
+- **Icons**: Lucide React Native
+- **Storage**: AsyncStorage
+
+## 🐛 Troubleshooting
+
+### App won't build
+- Clean and rebuild: Delete `node_modules`, run `npm install`
+- iOS: Delete `ios/Pods`, run `bundle exec pod install`
+- Android: Run `cd android && ./gradlew clean`
+
+### Deep links not working
+- iOS: Rebuild the app after Info.plist changes
+- Android: Reinstall the app after AndroidManifest.xml changes
+- Check logs for navigation errors
+
+### More help
+- [React Native Troubleshooting](https://reactnative.dev/docs/troubleshooting)
+- [iOS Setup](https://reactnative.dev/docs/environment-setup?platform=ios)
+- [Android Setup](https://reactnative.dev/docs/environment-setup?platform=android)
+
+---
+
+**Tech Stack**: React Native 0.81.4 • TypeScript 5.8 • MobX 6.15 • React Query 5.90 • React Navigation 7

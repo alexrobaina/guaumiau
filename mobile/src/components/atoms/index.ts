@@ -8,3 +8,6 @@ export {Spacer} from './Spacer';
 export {Divider} from './Divider';
 export {Badge} from './Badge';
 export {Checkbox} from './Checkbox';
+export {PetAvatar} from './PetAvatar';
+export {PetSizeBadge} from './PetSizeBadge';
+export {DatePicker} from './DatePicker';

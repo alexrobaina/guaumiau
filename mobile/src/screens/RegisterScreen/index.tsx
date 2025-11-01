@@ -1,18 +1,18 @@
 import React, {memo, useCallback} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {AuthLayout} from '@components/templates/AuthLayout';
 import {RegisterForm} from '@components/organisms/RegisterForm';
 import {useRegister} from '@/hooks/api';
-import {useAuth} from '@/contexts/AuthContext';
 import {IRegisterScreenProps} from './RegisterScreen.types';
 
 export const RegisterScreen = memo<IRegisterScreenProps>(() => {
-  const {login: authLogin} = useAuth();
+  const navigation = useNavigation();
 
   const register = useRegister({
     onSuccess: async data => {
       console.log('Registration successful:', data.user);
-      // Save user, accessToken, and refreshToken to context and storage
-      await authLogin(data.user, data.accessToken, data.refreshToken);
+      // Navigate to email verification screen
+      navigation.navigate('VerifyEmail' as never, {email: data.user.email} as never);
     },
     onError: error => {
       console.error('Registration failed:', error);
@@ -42,11 +42,27 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
     [register],
   );
 
-  const errorMessage =
-    register.error?.response?.data?.message ||
-    (register.isError
-      ? 'Registro fallido. Por favor, intenta de nuevo.'
-      : undefined);
+  // Extract error message from the response
+  const getErrorMessage = () => {
+    if (!register.isError) return undefined;
+
+    const responseData = register.error?.response?.data;
+    if (!responseData) return 'Registro fallido. Por favor, intenta de nuevo.';
+
+    // Handle nested message object (NestJS error format)
+    if (typeof responseData.message === 'object' && responseData.message?.message) {
+      return responseData.message.message;
+    }
+
+    // Handle string message
+    if (typeof responseData.message === 'string') {
+      return responseData.message;
+    }
+
+    return 'Registro fallido. Por favor, intenta de nuevo.';
+  };
+
+  const errorMessage = getErrorMessage();
 
   return (
     <AuthLayout

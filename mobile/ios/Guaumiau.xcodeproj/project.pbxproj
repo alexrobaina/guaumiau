@@ -12,6 +12,8 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9D33A98085479707F29DF483 /* libPods-Guaumiau.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD8E19DA783ED84C21B2BE6 /* libPods-Guaumiau.a */; };
+		AA604C184C7F49A78F0E44E6 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E9A69F2EF2B4D18B634BBEB /* Colors.xcassets */; };
+		D889926E6810445891203285 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9EC3511208AD4DDD8B088BF2 /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,8 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Guaumiau/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Guaumiau/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Guaumiau/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8E9A69F2EF2B4D18B634BBEB /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = Guaumiau/Colors.xcassets; sourceTree = "<group>"; };
+		9EC3511208AD4DDD8B088BF2 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = Guaumiau/BootSplash.storyboard; sourceTree = "<group>"; };
 		9FD8E19DA783ED84C21B2BE6 /* libPods-Guaumiau.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Guaumiau.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3B3F32D04BBA542B8C1BD7A /* Pods-Guaumiau.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Guaumiau.debug.xcconfig"; path = "Target Support Files/Pods-Guaumiau/Pods-Guaumiau.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -47,6 +51,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				9EC3511208AD4DDD8B088BF2 /* BootSplash.storyboard */,
+				8E9A69F2EF2B4D18B634BBEB /* Colors.xcassets */,
 			);
 			name = Guaumiau;
 			sourceTree = "<group>";
@@ -161,6 +167,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				2125467DF74806CAC06DC27F /* PrivacyInfo.xcprivacy in Resources */,
+				D889926E6810445891203285 /* BootSplash.storyboard in Resources */,
+				AA604C184C7F49A78F0E44E6 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

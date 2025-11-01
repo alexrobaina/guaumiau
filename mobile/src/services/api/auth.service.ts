@@ -97,4 +97,28 @@ export const authService = {
     }>('/auth/refresh', {refreshToken});
     return response.data;
   },
+
+  /**
+   * Verify email with token
+   * POST /auth/verify-email
+   */
+  verifyEmail: async (token: string): Promise<{message: string}> => {
+    const response = await apiClient.post<{message: string}>(
+      '/auth/verify-email',
+      {token},
+    );
+    return response.data;
+  },
+
+  /**
+   * Resend verification email
+   * POST /auth/resend-verification
+   */
+  resendVerification: async (email: string): Promise<{message: string}> => {
+    const response = await apiClient.post<{message: string}>(
+      '/auth/resend-verification',
+      {email},
+    );
+    return response.data;
+  },
 };

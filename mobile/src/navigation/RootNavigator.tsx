@@ -1,12 +1,13 @@
 import React from 'react';
-import {View, ActivityIndicator, StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {useAuth} from '@/contexts/AuthContext';
-import {AuthNavigator} from './AuthNavigator';
-import {MainNavigator} from './MainNavigator';
+import { View, ActivityIndicator, StyleSheet, Linking } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthNavigator } from './AuthNavigator';
+import { MainNavigator } from './MainNavigator';
+import { linking } from './linking';
 
 export const RootNavigator = () => {
-  const {isAuthenticated, isLoading} = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -17,7 +18,22 @@ export const RootNavigator = () => {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      linking={linking}
+      fallback={
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#2563EB" />
+        </View>
+      }
+      onReady={() => {
+        // Log initial URL when app opens from a deep link
+        Linking.getInitialURL().then(url => {
+          if (url) {
+            console.log('App opened with URL:', url);
+          }
+        });
+      }}
+    >
       {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );

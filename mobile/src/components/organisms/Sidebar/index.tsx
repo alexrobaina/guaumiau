@@ -1,25 +1,10 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  Pressable,
-  Animated,
-} from 'react-native';
-import {useNavigation, NavigationState} from '@react-navigation/native';
-import {
-  Home,
-  Calendar,
-  Trophy,
-  User,
-  Settings,
-  LogOut,
-  X,
-} from 'lucide-react-native';
-import {Text} from '@/components/atoms/Text';
-import {useAuth} from '@/contexts/AuthContext';
-import {theme} from '@/theme';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Home, Calendar, Trophy, User, Settings, LogOut, X, Dog } from 'lucide-react-native';
+import { Text } from '@/components/atoms/Text';
+import { useAuth } from '@/contexts/AuthContext';
+import { theme } from '@/theme';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -34,43 +19,39 @@ interface SidebarItemProps {
   onPress: () => void;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({
-  icon,
-  label,
-  isActive,
-  onPress,
-}) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, isActive, onPress }) => {
   return (
     <TouchableOpacity
       style={[styles.item, isActive && styles.itemActive]}
       onPress={onPress}
-      activeOpacity={0.7}>
+      activeOpacity={0.7}
+    >
       <View style={styles.iconContainer}>{icon}</View>
-      <Text
-        variant="body"
-        style={[styles.label, isActive && styles.labelActive]}>
+      <Text variant="body" style={[styles.label, isActive && styles.labelActive]}>
         {label}
       </Text>
     </TouchableOpacity>
   );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({isOpen, onClose}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const navigation = useNavigation<any>();
-  const {logout} = useAuth();
+  const { logout } = useAuth();
   const [currentRoute, setCurrentRoute] = useState('Home');
 
   // Track navigation state changes
   useEffect(() => {
     const unsubscribe = navigation.addListener('state', () => {
       const state = navigation.getState();
-      const route = state.routes[state.index];
-      setCurrentRoute(route.name);
+      if (state && state.routes && state.routes[state.index]) {
+        const route = state.routes[state.index];
+        setCurrentRoute(route.name);
+      }
     });
 
     // Get initial route
     const state = navigation.getState();
-    if (state) {
+    if (state && state.routes && state.routes[state.index]) {
       const route = state.routes[state.index];
       setCurrentRoute(route.name);
     }
@@ -90,6 +71,12 @@ export const Sidebar: React.FC<SidebarProps> = ({isOpen, onClose}) => {
       activeIcon: <Calendar size={24} color={theme.colors.primary} />,
       label: 'Schedule',
       routeName: 'Schedule',
+    },
+    {
+      icon: <Dog size={24} color={theme.colors.textSecondary} />,
+      activeIcon: <Dog size={24} color={theme.colors.primary} />,
+      label: 'My Pets',
+      routeName: 'MyPets',
     },
     {
       icon: <Trophy size={24} color={theme.colors.textSecondary} />,
@@ -122,15 +109,8 @@ export const Sidebar: React.FC<SidebarProps> = ({isOpen, onClose}) => {
   };
 
   return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}>
+    <Modal visible={isOpen} transparent={false} animationType="slide" onRequestClose={onClose}>
       <View style={styles.modalContainer}>
-        {/* Overlay */}
-        <Pressable style={styles.overlay} onPress={onClose} />
-
         {/* Sidebar */}
         <View style={styles.container}>
           <View style={styles.header}>
@@ -162,7 +142,8 @@ export const Sidebar: React.FC<SidebarProps> = ({isOpen, onClose}) => {
             <TouchableOpacity
               style={styles.logoutButton}
               onPress={handleLogout}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+            >
               <LogOut size={24} color={theme.colors.error} />
               <Text variant="body" color="error" style={styles.logoutLabel}>
                 Logout
@@ -178,24 +159,11 @@ export const Sidebar: React.FC<SidebarProps> = ({isOpen, onClose}) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    flexDirection: 'row',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: theme.colors.surface,
   },
   container: {
-    width: 280,
-    height: '100%',
+    flex: 1,
     backgroundColor: theme.colors.surface,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: -2,
-      height: 0,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 10,
   },
   header: {
     paddingHorizontal: theme.spacing.lg,

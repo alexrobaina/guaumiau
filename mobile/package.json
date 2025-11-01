@@ -9,10 +9,15 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "dev": "react-native start --reset-cache"
+    "dev": "react-native start --reset-cache",
+    "deeplink:test:ios": "./scripts/test-deeplinks.sh ios all",
+    "deeplink:test:android": "./scripts/test-deeplinks.sh android all",
+    "deeplink:ios:auth": "./scripts/test-deeplinks.sh ios auth",
+    "deeplink:android:auth": "./scripts/test-deeplinks.sh android auth"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/datetimepicker": "^8.5.0",
     "@react-native/new-app-screen": "0.81.4",
     "@react-navigation/bottom-tabs": "^7.4.8",
     "@react-navigation/native": "^7.1.18",
@@ -24,7 +29,9 @@
     "mobx-react-lite": "^4.1.1",
     "react": "19.1.0",
     "react-native": "0.81.4",
+    "react-native-bootsplash": "^6.3.11",
     "react-native-gesture-handler": "^2.28.0",
+    "react-native-image-picker": "^8.2.1",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.16.0",
     "react-native-svg": "^15.13.0"

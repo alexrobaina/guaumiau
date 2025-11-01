@@ -8,6 +8,8 @@ export {
   Spacer,
   Divider,
   Badge,
+  PetAvatar,
+  PetSizeBadge,
 } from './atoms';
 
 // Molecules

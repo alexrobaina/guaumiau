@@ -7,6 +7,7 @@ import {ScheduleScreen} from '../screens/ScheduleScreen';
 import {AchievementsScreen} from '../screens/AchievementsScreen';
 import {ProfileScreen} from '../screens/ProfileScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
+import {MyPetsScreen} from '../screens/MyPetsScreen';
 import {Sidebar} from '../components/organisms/Sidebar';
 import {theme} from '../theme';
 
@@ -70,6 +71,11 @@ export const MainNavigator = () => {
             name="Profile"
             component={ProfileScreen}
             options={{title: 'Profile'}}
+          />
+          <Stack.Screen
+            name="MyPets"
+            component={MyPetsScreen}
+            options={{title: 'My Pets'}}
           />
           <Stack.Screen
             name="Settings"
