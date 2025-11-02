@@ -1,57 +1,19 @@
-import React, {memo, useState, useCallback} from 'react';
-import {ScrollView, View, Text} from 'react-native';
-import {Footprints, Home} from 'lucide-react-native';
-import {HomeHeader} from '@components/organisms/HomeHeader';
-import {SearchBar} from '@components/molecules/SearchBar';
-import {FilterChipList} from '@components/molecules/FilterChipList';
-import {QuickActionCard} from '@components/atoms/QuickActionCard';
-import {WalkerCard} from '@components/molecules/WalkerCard';
-import {styles} from './styles';
-import {theme} from '@/theme';
-
-interface IWalker {
-  id: string;
-  name: string;
-  avatar: string;
-  distance: string;
-  rating: number;
-  reviews: number;
-  price: number;
-  available: boolean;
-}
-
-const MOCK_WALKERS: IWalker[] = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop',
-    distance: '0.5 km',
-    rating: 4.9,
-    reviews: 127,
-    price: 25,
-    available: true,
-  },
-  {
-    id: '2',
-    name: 'Mike Chen',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop',
-    distance: '0.8 km',
-    rating: 4.8,
-    reviews: 94,
-    price: 22,
-    available: true,
-  },
-  {
-    id: '3',
-    name: 'Emma Wilson',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop',
-    distance: '1.2 km',
-    rating: 5.0,
-    reviews: 156,
-    price: 30,
-    available: true,
-  },
-];
+import { memo, useState, useCallback, useMemo, useEffect } from 'react';
+import { ScrollView, View, Text, ActivityIndicator } from 'react-native';
+import { Footprints, Home } from 'lucide-react-native';
+import { HomeHeader } from '@components/organisms/HomeHeader';
+import { SearchBar } from '@components/molecules/SearchBar';
+import { FilterChipList } from '@components/molecules/FilterChipList';
+import { QuickActionCard } from '@components/atoms/QuickActionCard';
+import { WalkerCard } from '@components/molecules/WalkerCard';
+import { Sidebar } from '@components/organisms/Sidebar';
+import { LocationRequestModal } from '@components/organisms/LocationRequestModal';
+import { useProviders, useUpdateLocation } from '@/hooks/api';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from '@/hooks/useLocation';
+import { styles } from './styles';
+import { theme } from '@/theme';
 
 const FILTERS = [
   'Cerca de mi',
@@ -62,8 +24,115 @@ const FILTERS = [
 ];
 
 export const WalkerHomeScreen = memo(() => {
+  const { user } = useAuth();
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState(FILTERS[0]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+
+  // Debounce search text to prevent too many API calls while typing
+  const debouncedSearchText = useDebounce(searchText, 1000);
+
+  // Location hooks
+  const { location, requestLocation } = useLocation(false); // Don't auto-request
+  const updateLocationMutation = useUpdateLocation({
+    onSuccess: () => {
+      console.log('Location updated successfully');
+    },
+    onError: error => {
+      console.error('Failed to update location:', error);
+    },
+  });
+
+  // Check if user needs location on mount
+  useEffect(() => {
+    // If user is on "Cerca de mi" and doesn't have location, show modal
+    if (activeFilter === 'Cerca de mi' && user && (!user.latitude || !user.longitude)) {
+      setShowLocationModal(true);
+    }
+  }, [activeFilter, user]);
+
+  // Request and update location on mount (only for PET_OWNER)
+  useEffect(() => {
+    const updateUserLocation = async () => {
+      // Only update location for pet owners, not service providers
+      if (user && user.roles.includes('PET_OWNER')) {
+        // Skip if user already has location
+        if (user.latitude && user.longitude) {
+          return;
+        }
+
+        try {
+          const currentLocation = await requestLocation();
+          if (currentLocation) {
+            // Update location in backend
+            updateLocationMutation.mutate({
+              latitude: currentLocation.latitude,
+              longitude: currentLocation.longitude,
+            });
+          }
+        } catch (error) {
+          console.log('Location permission denied or unavailable');
+        }
+      }
+    };
+
+    updateUserLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]); // Only run when user ID changes (login/logout), not on user object updates
+
+  // Map filter to query params
+  const queryParams = useMemo(() => {
+    // Base params with pagination
+    const params: any = {
+      limit: 20,
+      page: 1,
+    };
+
+    // If searching, search globally without location restrictions
+    const isSearching = debouncedSearchText.trim().length > 0;
+
+    if (isSearching) {
+      // When searching, use broader location or no location filter
+      params.search = debouncedSearchText.trim();
+      // Don't pass latitude/longitude - backend will use user's location from auth
+      params.radius = 100; // Much larger radius when searching (100km)
+    } else {
+      // When not searching, use normal location-based filtering
+      // Don't pass latitude/longitude - backend will use user's location from auth
+      params.radius = 10; // 10km radius for normal browsing
+    }
+
+    // Apply active filter (only if not searching, to avoid conflicts)
+    if (!isSearching) {
+      switch (activeFilter) {
+        case 'Cerca de mi':
+          // Just use location, no additional filters
+          break;
+        case 'Disponible ahora':
+          params.availableNow = true;
+          break;
+        case 'Mejor valorados':
+          params.minRating = 4.8;
+          break;
+        case 'Paseador de perros':
+          params.serviceType = 'DOG_WALKING';
+          break;
+        case 'Cuidador de mascotas':
+          params.serviceType = 'PET_SITTING';
+          break;
+      }
+    }
+
+    return params;
+  }, [activeFilter, debouncedSearchText]);
+
+  // Get display name and location from user
+  const userName = user?.firstName || 'Usuario';
+  const userLocation = user?.city || 'Ubicación';
+
+  // Fetch providers from API
+  const { data, isLoading, error, refetch } = useProviders(queryParams);
 
   const handleNotificationPress = useCallback(() => {
     console.log('Notifications pressed');
@@ -86,21 +155,51 @@ export const WalkerHomeScreen = memo(() => {
   }, []);
 
   const handleFilterPress = useCallback((filter: string) => {
+    // Check if user needs to set location for "Cerca de mi" filter
+    if (filter === 'Cerca de mi' && user && (!user.latitude || !user.longitude)) {
+      setShowLocationModal(true);
+      return;
+    }
+
     setActiveFilter(filter);
+  }, [user]);
+
+  const handleMenuPress = useCallback(() => {
+    setIsSidebarOpen(true);
+  }, []);
+
+  const handleLocationSelected = useCallback((address: string, latitude: number, longitude: number, city?: string, country?: string) => {
+    // Update user location in backend
+    updateLocationMutation.mutate({
+      latitude,
+      longitude,
+      address,
+      city,
+      country,
+    });
+    setShowLocationModal(false);
+    // Set the filter to "Cerca de mi" after location is set
+    setActiveFilter('Cerca de mi');
+  }, [updateLocationMutation]);
+
+  const handleCloseLocationModal = useCallback(() => {
+    setShowLocationModal(false);
   }, []);
 
   return (
     <View style={styles.container}>
       <HomeHeader
-        userName="Alex"
-        location="San Francisco"
+        userName={userName}
+        location={userLocation}
         onNotificationPress={handleNotificationPress}
         onProfilePress={handleProfilePress}
+        onMenuPress={handleMenuPress}
       />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+      >
         {/* Search Bar - Overlapping Header */}
         <View style={styles.searchContainer}>
           <SearchBar
@@ -143,22 +242,63 @@ export const WalkerHomeScreen = memo(() => {
         {/* Top Walkers */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Mejores paseadores cerca de ti</Text>
-          {MOCK_WALKERS.map(walker => (
-            <WalkerCard
-              key={walker.id}
-              id={walker.id}
-              name={walker.name}
-              avatar={walker.avatar}
-              distance={walker.distance}
-              rating={walker.rating}
-              reviews={walker.reviews}
-              price={walker.price}
-              available={walker.available}
-              onPress={handleWalkerPress}
-            />
-          ))}
+
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <Text style={styles.loadingText}>Buscando paseadores...</Text>
+            </View>
+          )}
+
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>
+                Error al cargar paseadores. Por favor, intenta de nuevo.
+              </Text>
+            </View>
+          )}
+
+          {!isLoading &&
+            !error &&
+            data?.providers.map(provider => {
+              // Get the primary service (first DOG_WALKING service or first service)
+              const dogWalkingService = provider.services.find(
+                s => s.serviceType === 'DOG_WALKING',
+              );
+              const primaryService = dogWalkingService || provider.services[0];
+              console.log(provider.isAvailable);
+              return (
+                <WalkerCard
+                  id={provider.id}
+                  key={provider.id}
+                  onPress={handleWalkerPress}
+                  rating={provider.averageRating}
+                  reviews={provider.totalReviews}
+                  available={provider.isAvailable}
+                  avatar={provider.user.avatar || ''}
+                  price={primaryService?.basePrice || 0}
+                  name={`${provider.user.firstName} ${provider.user.lastName}`}
+                  distance={provider.distance !== undefined ? `${provider.distance} km` : 'N/A'}
+                  servicesOffered={provider.servicesOffered}
+                />
+              );
+            })}
+
+          {!isLoading && !error && data?.providers.length === 0 && (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                No se encontraron paseadores con los filtros seleccionados.
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <LocationRequestModal
+        visible={showLocationModal}
+        onClose={handleCloseLocationModal}
+        onLocationSelected={handleLocationSelected}
+      />
     </View>
   );
 });

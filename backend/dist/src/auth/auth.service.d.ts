@@ -10,13 +10,11 @@ export declare class AuthService {
     private emailService;
     private readonly logger;
     constructor(prisma: PrismaService, jwtService: JwtService, configService: ConfigService, emailService: EmailService);
-    register(email: string, username: string, password: string, firstName: string, lastName: string, userRole: UserRole, termsAccepted: boolean, avatar?: string): Promise<{
+    register(email: string, username: string, password: string, firstName: string, lastName: string, userRole: UserRole, termsAccepted: boolean, avatar?: string, address?: string, latitude?: number, longitude?: number, city?: string, country?: string): Promise<{
         accessToken: string;
         refreshToken: string;
         user: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             email: string;
             username: string;
             firstName: string;
@@ -44,6 +42,8 @@ export declare class AuthService {
             emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
     login(email: string, password: string): Promise<{
@@ -51,8 +51,6 @@ export declare class AuthService {
         refreshToken: string;
         user: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             email: string;
             username: string;
             firstName: string;
@@ -80,6 +78,8 @@ export declare class AuthService {
             emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
     forgotPassword(email: string): Promise<{
@@ -90,8 +90,6 @@ export declare class AuthService {
     }>;
     validateUser(userId: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         email: string;
         username: string;
         firstName: string;
@@ -119,6 +117,8 @@ export declare class AuthService {
         emailVerificationExpires: Date | null;
         emergencyContactName: string | null;
         emergencyContactPhone: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     } | null>;
     refreshTokens(refreshToken: string): Promise<{
         accessToken: string;
@@ -132,6 +132,38 @@ export declare class AuthService {
     }>;
     resendVerificationEmail(email: string): Promise<{
         message: string;
+    }>;
+    updateLocation(userId: string, latitude: number, longitude: number, address?: string, city?: string, country?: string): Promise<{
+        id: string;
+        email: string;
+        username: string;
+        firstName: string;
+        lastName: string;
+        phone: string | null;
+        avatar: string | null;
+        roles: import("@prisma/client").$Enums.UserRole[];
+        address: string | null;
+        city: string | null;
+        state: string | null;
+        postalCode: string | null;
+        country: string;
+        latitude: number | null;
+        longitude: number | null;
+        isEmailVerified: boolean;
+        isPhoneVerified: boolean;
+        isActive: boolean;
+        termsAccepted: boolean;
+        termsAcceptedAt: Date | null;
+        notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
+        pushTokens: string[];
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
+        emailVerificationToken: string | null;
+        emailVerificationExpires: Date | null;
+        emergencyContactName: string | null;
+        emergencyContactPhone: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     private generateTokens;
 }

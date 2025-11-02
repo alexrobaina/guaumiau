@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsEnum, IsBoolean } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsOptional, IsEnum, IsBoolean, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 
@@ -71,4 +71,44 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   avatar?: string;
+
+  @ApiPropertyOptional({
+    description: 'User address',
+    example: 'Av. Corrientes 1234, Buenos Aires, Argentina',
+  })
+  @IsString()
+  @IsOptional()
+  address?: string;
+
+  @ApiPropertyOptional({
+    description: 'Address latitude coordinate',
+    example: -34.6037,
+  })
+  @IsNumber()
+  @IsOptional()
+  latitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'Address longitude coordinate',
+    example: -58.3816,
+  })
+  @IsNumber()
+  @IsOptional()
+  longitude?: number;
+
+  @ApiPropertyOptional({
+    description: 'City extracted from address',
+    example: 'Buenos Aires',
+  })
+  @IsString()
+  @IsOptional()
+  city?: string;
+
+  @ApiPropertyOptional({
+    description: 'Country extracted from address',
+    example: 'Argentina',
+  })
+  @IsString()
+  @IsOptional()
+  country?: string;
 }

@@ -8,4 +8,9 @@ export declare class RegisterDto {
     userRole: UserRole;
     termsAccepted: boolean;
     avatar?: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    city?: string;
+    country?: string;
 }

@@ -9,6 +9,11 @@ export interface IRegisterFormProps {
     lastName: string,
     userRole: UserRole,
     termsAccepted: boolean,
+    address?: string,
+    latitude?: number,
+    longitude?: number,
+    city?: string,
+    country?: string,
   ) => void;
   isLoading?: boolean;
   error?: string;
@@ -23,6 +28,11 @@ export interface IRegisterFormState {
   lastName: string;
   userRole: UserRole | null;
   termsAccepted: boolean;
+  address: string;
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  country?: string;
   errors: {
     email?: string;
     username?: string;
@@ -32,5 +42,6 @@ export interface IRegisterFormState {
     lastName?: string;
     userRole?: string;
     termsAccepted?: string;
+    address?: string;
   };
 }

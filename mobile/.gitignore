@@ -84,3 +84,5 @@ src/types/generated/
 
 CLAUDE.md
 .claude
+
+src/config/env.ts

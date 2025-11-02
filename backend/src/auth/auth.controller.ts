@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus, Query, Res, Render } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus, Query, Res, Render, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiExcludeEndpoint } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
@@ -10,6 +10,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { UpdateLocationDto } from './dto/update-location.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -34,6 +35,11 @@ export class AuthController {
       registerDto.userRole,
       registerDto.termsAccepted,
       registerDto.avatar,
+      registerDto.address,
+      registerDto.latitude,
+      registerDto.longitude,
+      registerDto.city,
+      registerDto.country,
     );
   }
 
@@ -123,6 +129,27 @@ export class AuthController {
   @ApiResponse({ status: 429, description: 'Too many requests' })
   async resendVerification(@Body() resendVerificationDto: ResendVerificationDto) {
     return this.authService.resendVerificationEmail(resendVerificationDto.email);
+  }
+
+  @Patch('location')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @Throttle({ default: { limit: 20, ttl: 60000 } }) // 20 requests per minute for location updates
+  @ApiOperation({ summary: 'Update user location' })
+  @ApiResponse({ status: 200, description: 'Location updated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateLocation(
+    @CurrentUser() user: any,
+    @Body() updateLocationDto: UpdateLocationDto,
+  ) {
+    return this.authService.updateLocation(
+      user.id,
+      updateLocationDto.latitude,
+      updateLocationDto.longitude,
+      updateLocationDto.address,
+      updateLocationDto.city,
+      updateLocationDto.country,
+    );
   }
 
   @Get('verify')

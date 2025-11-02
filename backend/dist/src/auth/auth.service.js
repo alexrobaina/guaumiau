@@ -63,7 +63,7 @@ let AuthService = AuthService_1 = class AuthService {
         this.configService = configService;
         this.emailService = emailService;
     }
-    async register(email, username, password, firstName, lastName, userRole, termsAccepted, avatar) {
+    async register(email, username, password, firstName, lastName, userRole, termsAccepted, avatar, address, latitude, longitude, city, country) {
         const existingUser = await this.prisma.user.findFirst({
             where: {
                 OR: [{ email }, { username }],
@@ -90,6 +90,11 @@ let AuthService = AuthService_1 = class AuthService {
                 termsAccepted,
                 termsAcceptedAt: new Date(),
                 avatar,
+                address,
+                latitude,
+                longitude,
+                city,
+                country: country || 'AR',
                 emailVerificationToken: hashedVerificationToken,
                 emailVerificationExpires: verificationExpires,
             },
@@ -263,6 +268,20 @@ let AuthService = AuthService_1 = class AuthService {
         });
         await this.emailService.sendEmailVerification(email, verificationToken, user.username);
         return { message: 'Verification email sent' };
+    }
+    async updateLocation(userId, latitude, longitude, address, city, country) {
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                latitude,
+                longitude,
+                ...(address && { address }),
+                ...(city && { city }),
+                ...(country && { country }),
+            },
+        });
+        const { password: _, refreshToken: __, ...userWithoutPassword } = user;
+        return userWithoutPassword;
     }
     async generateTokens(userId) {
         const payload = { sub: userId };

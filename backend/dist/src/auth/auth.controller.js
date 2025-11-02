@@ -24,6 +24,7 @@ const reset_password_dto_1 = require("./dto/reset-password.dto");
 const refresh_token_dto_1 = require("./dto/refresh-token.dto");
 const verify_email_dto_1 = require("./dto/verify-email.dto");
 const resend_verification_dto_1 = require("./dto/resend-verification.dto");
+const update_location_dto_1 = require("./dto/update-location.dto");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const current_user_decorator_1 = require("./decorators/current-user.decorator");
 let AuthController = class AuthController {
@@ -32,7 +33,7 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async register(registerDto) {
-        return this.authService.register(registerDto.email, registerDto.username, registerDto.password, registerDto.firstName, registerDto.lastName, registerDto.userRole, registerDto.termsAccepted, registerDto.avatar);
+        return this.authService.register(registerDto.email, registerDto.username, registerDto.password, registerDto.firstName, registerDto.lastName, registerDto.userRole, registerDto.termsAccepted, registerDto.avatar, registerDto.address, registerDto.latitude, registerDto.longitude, registerDto.city, registerDto.country);
     }
     async login(loginDto) {
         return this.authService.login(loginDto.email, loginDto.password);
@@ -57,6 +58,9 @@ let AuthController = class AuthController {
     }
     async resendVerification(resendVerificationDto) {
         return this.authService.resendVerificationEmail(resendVerificationDto.email);
+    }
+    async updateLocation(user, updateLocationDto) {
+        return this.authService.updateLocation(user.id, updateLocationDto.latitude, updateLocationDto.longitude, updateLocationDto.address, updateLocationDto.city, updateLocationDto.country);
     }
     async verifyEmailPage(token, res) {
         try {
@@ -363,6 +367,20 @@ __decorate([
     __metadata("design:paramtypes", [resend_verification_dto_1.ResendVerificationDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resendVerification", null);
+__decorate([
+    (0, common_1.Patch)('location'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, throttler_1.Throttle)({ default: { limit: 20, ttl: 60000 } }),
+    (0, swagger_1.ApiOperation)({ summary: 'Update user location' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Location updated successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_location_dto_1.UpdateLocationDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "updateLocation", null);
 __decorate([
     (0, common_1.Get)('verify'),
     (0, swagger_1.ApiExcludeEndpoint)(),

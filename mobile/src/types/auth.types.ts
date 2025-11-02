@@ -7,6 +7,11 @@ export interface User {
   lastName: string;
   roles: string[];
   avatar: string | null;
+  address: string | null;
+  city: string | null;
+  country: string;
+  latitude: number | null;
+  longitude: number | null;
   termsAccepted: boolean;
   termsAcceptedAt: string | null;
   createdAt: string;
@@ -23,6 +28,11 @@ export interface RegisterRequest {
   userRole: 'PET_OWNER' | 'SERVICE_PROVIDER';
   termsAccepted: boolean;
   avatar?: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  country?: string;
 }
 
 export interface LoginRequest {

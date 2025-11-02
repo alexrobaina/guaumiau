@@ -42,7 +42,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
         if (storedToken && storedRefreshToken && storedUser) {
           setAuthToken(storedToken);
-          setUser(storedUser);
+
+          // Fetch fresh user data from backend to ensure we have latest data
+          try {
+            const response = await authService.me();
+            const freshUser = response.user;
+            await storage.saveUser(freshUser);
+            setUser(freshUser);
+          } catch (error) {
+            console.warn('Failed to fetch fresh user data, using cached:', error);
+            // Fallback to cached user if backend call fails
+            setUser(storedUser);
+          }
         }
       } catch (error) {
         console.error('Error loading auth:', error);

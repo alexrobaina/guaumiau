@@ -7,6 +7,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { UpdateLocationDto } from './dto/update-location.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -15,8 +16,6 @@ export declare class AuthController {
         refreshToken: string;
         user: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             email: string;
             username: string;
             firstName: string;
@@ -44,6 +43,8 @@ export declare class AuthController {
             emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
     login(loginDto: LoginDto): Promise<{
@@ -51,8 +52,6 @@ export declare class AuthController {
         refreshToken: string;
         user: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             email: string;
             username: string;
             firstName: string;
@@ -80,6 +79,8 @@ export declare class AuthController {
             emailVerificationExpires: Date | null;
             emergencyContactName: string | null;
             emergencyContactPhone: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
     refreshTokens(refreshTokenDto: RefreshTokenDto): Promise<{
@@ -103,6 +104,38 @@ export declare class AuthController {
     }>;
     resendVerification(resendVerificationDto: ResendVerificationDto): Promise<{
         message: string;
+    }>;
+    updateLocation(user: any, updateLocationDto: UpdateLocationDto): Promise<{
+        id: string;
+        email: string;
+        username: string;
+        firstName: string;
+        lastName: string;
+        phone: string | null;
+        avatar: string | null;
+        roles: import("@prisma/client").$Enums.UserRole[];
+        address: string | null;
+        city: string | null;
+        state: string | null;
+        postalCode: string | null;
+        country: string;
+        latitude: number | null;
+        longitude: number | null;
+        isEmailVerified: boolean;
+        isPhoneVerified: boolean;
+        isActive: boolean;
+        termsAccepted: boolean;
+        termsAcceptedAt: Date | null;
+        notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
+        pushTokens: string[];
+        resetPasswordToken: string | null;
+        resetPasswordExpires: Date | null;
+        emailVerificationToken: string | null;
+        emailVerificationExpires: Date | null;
+        emergencyContactName: string | null;
+        emergencyContactPhone: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     verifyEmailPage(token: string, res: Response): Promise<Response<any, Record<string, any>>>;
     private generateVerificationHtml;

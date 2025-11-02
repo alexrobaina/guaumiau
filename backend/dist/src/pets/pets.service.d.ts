@@ -6,9 +6,9 @@ export declare class PetsService {
     constructor(prisma: PrismaService);
     create(userId: string, createPetDto: CreatePetDto): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -39,9 +39,9 @@ export declare class PetsService {
     }>;
     findAllByUser(userId: string): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -72,9 +72,9 @@ export declare class PetsService {
     }[]>;
     findOne(id: string, userId: string): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -105,9 +105,9 @@ export declare class PetsService {
     }>;
     update(id: string, userId: string, updatePetDto: UpdatePetDto): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -141,9 +141,9 @@ export declare class PetsService {
     }>;
     addPhoto(id: string, userId: string, photoUrl: string): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -174,9 +174,9 @@ export declare class PetsService {
     }>;
     removePhoto(id: string, userId: string, photoUrl: string): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -218,9 +218,9 @@ export declare class PetsService {
         vetAddress?: string;
     }): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -261,9 +261,9 @@ export declare class PetsService {
         specialInstructions?: string;
     }): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;
@@ -294,9 +294,9 @@ export declare class PetsService {
     }>;
     findMultiple(petIds: string[], userId: string): Promise<{
         id: string;
-        name: string;
         createdAt: Date;
         updatedAt: Date;
+        name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
         size: import("@prisma/client").$Enums.PetSize;

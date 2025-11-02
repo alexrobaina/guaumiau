@@ -22,6 +22,11 @@ class RegisterDto {
     userRole;
     termsAccepted;
     avatar;
+    address;
+    latitude;
+    longitude;
+    city;
+    country;
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
@@ -101,4 +106,49 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "avatar", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'User address',
+        example: 'Av. Corrientes 1234, Buenos Aires, Argentina',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "address", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Address latitude coordinate',
+        example: -34.6037,
+    }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], RegisterDto.prototype, "latitude", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Address longitude coordinate',
+        example: -58.3816,
+    }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], RegisterDto.prototype, "longitude", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'City extracted from address',
+        example: 'Buenos Aires',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Country extracted from address',
+        example: 'Argentina',
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "country", void 0);
 //# sourceMappingURL=register.dto.js.map

@@ -1,11 +1,12 @@
-import {StyleSheet} from 'react-native';
-import {theme} from '@/theme';
+import { StyleSheet } from 'react-native';
+import { theme } from '@/theme';
 
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.primary,
     paddingTop: 48,
-    paddingBottom: 80,
+    paddingBottom: 50,
+
     paddingHorizontal: theme.spacing.lg,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
@@ -13,9 +14,19 @@ export const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+  },
+  menuButton: {
+    marginTop: theme.spacing.md,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.borderRadius.full,
+    marginRight: theme.spacing.sm,
   },
   userInfo: {
+    marginTop: theme.spacing.lg,
     flex: 1,
   },
   greeting: {

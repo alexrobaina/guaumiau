@@ -2,11 +2,14 @@ import React, { memo, useState, useCallback } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FormField } from '@components/molecules/FormField';
+import { GooglePlacesFormField } from '@components/molecules/GooglePlacesFormField';
 import { RadioGroup } from '@components/molecules/RadioGroup';
 import { Button } from '@components/atoms/Button';
 import { Text } from '@components/atoms/Text';
 import { Checkbox } from '@components/atoms/Checkbox';
+import { IGooglePlaceData, IGooglePlaceDetails } from '@components/atoms/GooglePlacesInput/GooglePlacesInput.types';
 import { IRegisterFormProps, IRegisterFormState, UserRole } from './RegisterForm.types';
+import { parseGooglePlaceAddress } from '@utils/addressParser';
 import { styles } from './RegisterForm.styles';
 
 const validateEmail = (email: string): string | undefined => {
@@ -64,6 +67,11 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
     lastName: '',
     userRole: null,
     termsAccepted: false,
+    address: '',
+    latitude: undefined,
+    longitude: undefined,
+    city: undefined,
+    country: undefined,
     errors: {},
   });
 
@@ -131,9 +139,31 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
     }));
   }, []);
 
+  const handleAddressChange = useCallback((address: string) => {
+    setFormState(prev => ({
+      ...prev,
+      address,
+      errors: { ...prev.errors, address: undefined },
+    }));
+  }, []);
+
+  const handlePlaceSelected = useCallback((data: IGooglePlaceData, details: IGooglePlaceDetails | null) => {
+    // Extract city and country from address components
+    const { city, country } = parseGooglePlaceAddress(details);
+
+    setFormState(prev => ({
+      ...prev,
+      address: data.description,
+      latitude: details?.geometry?.location?.lat,
+      longitude: details?.geometry?.location?.lng,
+      city,
+      country,
+      errors: { ...prev.errors, address: undefined },
+    }));
+  }, []);
+
   const handleSubmit = useCallback(() => {
     const emailError = validateEmail(formState.email);
-    const usernameError = validateUsername(formState.username);
     const passwordError = validatePassword(formState.password);
     const confirmPasswordError = validateConfirmPassword(
       formState.password,
@@ -144,6 +174,16 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
     const userRoleError = validateUserRole(formState.userRole);
     const termsError = validateTerms(formState.termsAccepted);
 
+    // Only validate username for SERVICE_PROVIDER
+    const usernameError = formState.userRole === 'SERVICE_PROVIDER'
+      ? validateUsername(formState.username)
+      : undefined;
+
+    // Only validate address for SERVICE_PROVIDER
+    const addressError = formState.userRole === 'SERVICE_PROVIDER' && !formState.address
+      ? 'La dirección es requerida para paseadores'
+      : undefined;
+
     if (
       emailError ||
       usernameError ||
@@ -152,7 +192,8 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
       firstNameError ||
       lastNameError ||
       userRoleError ||
-      termsError
+      termsError ||
+      addressError
     ) {
       setFormState(prev => ({
         ...prev,
@@ -165,19 +206,30 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
           lastName: lastNameError,
           userRole: userRoleError,
           termsAccepted: termsError,
+          address: addressError,
         },
       }));
       return;
     }
 
+    // For PET_OWNER, use email as username
+    const username = formState.userRole === 'SERVICE_PROVIDER'
+      ? formState.username
+      : formState.email;
+
     onSubmit(
       formState.email,
-      formState.username,
+      username,
       formState.password,
       formState.firstName,
       formState.lastName,
       formState.userRole!,
       formState.termsAccepted,
+      formState.address,
+      formState.latitude,
+      formState.longitude,
+      formState.city,
+      formState.country,
     );
   }, [
     formState.email,
@@ -188,6 +240,11 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
     formState.lastName,
     formState.userRole,
     formState.termsAccepted,
+    formState.address,
+    formState.latitude,
+    formState.longitude,
+    formState.city,
+    formState.country,
     onSubmit,
   ]);
 
@@ -244,6 +301,19 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
         required
       />
 
+      {/* Address field - Only for SERVICE_PROVIDER */}
+      {formState.userRole === 'SERVICE_PROVIDER' && (
+        <GooglePlacesFormField
+          label="Dirección"
+          placeholder="Busca tu dirección"
+          value={formState.address}
+          onChangeText={handleAddressChange}
+          onPlaceSelected={handlePlaceSelected}
+          error={formState.errors.address}
+          required
+        />
+      )}
+
       <FormField
         label="Email"
         placeholder="Ingresa tu email"
@@ -256,16 +326,19 @@ export const RegisterForm = memo<IRegisterFormProps>(({ onSubmit, isLoading = fa
         required
       />
 
-      <FormField
-        label="Nombre de Usuario"
-        placeholder="Elige un nombre de usuario"
-        value={formState.username}
-        onChangeText={handleUsernameChange}
-        error={formState.errors.username}
-        autoCapitalize="none"
-        autoComplete="username"
-        required
-      />
+      {/* Username - Only for SERVICE_PROVIDER */}
+      {formState.userRole === 'SERVICE_PROVIDER' && (
+        <FormField
+          label="Nombre de Usuario"
+          placeholder="Elige un nombre de usuario"
+          value={formState.username}
+          onChangeText={handleUsernameChange}
+          error={formState.errors.username}
+          autoCapitalize="none"
+          autoComplete="username"
+          required
+        />
+      )}
 
       <FormField
         label="Contraseña"

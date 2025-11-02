@@ -20,6 +20,9 @@ const s3_module_1 = require("./s3/s3.module");
 const auth_module_1 = require("./auth/auth.module");
 const email_module_1 = require("./email/email.module");
 const pets_module_1 = require("./pets/pets.module");
+const uploads_module_1 = require("./uploads/uploads.module");
+const providers_module_1 = require("./providers/providers.module");
+const places_module_1 = require("./places/places.module");
 const morgan_middleware_1 = require("./common/middleware/morgan.middleware");
 const winston_config_1 = require("./common/logger/winston.config");
 let AppModule = class AppModule {
@@ -61,6 +64,9 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             email_module_1.EmailModule,
             pets_module_1.PetsModule,
+            uploads_module_1.UploadsModule,
+            providers_module_1.ProvidersModule,
+            places_module_1.PlacesModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

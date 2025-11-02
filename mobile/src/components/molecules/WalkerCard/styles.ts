@@ -43,6 +43,30 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#059669',
   },
+  unavailableBadge: {
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 4,
+    borderRadius: theme.borderRadius.full,
+  },
+  unavailableText: {
+    fontSize: theme.fontSize.xs,
+    fontWeight: '500',
+    color: '#DC2626',
+  },
+  servicesContainer: {
+    flexDirection: 'row',
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.xs,
+  },
+  serviceIcon: {
+    backgroundColor: '#FFF7ED',
+    borderRadius: theme.borderRadius.md,
+    padding: 6,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+  },
   details: {
     flexDirection: 'row',
     gap: theme.spacing.md,

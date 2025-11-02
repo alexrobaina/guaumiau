@@ -12,6 +12,8 @@ import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
 import { PetsModule } from './pets/pets.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { ProvidersModule } from './providers/providers.module';
+import { PlacesModule } from './places/places.module';
 import { MorganMiddleware } from './common/middleware/morgan.middleware';
 import { winstonConfig } from './common/logger/winston.config';
 
@@ -48,6 +50,8 @@ import { winstonConfig } from './common/logger/winston.config';
     EmailModule,
     PetsModule,
     UploadsModule,
+    ProvidersModule,
+    PlacesModule,
   ],
   controllers: [AppController],
   providers: [

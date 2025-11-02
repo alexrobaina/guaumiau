@@ -18,7 +18,7 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
-  async register(email: string, username: string, password: string, firstName: string, lastName: string, userRole: UserRole, termsAccepted: boolean, avatar?: string) {
+  async register(email: string, username: string, password: string, firstName: string, lastName: string, userRole: UserRole, termsAccepted: boolean, avatar?: string, address?: string, latitude?: number, longitude?: number, city?: string, country?: string) {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ email }, { username }],
@@ -51,6 +51,11 @@ export class AuthService {
         termsAccepted,
         termsAcceptedAt: new Date(),
         avatar,
+        address,
+        latitude,
+        longitude,
+        city,
+        country: country || 'AR', // Default to Argentina if not provided
         emailVerificationToken: hashedVerificationToken,
         emailVerificationExpires: verificationExpires,
       },
@@ -272,6 +277,22 @@ export class AuthService {
     await this.emailService.sendEmailVerification(email, verificationToken, user.username);
 
     return { message: 'Verification email sent' };
+  }
+
+  async updateLocation(userId: string, latitude: number, longitude: number, address?: string, city?: string, country?: string) {
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        latitude,
+        longitude,
+        ...(address && { address }),
+        ...(city && { city }),
+        ...(country && { country }),
+      },
+    });
+
+    const { password: _, refreshToken: __, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
   private async generateTokens(userId: string) {

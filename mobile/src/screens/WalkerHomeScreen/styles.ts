@@ -1,5 +1,5 @@
-import {StyleSheet} from 'react-native';
-import {theme} from '@/theme';
+import { StyleSheet } from 'react-native';
+import { theme } from '@/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: theme.spacing.lg,
-    marginTop: -48,
+    marginTop: theme.spacing.lg,
     marginBottom: theme.spacing.lg,
   },
   filterContainer: {
@@ -36,5 +36,37 @@ export const styles = StyleSheet.create({
   },
   quickActionItem: {
     flex: 1,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.xxl,
+  },
+  loadingText: {
+    marginTop: theme.spacing.md,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.textSecondary,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  errorText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.error,
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  emptyText: {
+    fontSize: theme.fontSize.md,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
   },
 });

@@ -10,8 +10,6 @@ export declare class JwtStrategy extends JwtStrategy_base {
     constructor(configService: ConfigService, authService: AuthService);
     validate(payload: any): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         email: string;
         username: string;
         firstName: string;
@@ -39,6 +37,8 @@ export declare class JwtStrategy extends JwtStrategy_base {
         emailVerificationExpires: Date | null;
         emergencyContactName: string | null;
         emergencyContactPhone: string | null;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
 }
 export {};

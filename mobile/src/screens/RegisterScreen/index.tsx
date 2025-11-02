@@ -1,18 +1,21 @@
-import React, {memo, useCallback} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {AuthLayout} from '@components/templates/AuthLayout';
-import {RegisterForm} from '@components/organisms/RegisterForm';
-import {useRegister} from '@/hooks/api';
-import {IRegisterScreenProps} from './RegisterScreen.types';
+import React, { memo, useCallback } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { AuthStackParamList } from '@/navigation/types';
+import { AuthLayout } from '@components/templates/AuthLayout';
+import { RegisterForm } from '@components/organisms/RegisterForm';
+import { useRegister } from '@/hooks/api';
+import { ENV } from '@/config/env';
+import { IRegisterScreenProps } from './RegisterScreen.types';
 
 export const RegisterScreen = memo<IRegisterScreenProps>(() => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList, 'Register'>>();
 
   const register = useRegister({
     onSuccess: async data => {
       console.log('Registration successful:', data.user);
       // Navigate to email verification screen
-      navigation.navigate('VerifyEmail' as never, {email: data.user.email} as never);
+      navigation.navigate('VerifyEmail', { email: data.user.email });
     },
     onError: error => {
       console.error('Registration failed:', error);
@@ -28,6 +31,11 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
       lastName: string,
       userRole: 'PET_OWNER' | 'SERVICE_PROVIDER',
       termsAccepted: boolean,
+      address?: string,
+      latitude?: number,
+      longitude?: number,
+      city?: string,
+      country?: string,
     ) => {
       register.mutate({
         email,
@@ -37,6 +45,11 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
         lastName,
         userRole,
         termsAccepted,
+        address,
+        latitude,
+        longitude,
+        city,
+        country,
       });
     },
     [register],
@@ -46,17 +59,18 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
   const getErrorMessage = () => {
     if (!register.isError) return undefined;
 
-    const responseData = register.error?.response?.data;
+    const responseData = (register.error as any)?.response?.data;
     if (!responseData) return 'Registro fallido. Por favor, intenta de nuevo.';
 
+    const message = (responseData as any)?.message;
     // Handle nested message object (NestJS error format)
-    if (typeof responseData.message === 'object' && responseData.message?.message) {
-      return responseData.message.message;
+    if (message && typeof message === 'object' && message.message) {
+      return message.message;
     }
 
     // Handle string message
-    if (typeof responseData.message === 'string') {
-      return responseData.message;
+    if (typeof message === 'string') {
+      return message;
     }
 
     return 'Registro fallido. Por favor, intenta de nuevo.';
@@ -65,9 +79,7 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
   const errorMessage = getErrorMessage();
 
   return (
-    <AuthLayout
-      title="Crear Cuenta"
-      subtitle="Únete a nuestra comunidad de cuidado de mascotas">
+    <AuthLayout title="Crear Cuenta" subtitle="Únete a nuestra comunidad de cuidado de mascotas">
       <RegisterForm
         onSubmit={handleRegister}
         isLoading={register.isPending}
