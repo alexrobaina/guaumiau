@@ -1,7 +1,15 @@
 import { PetType, PetSize, PetGender, EnergyLevel } from '@prisma/client';
+declare class PetOwnerDto {
+    id: string;
+    firstName: string;
+    lastName: string;
+    username: string;
+    avatar?: string | null;
+}
 export declare class PetResponseDto {
     id: string;
     ownerId: string;
+    owner?: PetOwnerDto;
     name: string;
     type: PetType;
     breed?: string | null;
@@ -32,3 +40,4 @@ export declare class PetResponseDto {
     createdAt: Date;
     updatedAt: Date;
 }
+export {};

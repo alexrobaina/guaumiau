@@ -4,6 +4,7 @@ export {useRegister} from './useRegister';
 export {useForgotPassword} from './useForgotPassword';
 export {useResetPassword} from './useResetPassword';
 export {useMe} from './useMe';
+export {useUser} from './useUser';
 export {useVerifyEmail} from './useVerifyEmail';
 export {useResendVerification} from './useResendVerification';
 export {useUpdateLocation} from './useUpdateLocation';

@@ -54,6 +54,17 @@ let PetsService = class PetsService {
     async findOne(id, userId) {
         const pet = await this.prisma.pet.findUnique({
             where: { id },
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        username: true,
+                        avatar: true,
+                    },
+                },
+            },
         });
         if (!pet) {
             throw new common_1.NotFoundException(`Pet with ID ${id} not found`);

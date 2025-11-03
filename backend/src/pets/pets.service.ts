@@ -63,6 +63,17 @@ export class PetsService {
   async findOne(id: string, userId: string) {
     const pet = await this.prisma.pet.findUnique({
       where: { id },
+      include: {
+        owner: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            avatar: true,
+          },
+        },
+      },
     });
 
     if (!pet) {

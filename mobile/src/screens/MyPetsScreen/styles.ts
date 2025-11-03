@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xl,
+    paddingTop: theme.spacing.xl + 20, // Moved down (48 + 20 = 68px from top)
     paddingBottom: theme.spacing.md,
   },
   headerTitle: {

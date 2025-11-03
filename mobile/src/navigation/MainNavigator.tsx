@@ -7,9 +7,11 @@ import { AchievementsScreen } from '../screens/AchievementsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { MyPetsScreen } from '../screens/MyPetsScreen';
+import { MyAccountScreen } from '../screens/MyAccountScreen';
 import { WalkerHomeScreen } from '../screens/WalkerHomeScreen';
 import { ProviderProfileScreen } from '../screens/ProviderProfileScreen';
 import { SearchWalkersScreen } from '../screens/SearchWalkersScreen';
+import { PetProfileScreen } from '../screens/PetProfileScreen';
 import { Sidebar } from '../components/organisms/Sidebar';
 import { theme } from '../theme';
 
@@ -71,6 +73,11 @@ export const MainNavigator = () => {
           <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
           <Stack.Screen name="MyPets" component={MyPetsScreen} options={{ title: 'My Pets' }} />
           <Stack.Screen
+            name="MyAccount"
+            component={MyAccountScreen}
+            options={{ title: 'My Account' }}
+          />
+          <Stack.Screen
             name="Settings"
             component={SettingsScreen}
             options={{ title: 'Settings' }}
@@ -84,6 +91,11 @@ export const MainNavigator = () => {
             name="SearchWalkers"
             component={SearchWalkersScreen}
             options={{ title: 'Search Walkers' }}
+          />
+          <Stack.Screen
+            name="PetProfile"
+            component={PetProfileScreen}
+            options={{ title: 'Pet Profile', headerShown: false }}
           />
         </Stack.Navigator>
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

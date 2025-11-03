@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Plus, Pencil, AlertCircle } from 'lucide-react-native';
 import { Text } from '@/components/atoms/Text';
 import { styles } from './styles';
@@ -18,9 +19,10 @@ import { AddPetModal } from '@/components/organisms/AddPetModal';
 interface PetCardProps {
   pet: Pet;
   onEdit: () => void;
+  onPress: () => void;
 }
 
-const PetCard: React.FC<PetCardProps> = ({ pet, onEdit }) => {
+const PetCard: React.FC<PetCardProps> = ({ pet, onEdit, onPress }) => {
   // Format pet info string
   const genderLabel =
     pet.gender === PetGender.MALE ? 'Macho' : pet.gender === PetGender.FEMALE ? 'Hembra' : 'Desconocido';
@@ -45,7 +47,7 @@ const PetCard: React.FC<PetCardProps> = ({ pet, onEdit }) => {
   if (pet.isFriendlyWithDogs) badges.push('Amigable');
 
   return (
-    <View style={styles.petCard}>
+    <TouchableOpacity style={styles.petCard} onPress={onPress} activeOpacity={0.7}>
       <TouchableOpacity style={styles.editButton} onPress={onEdit} activeOpacity={0.7}>
         <Pencil size={20} color={theme.colors.primary} />
       </TouchableOpacity>
@@ -95,11 +97,12 @@ const PetCard: React.FC<PetCardProps> = ({ pet, onEdit }) => {
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 export function MyPetsScreen() {
+  const navigation = useNavigation<any>();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
@@ -113,6 +116,10 @@ export function MyPetsScreen() {
   const handleEditPet = (pet: Pet) => {
     setSelectedPet(pet);
     setIsAddModalVisible(true);
+  };
+
+  const handleViewPet = (pet: Pet) => {
+    navigation.navigate('PetProfile', { petId: pet.id });
   };
 
   const handleCloseModal = () => {
@@ -219,7 +226,12 @@ export function MyPetsScreen() {
       >
         <View style={styles.petsContainer}>
           {pets.map(pet => (
-            <PetCard key={pet.id} pet={pet} onEdit={() => handleEditPet(pet)} />
+            <PetCard
+              key={pet.id}
+              pet={pet}
+              onEdit={() => handleEditPet(pet)}
+              onPress={() => handleViewPet(pet)}
+            />
           ))}
         </View>
       </ScrollView>

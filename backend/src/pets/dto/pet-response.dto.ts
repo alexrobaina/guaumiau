@@ -1,12 +1,32 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PetType, PetSize, PetGender, EnergyLevel } from '@prisma/client';
 
+class PetOwnerDto {
+  @ApiProperty({ example: 'uuid-user-123' })
+  id: string;
+
+  @ApiProperty({ example: 'John' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Doe' })
+  lastName: string;
+
+  @ApiProperty({ example: 'johndoe' })
+  username: string;
+
+  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg' })
+  avatar?: string | null;
+}
+
 export class PetResponseDto {
   @ApiProperty({ example: 'uuid-123' })
   id: string;
 
   @ApiProperty({ example: 'uuid-user-123' })
   ownerId: string;
+
+  @ApiPropertyOptional({ type: PetOwnerDto })
+  owner?: PetOwnerDto;
 
   @ApiProperty({ example: 'Max' })
   name: string;

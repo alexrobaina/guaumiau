@@ -12,9 +12,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PetResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
+class PetOwnerDto {
+    id;
+    firstName;
+    lastName;
+    username;
+    avatar;
+}
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'uuid-user-123' }),
+    __metadata("design:type", String)
+], PetOwnerDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John' }),
+    __metadata("design:type", String)
+], PetOwnerDto.prototype, "firstName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Doe' }),
+    __metadata("design:type", String)
+], PetOwnerDto.prototype, "lastName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'johndoe' }),
+    __metadata("design:type", String)
+], PetOwnerDto.prototype, "username", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'https://example.com/avatar.jpg' }),
+    __metadata("design:type", Object)
+], PetOwnerDto.prototype, "avatar", void 0);
 class PetResponseDto {
     id;
     ownerId;
+    owner;
     name;
     type;
     breed;
@@ -54,6 +82,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: 'uuid-user-123' }),
     __metadata("design:type", String)
 ], PetResponseDto.prototype, "ownerId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: PetOwnerDto }),
+    __metadata("design:type", PetOwnerDto)
+], PetResponseDto.prototype, "owner", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'Max' }),
     __metadata("design:type", String)

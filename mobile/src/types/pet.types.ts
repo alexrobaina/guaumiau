@@ -40,9 +40,18 @@ export interface VaccinationRecord {
   nextDue?: string;
 }
 
+export interface PetOwner {
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  avatar?: string | null;
+}
+
 export interface Pet {
   id: string;
   ownerId: string;
+  owner?: PetOwner;
 
   // Basic Info
   name: string;

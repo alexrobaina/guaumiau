@@ -71,6 +71,14 @@ export declare class PetsService {
         ownerId: string;
     }[]>;
     findOne(id: string, userId: string): Promise<{
+        owner: {
+            id: string;
+            username: string;
+            firstName: string;
+            lastName: string;
+            avatar: string | null;
+        };
+    } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;

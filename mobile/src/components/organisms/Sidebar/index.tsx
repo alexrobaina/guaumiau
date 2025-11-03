@@ -1,18 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {
-  Home,
-  Calendar,
-  Trophy,
-  User,
-  Settings,
-  LogOut,
-  X,
-  Dog,
-  Footprints,
-  Search,
-} from 'lucide-react-native';
+import { User, LogOut, X, Cat, Dog, Footprints, Search } from 'lucide-react-native';
 import { Text } from '@/components/atoms/Text';
 import { useAuth } from '@/contexts/AuthContext';
 import { theme } from '@/theme';
@@ -74,44 +63,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     {
       icon: <Footprints size={24} color={theme.colors.textSecondary} />,
       activeIcon: <Footprints size={24} color={theme.colors.primary} />,
-      label: 'Walker Home',
+      label: 'Cuidadores ',
       routeName: 'WalkerHome',
     },
     {
       icon: <Search size={24} color={theme.colors.textSecondary} />,
       activeIcon: <Search size={24} color={theme.colors.primary} />,
-      label: 'Search Walkers',
+      label: 'Buscar Cuidadores',
       routeName: 'SearchWalkers',
-    },
-    {
-      icon: <Calendar size={24} color={theme.colors.textSecondary} />,
-      activeIcon: <Calendar size={24} color={theme.colors.primary} />,
-      label: 'Schedule',
-      routeName: 'Schedule',
     },
     {
       icon: <Dog size={24} color={theme.colors.textSecondary} />,
       activeIcon: <Dog size={24} color={theme.colors.primary} />,
-      label: 'My Pets',
+      label: 'Mis Mascotas',
       routeName: 'MyPets',
     },
     {
-      icon: <Trophy size={24} color={theme.colors.textSecondary} />,
-      activeIcon: <Trophy size={24} color={theme.colors.primary} />,
-      label: 'Achievements',
-      routeName: 'Achievements',
-    },
-    {
+      label: 'Mi Perfil',
+      routeName: 'MyAccount',
       icon: <User size={24} color={theme.colors.textSecondary} />,
       activeIcon: <User size={24} color={theme.colors.primary} />,
-      label: 'Profile',
-      routeName: 'Profile',
-    },
-    {
-      icon: <Settings size={24} color={theme.colors.textSecondary} />,
-      activeIcon: <Settings size={24} color={theme.colors.primary} />,
-      label: 'Settings',
-      routeName: 'Settings',
     },
   ];
 
@@ -132,7 +103,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <View style={styles.container}>
           <View style={styles.header}>
             <View style={styles.headerContent}>
-              <Text style={styles.brandText}>Guaumiau</Text>
+              <View style={styles.brandContainer}>
+                <Cat size={24} color={theme.colors.primary} />
+                <Text style={styles.brandText}>Guau Miau</Text>
+                <Dog size={24} color={theme.colors.primary} />
+              </View>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                 <X size={24} color={theme.colors.text} />
               </TouchableOpacity>
@@ -184,18 +159,28 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.lg,
-    paddingTop: theme.spacing.xxl + 20, // Extra padding for status bar
+    paddingVertical: theme.spacing.md,
+    paddingTop: theme.spacing.xxl + 30, // Extra padding for status bar
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: theme.colors.secondary,
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  brandContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+  },
   brandText: {
-    fontSize: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.md,
+    fontSize: 24,
     fontWeight: 'bold',
     color: theme.colors.primary,
   },
@@ -231,10 +216,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   footer: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.xxl,
+    paddingBottom: theme.spacing.xl,
+    paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
+    borderTopColor: theme.colors.secondary,
   },
   logoutButton: {
     flexDirection: 'row',
