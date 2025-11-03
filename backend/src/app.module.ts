@@ -27,19 +27,9 @@ import { winstonConfig } from './common/logger/winston.config';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => [
         {
-          name: 'short',
-          ttl: 1000, // 1 second
-          limit: parseInt(config.get('THROTTLE_SHORT_LIMIT') || '50'), // Increased from 5 to 50
-        },
-        {
-          name: 'medium',
-          ttl: 10000, // 10 seconds
-          limit: parseInt(config.get('THROTTLE_MEDIUM_LIMIT') || '200'), // Increased from 20 to 200
-        },
-        {
-          name: 'long',
+          name: 'default',
           ttl: 60000, // 60 seconds
-          limit: parseInt(config.get('THROTTLE_LONG_LIMIT') || '1000'), // Increased from 300 to 1000
+          limit: parseInt(config.get('THROTTLE_LIMIT') || '10000'), // Very high limit for development
         },
       ],
     }),

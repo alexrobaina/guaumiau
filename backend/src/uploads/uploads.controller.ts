@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { SkipThrottle } from '@nestjs/throttler';
 import {
   ApiTags,
   ApiOperation,
@@ -29,6 +30,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
+  @SkipThrottle({ default: true })
   @Get(':folder/:userId/:filename')
   @ApiOperation({ summary: 'Get uploaded file' })
   @ApiResponse({

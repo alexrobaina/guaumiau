@@ -17,7 +17,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Request } from 'express';
+import type { Request } from 'express';
 import { PetsService } from './pets.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
@@ -45,6 +45,13 @@ export class PetsController {
     @Body() createPetDto: CreatePetDto,
   ): Promise<PetResponseDto> {
     const user = (request as any).user;
+    console.log('[CREATE PET] User from request:', user);
+    console.log('[CREATE PET] User ID:', user?.id);
+
+    if (!user || !user.id) {
+      throw new Error('User not authenticated properly');
+    }
+
     return this.petsService.create(user.id, createPetDto);
   }
 

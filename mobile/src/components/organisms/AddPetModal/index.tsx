@@ -53,35 +53,42 @@ const petValidationSchema = Yup.object().shape({
 
 export const AddPetModal: React.FC<AddPetModalProps> = ({visible, onClose, pet}) => {
   const isEditing = !!pet;
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(pet?.photos || []);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  // For editing: store server URLs, for creating: store local URIs
+  const [selectedImages, setSelectedImages] = useState<string[]>(pet?.photos || []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Update photos when pet changes (for editing)
   useEffect(() => {
     if (pet?.photos) {
-      setUploadedPhotos(pet.photos);
+      setSelectedImages(pet.photos);
     } else {
-      setUploadedPhotos([]);
+      setSelectedImages([]);
     }
   }, [pet]);
 
   const createPet = useCreatePet({
     onSuccess: () => {
-      setUploadedPhotos([]);
+      setSelectedImages([]);
+      setIsSubmitting(false);
       onClose();
     },
     onError: (error) => {
       console.error('Failed to create pet:', error);
+      setIsSubmitting(false);
+      Alert.alert('Error', 'No se pudo crear la mascota');
     },
   });
 
   const updatePet = useUpdatePet({
     onSuccess: () => {
-      setUploadedPhotos([]);
+      setSelectedImages([]);
+      setIsSubmitting(false);
       onClose();
     },
     onError: (error) => {
       console.error('Failed to update pet:', error);
+      setIsSubmitting(false);
+      Alert.alert('Error', 'No se pudo actualizar la mascota');
     },
   });
 
@@ -150,18 +157,8 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({visible, onClose, pet})
       return;
     }
 
-    // Upload image
-    setUploadingPhoto(true);
-    try {
-      const result = await uploadImageMutation.mutateAsync(asset.uri);
-      setUploadedPhotos(prev => [...prev, result.url]);
-      Alert.alert('Éxito', 'Foto subida correctamente');
-    } catch (error) {
-      console.error('Upload error:', error);
-      Alert.alert('Error', 'Error al subir la foto');
-    } finally {
-      setUploadingPhoto(false);
-    }
+    // Just store the local URI - will upload on form submit
+    setSelectedImages(prev => [...prev, asset.uri]);
   };
 
   const handleRemovePhoto = (photoUrl: string) => {
@@ -177,7 +174,7 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({visible, onClose, pet})
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
-            setUploadedPhotos(prev => prev.filter(url => url !== photoUrl));
+            setSelectedImages(prev => prev.filter(url => url !== photoUrl));
           },
         },
       ],
@@ -212,33 +209,62 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({visible, onClose, pet})
     specialInstructions: pet?.specialInstructions || '',
   };
 
-  const handleSubmit = (values: CreatePetRequest) => {
-    // Clean up empty strings to undefined for optional fields
-    const cleanValues = {
-      ...values,
-      photos: uploadedPhotos.length > 0 ? uploadedPhotos : undefined,
-      breed: values.breed || undefined,
-      microchipId: values.microchipId || undefined,
-      allergies: values.allergies || undefined,
-      medications: values.medications || undefined,
-      specialNeeds: values.specialNeeds || undefined,
-      vetName: values.vetName || undefined,
-      vetPhone: values.vetPhone || undefined,
-      vetAddress: values.vetAddress || undefined,
-      trainingLevel: values.trainingLevel || undefined,
-      favoriteActivities: values.favoriteActivities || undefined,
-      preferredWalkFrequency: values.preferredWalkFrequency || undefined,
-      specialInstructions: values.specialInstructions || undefined,
-    };
+  const handleSubmit = async (values: CreatePetRequest) => {
+    setIsSubmitting(true);
 
-    if (isEditing && pet) {
-      updatePet.mutate({id: pet.id, data: cleanValues});
-    } else {
-      createPet.mutate(cleanValues);
+    try {
+      // Upload all local images first
+      const uploadedUrls: string[] = [];
+
+      for (const imageUri of selectedImages) {
+        // Skip if it's already a server URL (for editing existing pets)
+        if (imageUri.startsWith('http') || imageUri.startsWith('/uploads')) {
+          uploadedUrls.push(imageUri);
+        } else {
+          // Upload local image
+          try {
+            const result = await uploadImageMutation.mutateAsync(imageUri);
+            uploadedUrls.push(result.url);
+          } catch (error) {
+            console.error('Failed to upload image:', error);
+            Alert.alert('Error', 'No se pudo subir una de las fotos');
+            setIsSubmitting(false);
+            return;
+          }
+        }
+      }
+
+      // Clean up empty strings to undefined for optional fields
+      const cleanValues = {
+        ...values,
+        photos: uploadedUrls.length > 0 ? uploadedUrls : undefined,
+        breed: values.breed || undefined,
+        microchipId: values.microchipId || undefined,
+        allergies: values.allergies || undefined,
+        medications: values.medications || undefined,
+        specialNeeds: values.specialNeeds || undefined,
+        vetName: values.vetName || undefined,
+        vetPhone: values.vetPhone || undefined,
+        vetAddress: values.vetAddress || undefined,
+        trainingLevel: values.trainingLevel || undefined,
+        favoriteActivities: values.favoriteActivities || undefined,
+        preferredWalkFrequency: values.preferredWalkFrequency || undefined,
+        specialInstructions: values.specialInstructions || undefined,
+      };
+
+      if (isEditing && pet) {
+        updatePet.mutate({id: pet.id, data: cleanValues});
+      } else {
+        createPet.mutate(cleanValues);
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      setIsSubmitting(false);
+      Alert.alert('Error', 'Ocurrió un error al guardar la mascota');
     }
   };
 
-  const isLoading = createPet.isPending || updatePet.isPending;
+  const isLoading = createPet.isPending || updatePet.isPending || isSubmitting;
 
   return (
     <Modal
@@ -286,21 +312,23 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({visible, onClose, pet})
 
                   <View style={styles.formGroup}>
                     <View style={styles.photosContainer}>
-                      {uploadedPhotos.map((photoUrl, index) => {
-                        // Construct full URL for images
-                        const imageUri = photoUrl.startsWith('http')
-                          ? photoUrl
-                          : `http://127.0.0.1:3000${photoUrl}`;
+                      {selectedImages.map((imageUri, index) => {
+                        // For local URIs, use directly. For server URLs, construct full URL
+                        const displayUri = imageUri.startsWith('file://') || imageUri.startsWith('content://')
+                          ? imageUri
+                          : imageUri.startsWith('http')
+                          ? imageUri
+                          : `http://127.0.0.1:3000${imageUri}`;
 
                         return (
                           <View key={index} style={styles.photoWrapper}>
                             <Image
-                              source={{uri: imageUri}}
+                              source={{uri: displayUri}}
                               style={styles.photoThumbnail}
                             />
                             <TouchableOpacity
                               style={styles.removePhotoButton}
-                              onPress={() => handleRemovePhoto(photoUrl)}
+                              onPress={() => handleRemovePhoto(imageUri)}
                             >
                               <X size={16} color={theme.colors.surface} />
                             </TouchableOpacity>
@@ -311,9 +339,9 @@ export const AddPetModal: React.FC<AddPetModalProps> = ({visible, onClose, pet})
                       <TouchableOpacity
                         style={styles.addPhotoButton}
                         onPress={handleImagePicker}
-                        disabled={uploadingPhoto}
+                        disabled={isLoading}
                       >
-                        {uploadingPhoto ? (
+                        {isLoading && selectedImages.length === 0 ? (
                           <ActivityIndicator size="small" color={theme.colors.primary} />
                         ) : (
                           <>

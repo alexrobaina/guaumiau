@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadsController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
+const throttler_1 = require("@nestjs/throttler");
 const swagger_1 = require("@nestjs/swagger");
 const uploads_service_1 = require("./uploads.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
@@ -54,6 +55,7 @@ let UploadsController = class UploadsController {
 };
 exports.UploadsController = UploadsController;
 __decorate([
+    (0, throttler_1.SkipThrottle)({ default: true }),
     (0, common_1.Get)(':folder/:userId/:filename'),
     (0, swagger_1.ApiOperation)({ summary: 'Get uploaded file' }),
     (0, swagger_1.ApiResponse)({

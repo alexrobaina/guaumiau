@@ -42,19 +42,9 @@ exports.AppModule = AppModule = __decorate([
                 inject: [config_1.ConfigService],
                 useFactory: (config) => [
                     {
-                        name: 'short',
-                        ttl: 1000,
-                        limit: parseInt(config.get('THROTTLE_SHORT_LIMIT') || '50'),
-                    },
-                    {
-                        name: 'medium',
-                        ttl: 10000,
-                        limit: parseInt(config.get('THROTTLE_MEDIUM_LIMIT') || '200'),
-                    },
-                    {
-                        name: 'long',
+                        name: 'default',
                         ttl: 60000,
-                        limit: parseInt(config.get('THROTTLE_LONG_LIMIT') || '1000'),
+                        limit: parseInt(config.get('THROTTLE_LIMIT') || '10000'),
                     },
                 ],
             }),

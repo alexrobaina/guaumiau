@@ -27,18 +27,19 @@ const PetCard: React.FC<PetCardProps> = ({ pet, onEdit }) => {
   const info = `${genderLabel}${pet.age ? `, ${pet.age} años` : ''}`;
 
   // Get primary photo or use placeholder
-  const getPhotoUri = () => {
-    if (pet.photos && pet.photos.length > 0) {
-      const photoUrl = pet.photos[0];
-      // If it's already a full URL, use it, otherwise construct the URL
-      return photoUrl.startsWith('http')
-        ? photoUrl
-        : `http://127.0.0.1:3000${photoUrl}`;
-    }
-    return 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop';
-  };
+  let photo = 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop';
 
-  const photo = getPhotoUri();
+  if (pet.photos && pet.photos.length > 0) {
+    const photoUrl = pet.photos[0];
+    // If it's a local path, construct full URL
+    if (photoUrl.startsWith('/uploads')) {
+      photo = `http://127.0.0.1:3000${photoUrl}`;
+    } else {
+      photo = photoUrl;
+    }
+  }
+
+  console.log(`[MyPetsScreen] Pet: ${pet.name}, Photo URL: ${photo}`);
 
   // Create badges based on pet properties
   const badges: string[] = [];

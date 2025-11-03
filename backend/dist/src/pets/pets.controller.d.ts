@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 import { PetsService } from './pets.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
