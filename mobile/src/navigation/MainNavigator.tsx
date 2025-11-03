@@ -8,6 +8,8 @@ import { ProfileScreen } from '../screens/ProfileScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { MyPetsScreen } from '../screens/MyPetsScreen';
 import { WalkerHomeScreen } from '../screens/WalkerHomeScreen';
+import { ProviderProfileScreen } from '../screens/ProviderProfileScreen';
+import { SearchWalkersScreen } from '../screens/SearchWalkersScreen';
 import { Sidebar } from '../components/organisms/Sidebar';
 import { theme } from '../theme';
 
@@ -72,6 +74,16 @@ export const MainNavigator = () => {
             name="Settings"
             component={SettingsScreen}
             options={{ title: 'Settings' }}
+          />
+          <Stack.Screen
+            name="ProviderProfile"
+            component={ProviderProfileScreen}
+            options={{ title: 'Provider Profile' }}
+          />
+          <Stack.Screen
+            name="SearchWalkers"
+            component={SearchWalkersScreen}
+            options={{ title: 'Search Walkers' }}
           />
         </Stack.Navigator>
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

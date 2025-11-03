@@ -43,10 +43,12 @@ export class ProvidersService {
   async findProviders(
     query: ProviderQueryDto,
   ): Promise<PaginatedProvidersResponseDto> {
+    console.log('🔍 [BACKEND] Received query:', JSON.stringify(query, null, 2));
+
     const {
       latitude,
       longitude,
-      radius = 10,
+      radius = 50,
       serviceType,
       availableNow,
       minRating,
@@ -57,27 +59,45 @@ export class ProvidersService {
 
     const skip = (page - 1) * limit;
 
+    console.log('🔍 [BACKEND] Parsed params:', {
+      latitude,
+      longitude,
+      radius,
+      serviceType,
+      availableNow,
+      minRating,
+      search,
+      page,
+      limit,
+    });
+
     // Build where clause - only show verified providers
     const where: any = {
       isVerified: true,
     };
 
+    console.log('🔍 [BACKEND] Initial where clause:', JSON.stringify(where, null, 2));
+
     // Add optional filters only if they are explicitly provided
     if (availableNow !== undefined) {
+      console.log('🔍 [BACKEND] Adding availableNow filter:', availableNow);
       where.isAvailable = availableNow;
     }
 
     if (minRating !== undefined && minRating > 0) {
+      console.log('🔍 [BACKEND] Adding minRating filter:', minRating);
       where.averageRating = { gte: minRating };
     }
 
     if (serviceType !== undefined && serviceType) {
+      console.log('🔍 [BACKEND] Adding serviceType filter:', serviceType);
       where.servicesOffered = { has: serviceType };
     }
 
     // Add search filter
     if (search !== undefined && search.trim()) {
       const searchTerm = search.trim();
+      console.log('🔍 [BACKEND] Adding search filter:', searchTerm);
       where.OR = [
         {
           user: {
@@ -99,6 +119,8 @@ export class ProvidersService {
         },
       ];
     }
+
+    console.log('🔍 [BACKEND] Final where clause:', JSON.stringify(where, null, 2));
 
     // Get providers with user and services
     const providers = await this.prisma.serviceProviderProfile.findMany({
@@ -129,12 +151,16 @@ export class ProvidersService {
       ],
     });
 
+    console.log('🔍 [BACKEND] Found', providers.length, 'providers from DB before location filtering');
+
     // Calculate distances and map to DTO
     const hasLocationFilter =
       latitude !== undefined &&
       longitude !== undefined &&
       !isNaN(latitude) &&
       !isNaN(longitude);
+
+    console.log('🔍 [BACKEND] Location filter active:', hasLocationFilter, 'Radius:', radius);
 
     const mappedProviders: ProviderResponseDto[] = providers
       .map((provider) => {
@@ -247,6 +273,17 @@ export class ProvidersService {
     // Paginate
     const total = mappedProviders.length;
     const paginatedProviders = mappedProviders.slice(skip, skip + limit);
+
+    console.log('🔍 [BACKEND] After location filtering and pagination:', {
+      totalProviders: total,
+      returnedProviders: paginatedProviders.length,
+      page,
+      limit,
+    });
+
+    console.log('🔍 [BACKEND] Returning providers:', paginatedProviders.map(p =>
+      `${p.user.firstName} ${p.user.lastName} (${p.averageRating}⭐, ${p.distance ? p.distance + 'km' : 'no distance'})`
+    ).join(', '));
 
     return {
       providers: paginatedProviders,

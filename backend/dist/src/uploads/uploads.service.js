@@ -54,6 +54,9 @@ let UploadsService = class UploadsService {
         const url = `/uploads/${fileName}`;
         return { url };
     }
+    async getFile(key) {
+        return await this.s3Service.getFile(key);
+    }
     async deleteFile(key) {
         const cleanKey = key.startsWith('/uploads/') ? key.substring(9) : key;
         await this.s3Service.deleteFile(cleanKey);

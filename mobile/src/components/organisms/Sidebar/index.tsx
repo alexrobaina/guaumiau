@@ -11,6 +11,7 @@ import {
   X,
   Dog,
   Footprints,
+  Search,
 } from 'lucide-react-native';
 import { Text } from '@/components/atoms/Text';
 import { useAuth } from '@/contexts/AuthContext';
@@ -75,6 +76,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       activeIcon: <Footprints size={24} color={theme.colors.primary} />,
       label: 'Walker Home',
       routeName: 'WalkerHome',
+    },
+    {
+      icon: <Search size={24} color={theme.colors.textSecondary} />,
+      activeIcon: <Search size={24} color={theme.colors.primary} />,
+      label: 'Search Walkers',
+      routeName: 'SearchWalkers',
     },
     {
       icon: <Calendar size={24} color={theme.colors.textSecondary} />,

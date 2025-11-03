@@ -19,21 +19,13 @@ const throttler_1 = require("@nestjs/throttler");
 const providers_service_1 = require("./providers.service");
 const provider_query_dto_1 = require("./dto/provider-query.dto");
 const provider_response_dto_1 = require("./dto/provider-response.dto");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
-const current_user_decorator_1 = require("../auth/decorators/current-user.decorator");
 let ProvidersController = class ProvidersController {
     providersService;
     constructor(providersService) {
         this.providersService = providersService;
     }
-    async findProviders(query, user) {
-        const latitude = query.latitude !== undefined ? query.latitude : (user.latitude ?? undefined);
-        const longitude = query.longitude !== undefined ? query.longitude : (user.longitude ?? undefined);
-        return this.providersService.findProviders({
-            ...query,
-            latitude,
-            longitude,
-        });
+    async findProviders(query) {
+        return this.providersService.findProviders(query);
     }
     async findOne(id) {
         return this.providersService.findOne(id);
@@ -42,12 +34,10 @@ let ProvidersController = class ProvidersController {
 exports.ProvidersController = ProvidersController;
 __decorate([
     (0, common_1.Get)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
-    (0, throttler_1.Throttle)({ long: { limit: 100, ttl: 60000 } }),
+    (0, throttler_1.SkipThrottle)(),
     (0, swagger_1.ApiOperation)({
         summary: 'Get service providers with filters',
-        description: 'Search for service providers with location-based filtering, service type, rating, and availability filters. If latitude/longitude are not provided in query, uses the authenticated user\'s location.',
+        description: 'Search for service providers with location-based filtering, service type, rating, and availability filters.',
     }),
     (0, swagger_1.ApiResponse)({
         status: 200,
@@ -55,9 +45,8 @@ __decorate([
         type: provider_response_dto_1.PaginatedProvidersResponseDto,
     }),
     __param(0, (0, common_1.Query)()),
-    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [provider_query_dto_1.ProviderQueryDto, Object]),
+    __metadata("design:paramtypes", [provider_query_dto_1.ProviderQueryDto]),
     __metadata("design:returntype", Promise)
 ], ProvidersController.prototype, "findProviders", null);
 __decorate([

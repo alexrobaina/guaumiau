@@ -8,5 +8,6 @@ export declare class UploadsService {
     uploadAvatar(file: Express.Multer.File, userId: string): Promise<{
         url: string;
     }>;
+    getFile(key: string): Promise<Buffer>;
     deleteFile(key: string): Promise<void>;
 }

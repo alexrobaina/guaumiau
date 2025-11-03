@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,12 +17,12 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 import { PetsService } from './pets.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { PetResponseDto } from './dto/pet-response.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('pets')
 @Controller('pets')
@@ -40,10 +41,11 @@ export class PetsController {
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async create(
-    @CurrentUser() user: any,
+    @Req() request: Request,
     @Body() createPetDto: CreatePetDto,
   ): Promise<PetResponseDto> {
-    return this.petsService.create(user.userId, createPetDto);
+    const user = (request as any).user;
+    return this.petsService.create(user.id, createPetDto);
   }
 
   @Get()
@@ -54,8 +56,9 @@ export class PetsController {
     type: [PetResponseDto],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async findAll(@CurrentUser() user: any): Promise<PetResponseDto[]> {
-    return this.petsService.findAllByUser(user.userId);
+  async findAll(@Req() request: Request): Promise<PetResponseDto[]> {
+    const user = (request as any).user;
+    return this.petsService.findAllByUser(user.id);
   }
 
   @Get(':id')
@@ -69,10 +72,11 @@ export class PetsController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findOne(
+    @Req() request: Request,
     @Param('id') id: string,
-    @CurrentUser() user: any,
   ): Promise<PetResponseDto> {
-    return this.petsService.findOne(id, user.userId);
+    const user = (request as any).user;
+    return this.petsService.findOne(id, user.id);
   }
 
   @Patch(':id')
@@ -87,11 +91,12 @@ export class PetsController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async update(
+    @Req() request: Request,
     @Param('id') id: string,
-    @CurrentUser() user: any,
     @Body() updatePetDto: UpdatePetDto,
   ): Promise<PetResponseDto> {
-    return this.petsService.update(id, user.userId, updatePetDto);
+    const user = (request as any).user;
+    return this.petsService.update(id, user.id, updatePetDto);
   }
 
   @Delete(':id')
@@ -101,8 +106,9 @@ export class PetsController {
   @ApiResponse({ status: 404, description: 'Pet not found' })
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async remove(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.petsService.remove(id, user.userId);
+  async remove(@Req() request: Request, @Param('id') id: string) {
+    const user = (request as any).user;
+    return this.petsService.remove(id, user.id);
   }
 
   @Post(':id/photos')
@@ -116,11 +122,12 @@ export class PetsController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async addPhoto(
+    @Req() request: Request,
     @Param('id') id: string,
-    @CurrentUser() user: any,
     @Body('photoUrl') photoUrl: string,
   ): Promise<PetResponseDto> {
-    return this.petsService.addPhoto(id, user.userId, photoUrl);
+    const user = (request as any).user;
+    return this.petsService.addPhoto(id, user.id, photoUrl);
   }
 
   @Delete(':id/photos')
@@ -135,11 +142,12 @@ export class PetsController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async removePhoto(
+    @Req() request: Request,
     @Param('id') id: string,
-    @CurrentUser() user: any,
     @Body('photoUrl') photoUrl: string,
   ): Promise<PetResponseDto> {
-    return this.petsService.removePhoto(id, user.userId, photoUrl);
+    const user = (request as any).user;
+    return this.petsService.removePhoto(id, user.id, photoUrl);
   }
 
   @Patch(':id/medical')
@@ -153,11 +161,12 @@ export class PetsController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateMedicalInfo(
+    @Req() request: Request,
     @Param('id') id: string,
-    @CurrentUser() user: any,
     @Body() medicalInfo: any,
   ): Promise<PetResponseDto> {
-    return this.petsService.updateMedicalInfo(id, user.userId, medicalInfo);
+    const user = (request as any).user;
+    return this.petsService.updateMedicalInfo(id, user.id, medicalInfo);
   }
 
   @Patch(':id/behavior')
@@ -171,10 +180,11 @@ export class PetsController {
   @ApiResponse({ status: 403, description: 'Forbidden - not your pet' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateBehaviorInfo(
+    @Req() request: Request,
     @Param('id') id: string,
-    @CurrentUser() user: any,
     @Body() behaviorInfo: any,
   ): Promise<PetResponseDto> {
-    return this.petsService.updateBehaviorInfo(id, user.userId, behaviorInfo);
+    const user = (request as any).user;
+    return this.petsService.updateBehaviorInfo(id, user.id, behaviorInfo);
   }
 }

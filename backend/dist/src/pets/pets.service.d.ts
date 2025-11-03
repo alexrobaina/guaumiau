@@ -6,8 +6,6 @@ export declare class PetsService {
     constructor(prisma: PrismaService);
     create(userId: string, createPetDto: CreatePetDto): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -35,12 +33,12 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     findAllByUser(userId: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -68,12 +66,12 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }[]>;
     findOne(id: string, userId: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -101,12 +99,12 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     update(id: string, userId: string, updatePetDto: UpdatePetDto): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -134,6 +132,8 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     remove(id: string, userId: string): Promise<{
@@ -141,8 +141,6 @@ export declare class PetsService {
     }>;
     addPhoto(id: string, userId: string, photoUrl: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -170,12 +168,12 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     removePhoto(id: string, userId: string, photoUrl: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -203,6 +201,8 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     updateMedicalInfo(id: string, userId: string, medicalInfo: {
@@ -218,8 +218,6 @@ export declare class PetsService {
         vetAddress?: string;
     }): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -247,6 +245,8 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     updateBehaviorInfo(id: string, userId: string, behaviorInfo: {
@@ -261,8 +261,6 @@ export declare class PetsService {
         specialInstructions?: string;
     }): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -290,12 +288,12 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }>;
     findMultiple(petIds: string[], userId: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
         type: import("@prisma/client").$Enums.PetType;
         breed: string | null;
@@ -323,6 +321,8 @@ export declare class PetsService {
         preferredWalkDuration: number | null;
         preferredWalkFrequency: string | null;
         specialInstructions: string | null;
+        createdAt: Date;
+        updatedAt: Date;
         ownerId: string;
     }[]>;
 }

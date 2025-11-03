@@ -6,7 +6,7 @@ export class PlacesService {
 
   constructor() {
     // Get API key from environment variable
-    this.apiKey = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyCqFbjokkkUeyPBp2Q8521jviFfzoJmnnE';
+    this.apiKey = process.env.GOOGLE_PLACES_API_KEY ?? '';
   }
 
   async autocomplete(input: string, language = 'es', country = 'ar') {
@@ -22,7 +22,10 @@ export class PlacesService {
       const response = await fetch(url);
       const data = await response.json();
 
-      if (data.status === 'REQUEST_DENIED' || data.status === 'INVALID_REQUEST') {
+      if (
+        data.status === 'REQUEST_DENIED' ||
+        data.status === 'INVALID_REQUEST'
+      ) {
         throw new HttpException(
           data.error_message || 'Google Places API error',
           HttpStatus.BAD_REQUEST,
@@ -52,7 +55,10 @@ export class PlacesService {
       const response = await fetch(url);
       const data = await response.json();
 
-      if (data.status === 'REQUEST_DENIED' || data.status === 'INVALID_REQUEST') {
+      if (
+        data.status === 'REQUEST_DENIED' ||
+        data.status === 'INVALID_REQUEST'
+      ) {
         throw new HttpException(
           data.error_message || 'Google Places API error',
           HttpStatus.BAD_REQUEST,

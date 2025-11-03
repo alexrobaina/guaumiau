@@ -14,7 +14,7 @@ const common_1 = require("@nestjs/common");
 let PlacesService = class PlacesService {
     apiKey;
     constructor() {
-        this.apiKey = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyCqFbjokkkUeyPBp2Q8521jviFfzoJmnnE';
+        this.apiKey = process.env.GOOGLE_PLACES_API_KEY ?? '';
     }
     async autocomplete(input, language = 'es', country = 'ar') {
         if (!input || input.length < 2) {
@@ -24,7 +24,8 @@ let PlacesService = class PlacesService {
             const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${this.apiKey}&language=${language}&components=country:${country}`;
             const response = await fetch(url);
             const data = await response.json();
-            if (data.status === 'REQUEST_DENIED' || data.status === 'INVALID_REQUEST') {
+            if (data.status === 'REQUEST_DENIED' ||
+                data.status === 'INVALID_REQUEST') {
                 throw new common_1.HttpException(data.error_message || 'Google Places API error', common_1.HttpStatus.BAD_REQUEST);
             }
             return data;
@@ -44,7 +45,8 @@ let PlacesService = class PlacesService {
             const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${this.apiKey}&language=${language}`;
             const response = await fetch(url);
             const data = await response.json();
-            if (data.status === 'REQUEST_DENIED' || data.status === 'INVALID_REQUEST') {
+            if (data.status === 'REQUEST_DENIED' ||
+                data.status === 'INVALID_REQUEST') {
                 throw new common_1.HttpException(data.error_message || 'Google Places API error', common_1.HttpStatus.BAD_REQUEST);
             }
             return data;

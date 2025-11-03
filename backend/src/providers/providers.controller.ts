@@ -1,15 +1,12 @@
-import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
+import { Controller, Get, Query, Param } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { ProvidersService } from './providers.service';
 import { ProviderQueryDto } from './dto/provider-query.dto';
 import {
   ProviderResponseDto,
   PaginatedProvidersResponseDto,
 } from './dto/provider-response.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { User } from '@prisma/client';
 
 @ApiTags('providers')
 @Controller('providers')
@@ -17,13 +14,11 @@ export class ProvidersController {
   constructor(private readonly providersService: ProvidersService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @Throttle({ long: { limit: 100, ttl: 60000 } }) // Allow 100 requests per minute for search
+  @SkipThrottle() // Skip global throttler for development - remove in production
   @ApiOperation({
     summary: 'Get service providers with filters',
     description:
-      'Search for service providers with location-based filtering, service type, rating, and availability filters. If latitude/longitude are not provided in query, uses the authenticated user\'s location.',
+      'Search for service providers with location-based filtering, service type, rating, and availability filters.',
   })
   @ApiResponse({
     status: 200,
@@ -32,17 +27,8 @@ export class ProvidersController {
   })
   async findProviders(
     @Query() query: ProviderQueryDto,
-    @CurrentUser() user: User,
   ): Promise<PaginatedProvidersResponseDto> {
-    // If lat/long not provided in query, use user's location
-    const latitude = query.latitude !== undefined ? query.latitude : (user.latitude ?? undefined);
-    const longitude = query.longitude !== undefined ? query.longitude : (user.longitude ?? undefined);
-
-    return this.providersService.findProviders({
-      ...query,
-      latitude,
-      longitude,
-    });
+    return this.providersService.findProviders(query);
   }
 
   @Get(':id')

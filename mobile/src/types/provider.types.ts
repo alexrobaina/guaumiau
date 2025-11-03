@@ -51,6 +51,7 @@ export interface ProviderQueryParams {
   serviceType?: string;
   availableNow?: boolean;
   minRating?: number;
+  search?: string;
   page?: number;
   limit?: number;
 }

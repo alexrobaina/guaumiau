@@ -32,16 +32,16 @@ export class ProviderQueryDto {
 
   @ApiPropertyOptional({
     description: 'Radius in kilometers',
-    default: 10,
+    default: 50,
     minimum: 1,
-    maximum: 100,
+    maximum: 500,
   })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  @Max(100)
-  radius?: number = 10;
+  @Max(500)
+  radius?: number = 50;
 
   @ApiPropertyOptional({
     enum: ServiceTypeFilter,

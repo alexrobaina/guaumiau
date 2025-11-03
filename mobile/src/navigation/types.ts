@@ -13,4 +13,6 @@ export type MainStackParamList = {
   Profile: undefined;
   MyPets: undefined;
   Settings: undefined;
+  ProviderProfile: { providerId: string };
+  SearchWalkers: undefined;
 };

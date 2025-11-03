@@ -33,6 +33,12 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>GuauMiau necesita acceso a tu ubicación para mostrarte paseadores cerca de ti y calcular distancias precisas.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>GuauMiau necesita acceso a tu cámara para tomar fotos de tus mascotas.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>GuauMiau necesita acceso a tu biblioteca de fotos para seleccionar imágenes de tus mascotas.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>GuauMiau necesita acceso para guardar fotos de tus mascotas en tu biblioteca.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

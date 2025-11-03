@@ -1,155 +1,235 @@
-import React from 'react';
-import {View, FlatList, TouchableOpacity, RefreshControl} from 'react-native';
-import {Plus} from 'lucide-react-native';
-import {Layout} from '@/components/Layout';
-import {Text, Button, Spinner, Card, Spacer, PetAvatar, PetSizeBadge} from '@/components';
-import {usePets} from '@/hooks/api';
-import {Pet} from '@/types/pet.types';
-import {styles} from './styles';
-import {theme} from '@/theme';
+import React, { useState } from 'react';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+import { Plus, Pencil, AlertCircle } from 'lucide-react-native';
+import { Text } from '@/components/atoms/Text';
+import { styles } from './styles';
+import { theme } from '@/theme';
+import { usePets } from '@/hooks/api/usePets';
+import { Pet, PetGender } from '@/types/pet.types';
+import { AddPetModal } from '@/components/organisms/AddPetModal';
 
 interface PetCardProps {
   pet: Pet;
-  onPress: () => void;
+  onEdit: () => void;
 }
 
-const PetCard: React.FC<PetCardProps> = ({pet, onPress}) => {
-  const firstPhoto = pet.photos && pet.photos.length > 0 ? pet.photos[0] : null;
+const PetCard: React.FC<PetCardProps> = ({ pet, onEdit }) => {
+  // Format pet info string
+  const genderLabel =
+    pet.gender === PetGender.MALE ? 'Macho' : pet.gender === PetGender.FEMALE ? 'Hembra' : 'Desconocido';
+  const info = `${genderLabel}${pet.age ? `, ${pet.age} años` : ''}`;
+
+  // Get primary photo or use placeholder
+  const getPhotoUri = () => {
+    if (pet.photos && pet.photos.length > 0) {
+      const photoUrl = pet.photos[0];
+      // If it's already a full URL, use it, otherwise construct the URL
+      return photoUrl.startsWith('http')
+        ? photoUrl
+        : `http://127.0.0.1:3000${photoUrl}`;
+    }
+    return 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop';
+  };
+
+  const photo = getPhotoUri();
+
+  // Create badges based on pet properties
+  const badges: string[] = [];
+  if (pet.isVaccinated) badges.push('Vacunado');
+  if (pet.isFriendlyWithDogs) badges.push('Amigable');
 
   return (
-    <Card padding="medium" onPress={onPress}>
-      <View style={styles.petCard}>
-        <PetAvatar
-          photoUrl={firstPhoto}
-          petType={pet.type}
-          size="medium"
-        />
+    <View style={styles.petCard}>
+      <TouchableOpacity style={styles.editButton} onPress={onEdit} activeOpacity={0.7}>
+        <Pencil size={20} color={theme.colors.primary} />
+      </TouchableOpacity>
+
+      <View style={styles.petCardContent}>
+        <Image source={{ uri: photo }} style={styles.petPhoto} />
+
         <View style={styles.petInfo}>
-          <Text variant="h3">{pet.name}</Text>
-          <Spacer size="xs" />
-          <Text variant="caption" color="textSecondary">
-            {pet.breed || pet.type}
+          <Text variant="h3" style={styles.petName}>
+            {pet.name}
           </Text>
+          <Text variant="caption" color="textSecondary" style={styles.petBreed}>
+            {pet.breed || 'Raza desconocida'} • {info}
+          </Text>
+
+          <View style={styles.petDetails}>
+            <Text variant="caption" color="text" style={styles.petDetailText}>
+              Edad: {pet.age ? `${pet.age} años` : 'N/D'}
+            </Text>
+            <Text variant="caption" color="text" style={styles.petDetailText}>
+              Peso: {pet.weight ? `${pet.weight} kg` : 'N/D'}
+            </Text>
+          </View>
+
+          {badges.length > 0 && (
+            <View style={styles.badgesContainer}>
+              {badges.map((badge, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.badge,
+                    badge === 'Vacunado' ? styles.badgeGreen : styles.badgeBlue,
+                  ]}
+                >
+                  <Text
+                    variant="caption"
+                    style={[
+                      styles.badgeText,
+                      badge === 'Vacunado' ? styles.badgeTextGreen : styles.badgeTextBlue,
+                    ]}
+                  >
+                    {badge}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
-        <PetSizeBadge size={pet.size} />
       </View>
-    </Card>
+    </View>
   );
 };
 
 export function MyPetsScreen() {
-  const {data: pets, isLoading, isError, error, refetch} = usePets();
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
 
-  if (isLoading) {
-    return (
-      <Layout>
-        <View style={styles.centerContainer}>
-          <Spinner size="large" />
-          <Spacer size="md" />
-          <Text variant="body" color="textSecondary">
-            Loading pets...
-          </Text>
-        </View>
-      </Layout>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Layout>
-        <View style={styles.centerContainer}>
-          <Text variant="body" color="error" align="center">
-            {error?.response?.data?.message || 'Failed to load pets'}
-          </Text>
-          <Spacer size="md" />
-          <Button title="Retry" onPress={() => refetch()} />
-        </View>
-      </Layout>
-    );
-  }
+  const { data: pets, isLoading, isError, error, refetch, isRefetching } = usePets();
 
   const handleAddPet = () => {
-    // TODO: Navigate to AddPet screen
-    console.log('Navigate to Add Pet');
+    setSelectedPet(null);
+    setIsAddModalVisible(true);
   };
 
-  const handlePetPress = (pet: Pet) => {
-    // TODO: Navigate to Pet Profile screen
-    console.log('Navigate to Pet Profile', pet.id);
+  const handleEditPet = (pet: Pet) => {
+    setSelectedPet(pet);
+    setIsAddModalVisible(true);
   };
 
-  if (!pets || pets.length === 0) {
+  const handleCloseModal = () => {
+    setIsAddModalVisible(false);
+    setSelectedPet(null);
+  };
+
+  // Loading state
+  if (isLoading) {
     return (
-      <Layout>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text variant="h2">Mis Mascotas</Text>
-          </View>
-          <Spacer size="lg" />
-
-          <View style={styles.emptyContainer}>
-            <Text variant="h1" align="center" style={styles.emptyEmoji}>
-              🐾
-            </Text>
-            <Spacer size="md" />
-            <Text variant="h2" align="center">
-              Aún no tienes mascotas
-            </Text>
-            <Spacer size="sm" />
-            <Text variant="body" color="textSecondary" align="center" style={styles.emptyText}>
-              Agrega tu primera mascota para comenzar a reservar servicios de cuidado y paseo
-            </Text>
-          </View>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text variant="h1" style={styles.headerTitle}>
+            Mis Mascotas
+          </Text>
         </View>
-
-        {/* Floating Action Button */}
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={handleAddPet}
-          activeOpacity={0.8}>
-          <Plus size={28} color="#FFF" />
-        </TouchableOpacity>
-      </Layout>
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text variant="body" color="textSecondary" style={styles.centerText}>
+            Cargando tus mascotas...
+          </Text>
+        </View>
+      </View>
     );
   }
 
-  return (
-    <Layout>
+  // Error state
+  if (isError) {
+    return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text variant="h2">Mis Mascotas</Text>
+          <Text variant="h1" style={styles.headerTitle}>
+            Mis Mascotas
+          </Text>
         </View>
+        <View style={styles.centerContainer}>
+          <AlertCircle size={48} color={theme.colors.error} />
+          <Text variant="body" color="error" style={styles.centerText}>
+            Error al cargar las mascotas
+          </Text>
+          <Text variant="caption" color="textSecondary" style={styles.errorMessage}>
+            {error?.response?.data?.message || error?.message || 'Error desconocido'}
+          </Text>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => refetch()}
+            activeOpacity={0.7}
+          >
+            <Text variant="body" style={styles.retryButtonText}>
+              Reintentar
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
-        <Spacer size="md" />
+  // Empty state
+  if (!pets || pets.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text variant="h1" style={styles.headerTitle}>
+            Mis Mascotas
+          </Text>
+        </View>
+        <View style={styles.centerContainer}>
+          <Text variant="h2" style={styles.emptyTitle}>
+            Aún no tienes mascotas
+          </Text>
+          <Text variant="body" color="textSecondary" style={styles.emptyText}>
+            Agrega tu primera mascota para comenzar
+          </Text>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddPet} activeOpacity={0.7}>
+            <Plus size={24} color="#FFF" />
+            <Text variant="body" style={styles.addButtonText}>
+              Agregar Mascota
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
-        <FlatList
-          data={pets}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <>
-              <PetCard pet={item} onPress={() => handlePetPress(item)} />
-              <Spacer size="sm" />
-            </>
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 80}}
-          refreshControl={
-            <RefreshControl
-              refreshing={isLoading}
-              onRefresh={refetch}
-              tintColor={theme.colors.primary}
-            />
-          }
-        />
+  // Pets list
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text variant="h1" style={styles.headerTitle}>
+          Mis Mascotas
+        </Text>
       </View>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={handleAddPet}
-        activeOpacity={0.8}>
-        <Plus size={28} color="#FFF" />
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={theme.colors.primary}
+          />
+        }
+      >
+        <View style={styles.petsContainer}>
+          {pets.map(pet => (
+            <PetCard key={pet.id} pet={pet} onEdit={() => handleEditPet(pet)} />
+          ))}
+        </View>
+      </ScrollView>
+
+      <TouchableOpacity style={styles.fab} onPress={handleAddPet} activeOpacity={0.8}>
+        <Plus size={24} color="#FFF" />
       </TouchableOpacity>
-    </Layout>
+
+      <AddPetModal visible={isAddModalVisible} onClose={handleCloseModal} pet={selectedPet} />
+    </View>
   );
 }

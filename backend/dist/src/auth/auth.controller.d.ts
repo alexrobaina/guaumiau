@@ -18,9 +18,9 @@ export declare class AuthController {
             id: string;
             email: string;
             username: string;
+            phone: string | null;
             firstName: string;
             lastName: string;
-            phone: string | null;
             avatar: string | null;
             roles: import("@prisma/client").$Enums.UserRole[];
             address: string | null;
@@ -54,9 +54,9 @@ export declare class AuthController {
             id: string;
             email: string;
             username: string;
+            phone: string | null;
             firstName: string;
             lastName: string;
-            phone: string | null;
             avatar: string | null;
             roles: import("@prisma/client").$Enums.UserRole[];
             address: string | null;
@@ -109,9 +109,9 @@ export declare class AuthController {
         id: string;
         email: string;
         username: string;
+        phone: string | null;
         firstName: string;
         lastName: string;
-        phone: string | null;
         avatar: string | null;
         roles: import("@prisma/client").$Enums.UserRole[];
         address: string | null;

@@ -31,7 +31,7 @@ var ServiceTypeFilter;
 class ProviderQueryDto {
     latitude;
     longitude;
-    radius = 10;
+    radius = 50;
     serviceType;
     availableNow;
     minRating;
@@ -57,15 +57,15 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({
         description: 'Radius in kilometers',
-        default: 10,
+        default: 50,
         minimum: 1,
-        maximum: 100,
+        maximum: 500,
     }),
     (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1),
-    (0, class_validator_1.Max)(100),
+    (0, class_validator_1.Max)(500),
     __metadata("design:type", Number)
 ], ProviderQueryDto.prototype, "radius", void 0);
 __decorate([

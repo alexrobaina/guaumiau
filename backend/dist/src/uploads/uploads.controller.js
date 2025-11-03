@@ -18,28 +18,61 @@ const platform_express_1 = require("@nestjs/platform-express");
 const swagger_1 = require("@nestjs/swagger");
 const uploads_service_1 = require("./uploads.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
-const current_user_decorator_1 = require("../auth/decorators/current-user.decorator");
 let UploadsController = class UploadsController {
     uploadsService;
     constructor(uploadsService) {
         this.uploadsService = uploadsService;
     }
-    async uploadPetImage(file, user) {
-        if (!file) {
-            throw new common_1.BadRequestException('No file uploaded');
-        }
-        return this.uploadsService.uploadPetImage(file, user.userId);
+    async getFile(folder, userId, filename, res) {
+        const key = `${folder}/${userId}/${filename}`;
+        const file = await this.uploadsService.getFile(key);
+        const ext = filename.split('.').pop()?.toLowerCase();
+        const contentType = ext === 'png' ? 'image/png'
+            : ext === 'webp' ? 'image/webp'
+                : 'image/jpeg';
+        res.set({
+            'Content-Type': contentType,
+            'Content-Disposition': `inline; filename="${filename}"`,
+            'Cache-Control': 'public, max-age=31536000',
+        });
+        return new common_1.StreamableFile(file);
     }
-    async uploadAvatar(file, user) {
+    async uploadPetImage(request, file) {
         if (!file) {
             throw new common_1.BadRequestException('No file uploaded');
         }
-        return this.uploadsService.uploadAvatar(file, user.userId);
+        const user = request.user;
+        return this.uploadsService.uploadPetImage(file, user.id);
+    }
+    async uploadAvatar(request, file) {
+        if (!file) {
+            throw new common_1.BadRequestException('No file uploaded');
+        }
+        const user = request.user;
+        return this.uploadsService.uploadAvatar(file, user.id);
     }
 };
 exports.UploadsController = UploadsController;
 __decorate([
+    (0, common_1.Get)(':folder/:userId/:filename'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get uploaded file' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'File retrieved successfully',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'File not found' }),
+    __param(0, (0, common_1.Param)('folder')),
+    __param(1, (0, common_1.Param)('userId')),
+    __param(2, (0, common_1.Param)('filename')),
+    __param(3, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String, Object]),
+    __metadata("design:returntype", Promise)
+], UploadsController.prototype, "getFile", null);
+__decorate([
     (0, common_1.Post)('pet-image'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     (0, swagger_1.ApiOperation)({ summary: 'Upload a pet image' }),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
@@ -66,14 +99,16 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request - invalid file' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    __param(0, (0, common_1.UploadedFile)()),
-    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UploadsController.prototype, "uploadPetImage", null);
 __decorate([
     (0, common_1.Post)('avatar'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     (0, swagger_1.ApiOperation)({ summary: 'Upload a user avatar' }),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
@@ -100,8 +135,8 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request - invalid file' }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    __param(0, (0, common_1.UploadedFile)()),
-    __param(1, (0, current_user_decorator_1.CurrentUser)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
@@ -109,8 +144,6 @@ __decorate([
 exports.UploadsController = UploadsController = __decorate([
     (0, swagger_1.ApiTags)('uploads'),
     (0, common_1.Controller)('uploads'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)(),
     __metadata("design:paramtypes", [uploads_service_1.UploadsService])
 ], UploadsController);
 //# sourceMappingURL=uploads.controller.js.map

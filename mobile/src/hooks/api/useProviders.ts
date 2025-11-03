@@ -12,8 +12,11 @@ export const useProviders = (
     'queryKey' | 'queryFn'
   >,
 ) => {
+  // Create a stable query key by serializing params in a consistent order
+  const queryKey = ['providers', JSON.stringify(params || {})];
+
   return useQuery<PaginatedProvidersResponse, Error>({
-    queryKey: ['providers', params],
+    queryKey,
     queryFn: () => providerService.getProviders(params),
     ...options,
   });

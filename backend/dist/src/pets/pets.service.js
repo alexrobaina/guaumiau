@@ -18,20 +18,25 @@ let PetsService = class PetsService {
         this.prisma = prisma;
     }
     async create(userId, createPetDto) {
+        if (!userId) {
+            throw new common_1.BadRequestException('User ID is required');
+        }
         try {
+            const { photos, vaccinationRecords, ...petData } = createPetDto;
             const pet = await this.prisma.pet.create({
                 data: {
-                    ...createPetDto,
+                    ...petData,
                     ownerId: userId,
-                    photos: createPetDto.photos || [],
-                    vaccinationRecords: createPetDto.vaccinationRecords
-                        ? createPetDto.vaccinationRecords
+                    photos: photos || [],
+                    vaccinationRecords: vaccinationRecords
+                        ? vaccinationRecords
                         : [],
                 },
             });
             return pet;
         }
         catch (error) {
+            console.error('Error creating pet:', error);
             throw new common_1.BadRequestException('Failed to create pet');
         }
     }

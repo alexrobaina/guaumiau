@@ -77,6 +77,10 @@ export class UploadsService {
     return { url };
   }
 
+  async getFile(key: string): Promise<Buffer> {
+    return await this.s3Service.getFile(key);
+  }
+
   async deleteFile(key: string): Promise<void> {
     // Remove '/uploads/' prefix if present
     const cleanKey = key.startsWith('/uploads/') ? key.substring(9) : key;
