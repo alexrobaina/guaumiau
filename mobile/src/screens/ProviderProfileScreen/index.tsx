@@ -225,7 +225,6 @@ export const ProviderProfileScreen = memo(() => {
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={() => {
-              console.log('Book provider:', provider.id);
             }}
           >
             <Text variant="body" style={styles.primaryButtonText}>
@@ -236,7 +235,6 @@ export const ProviderProfileScreen = memo(() => {
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => {
-              console.log('Message provider:', provider.id);
             }}
           >
             <MessageCircle size={20} color={theme.colors.primary} />

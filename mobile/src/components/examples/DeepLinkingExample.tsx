@@ -19,13 +19,11 @@ import {
 export const DeepLinkingExample: React.FC = () => {
   // Listen to incoming deep links
   const {initialUrl, lastUrl} = useDeepLinking(url => {
-    console.log('Received deep link:', url);
     Alert.alert('Deep Link Received', url);
   });
 
   const handleOpenLogin = async () => {
     const link = DeepLinks.login();
-    console.log('Opening:', link);
     await openURL(link);
   };
 
@@ -35,7 +33,6 @@ export const DeepLinkingExample: React.FC = () => {
 
     // In a real app, you'd use the Share API
     Alert.alert('Shareable Link', link, [
-      {text: 'Copy', onPress: () => console.log('Copied:', link)},
       {text: 'Open', onPress: () => openURL(link)},
       {text: 'Cancel', style: 'cancel'},
     ]);

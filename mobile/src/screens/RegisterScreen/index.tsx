@@ -13,7 +13,6 @@ export const RegisterScreen = memo<IRegisterScreenProps>(() => {
 
   const register = useRegister({
     onSuccess: async data => {
-      console.log('Registration successful:', data.user);
       // Navigate to email verification screen
       navigation.navigate('VerifyEmail', { email: data.user.email });
     },

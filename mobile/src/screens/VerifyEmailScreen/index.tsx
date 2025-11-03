@@ -24,7 +24,6 @@ export const VerifyEmailScreen = memo<IVerifyEmailScreenProps>(() => {
 
   const verifyEmail = useVerifyEmail({
     onSuccess: data => {
-      console.log('Email verified:', data.message);
       setVerificationStatus('success');
       setTimeout(() => {
         navigation.navigate('Login' as never);

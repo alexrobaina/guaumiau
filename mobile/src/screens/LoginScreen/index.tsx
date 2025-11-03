@@ -10,7 +10,6 @@ export const LoginScreen = memo<ILoginScreenProps>(() => {
 
   const login = useLogin({
     onSuccess: async data => {
-      console.log('Login successful:', data.user);
       // Save user, accessToken, and refreshToken to context and storage
       await authLogin(data.user, data.accessToken, data.refreshToken);
     },

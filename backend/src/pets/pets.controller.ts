@@ -45,8 +45,6 @@ export class PetsController {
     @Body() createPetDto: CreatePetDto,
   ): Promise<PetResponseDto> {
     const user = (request as any).user;
-    console.log('[CREATE PET] User from request:', user);
-    console.log('[CREATE PET] User ID:', user?.id);
 
     if (!user || !user.id) {
       throw new Error('User not authenticated properly');

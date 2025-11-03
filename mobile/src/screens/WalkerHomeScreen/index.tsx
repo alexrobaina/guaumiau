@@ -39,7 +39,6 @@ export const WalkerHomeScreen = memo(() => {
   // Location hooks
   const updateLocationMutation = useUpdateLocation({
     onSuccess: () => {
-      console.log('Location updated successfully');
     },
     onError: error => {
       console.error('Failed to update location:', error);
@@ -107,17 +106,11 @@ export const WalkerHomeScreen = memo(() => {
 
   // Debug logging
   useEffect(() => {
-    console.log('\n========================================');
-    console.log('🏷️  [FRONTEND] Active filter:', activeFilter);
-    console.log('🔍 [FRONTEND] Query params:', JSON.stringify(queryParams, null, 2));
-    console.log('👤 [FRONTEND] User location:', {
       hasLocation: !!(user?.latitude && user?.longitude),
       latitude: user?.latitude,
       longitude: user?.longitude,
       city: user?.city,
     });
-    console.log('🔎 [FRONTEND] Search text:', searchText ? `"${searchText}"` : 'empty');
-    console.log('========================================\n');
   }, [queryParams, activeFilter, user?.latitude, user?.longitude, user?.city, searchText]);
 
   // Fetch providers from API
@@ -146,19 +139,12 @@ export const WalkerHomeScreen = memo(() => {
 
   // Debug response
   useEffect(() => {
-    console.log('\n========== RESPONSE ==========');
     if (isLoading) {
-      console.log('⏳ [FRONTEND] Loading providers...');
     }
     if (data) {
-      console.log('✅ [FRONTEND] Providers received:', data.total, 'total');
-      console.log('📦 [FRONTEND] Providers list:');
       data.providers.forEach((p, i) => {
-        console.log(`   ${i + 1}. ${p.user.firstName} ${p.user.lastName}`);
-        console.log(
           `      Rating: ${p.averageRating}⭐ | Available: ${p.isAvailable ? 'YES' : 'NO'} | Distance: ${p.distance ? p.distance + 'km' : 'N/A'}`,
         );
-        console.log(`      Services: ${p.servicesOffered.join(', ')}`);
       });
     }
     if (error) {
@@ -167,23 +153,18 @@ export const WalkerHomeScreen = memo(() => {
       console.error('   Message:', (error as any)?.message);
       console.error('   Full error:', error);
     }
-    console.log('==============================\n');
   }, [data, error, isLoading]);
 
   const handleNotificationPress = useCallback(() => {
-    console.log('Notifications pressed');
   }, []);
 
   const handleProfilePress = useCallback(() => {
-    console.log('Profile pressed');
   }, []);
 
   const handleBookWalkPress = useCallback(() => {
-    console.log('Book walk pressed');
   }, []);
 
   const handlePetSittingPress = useCallback(() => {
-    console.log('Pet sitting pressed');
   }, []);
 
   const handleWalkerPress = useCallback(
@@ -195,12 +176,9 @@ export const WalkerHomeScreen = memo(() => {
 
   const handleFilterPress = useCallback(
     (filter: string) => {
-      console.log('\n🎯 [FRONTEND] User clicked filter:', filter);
-      console.log('   Previous filter:', activeFilter);
 
       // Check if user needs to set location for "Cerca de mi" filter
       if (filter === 'Cerca de mi' && user && (!user.latitude || !user.longitude)) {
-        console.log('   ⚠️  User has no location, showing location modal');
         setShowLocationModal(true);
         // Don't change the active filter yet - wait for location to be set
         return;
@@ -208,11 +186,9 @@ export const WalkerHomeScreen = memo(() => {
 
       // Clear search when changing filters to avoid confusion
       if (filter !== activeFilter && searchText.trim().length > 0) {
-        console.log('   🧹 Clearing search text');
         setSearchText('');
       }
 
-      console.log('   ✅ Setting new filter:', filter);
       setActiveFilter(filter);
     },
     [user, activeFilter, searchText],

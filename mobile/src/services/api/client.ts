@@ -130,7 +130,6 @@ apiClient.interceptors.response.use(
         isRefreshing = false;
         await storage.clearAuth();
         clearAuthToken();
-        console.log('Token refresh failed - User logged out');
         return Promise.reject(refreshError);
       }
     }

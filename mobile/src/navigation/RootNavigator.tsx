@@ -29,7 +29,6 @@ export const RootNavigator = () => {
         // Log initial URL when app opens from a deep link
         Linking.getInitialURL().then(url => {
           if (url) {
-            console.log('App opened with URL:', url);
           }
         });
       }}

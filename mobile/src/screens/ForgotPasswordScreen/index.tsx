@@ -13,7 +13,6 @@ export const ForgotPasswordScreen = memo<IForgotPasswordScreenProps>(() => {
 
   const forgotPassword = useForgotPassword({
     onSuccess: data => {
-      console.log('Password reset email sent:', data.message);
     },
     onError: error => {
       console.error('Forgot password failed:', error.response?.data?.message);

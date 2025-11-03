@@ -39,8 +39,6 @@ const PetCard: React.FC<PetCardProps> = ({ pet, onEdit }) => {
     }
   }
 
-  console.log(`[MyPetsScreen] Pet: ${pet.name}, Photo URL: ${photo}`);
-
   // Create badges based on pet properties
   const badges: string[] = [];
   if (pet.isVaccinated) badges.push('Vacunado');
