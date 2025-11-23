@@ -295,6 +295,81 @@ export class AuthService {
     return userWithoutPassword;
   }
 
+  async updateProfile(userId: string, updateData: {
+    email?: string;
+    username?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    avatar?: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  }) {
+    // Check if email or username is being updated and if it's already taken
+    if (updateData.email || updateData.username) {
+      const existingUser = await this.prisma.user.findFirst({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            {
+              OR: [
+                ...(updateData.email ? [{ email: updateData.email }] : []),
+                ...(updateData.username ? [{ username: updateData.username }] : []),
+              ],
+            },
+          ],
+        },
+      });
+
+      if (existingUser) {
+        throw new BadRequestException('Email or username already exists');
+      }
+    }
+
+    // Check if phone is being updated and if it's already taken
+    if (updateData.phone) {
+      const existingPhone = await this.prisma.user.findFirst({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            { phone: updateData.phone },
+          ],
+        },
+      });
+
+      if (existingPhone) {
+        throw new BadRequestException('Phone number already exists');
+      }
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(updateData.email && { email: updateData.email }),
+        ...(updateData.username && { username: updateData.username }),
+        ...(updateData.firstName && { firstName: updateData.firstName }),
+        ...(updateData.lastName && { lastName: updateData.lastName }),
+        ...(updateData.phone && { phone: updateData.phone }),
+        ...(updateData.avatar && { avatar: updateData.avatar }),
+        ...(updateData.address && { address: updateData.address }),
+        ...(updateData.latitude !== undefined && { latitude: updateData.latitude }),
+        ...(updateData.longitude !== undefined && { longitude: updateData.longitude }),
+        ...(updateData.city && { city: updateData.city }),
+        ...(updateData.state && { state: updateData.state }),
+        ...(updateData.postalCode && { postalCode: updateData.postalCode }),
+        ...(updateData.country && { country: updateData.country }),
+      },
+    });
+
+    const { password: _, refreshToken: __, ...userWithoutPassword } = user;
+    return { user: userWithoutPassword };
+  }
+
   private async generateTokens(userId: string) {
     const payload = { sub: userId };
 

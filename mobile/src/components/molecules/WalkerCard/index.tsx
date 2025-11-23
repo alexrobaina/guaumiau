@@ -1,5 +1,5 @@
 import React, {memo} from 'react';
-import {View, Image, Text} from 'react-native';
+import {View, Image, Text, TouchableOpacity} from 'react-native';
 import {MapPin, Star, Dog, Cat, Home, Footprints} from 'lucide-react-native';
 import {Button} from '@components/atoms/Button';
 import {styles} from './styles';
@@ -16,11 +16,12 @@ interface IWalkerCardProps {
   available: boolean;
   servicesOffered: string[];
   onPress: (id: string) => void;
+  onReservePress?: (id: string) => void;
   testID?: string;
 }
 
 export const WalkerCard = memo<IWalkerCardProps>(
-  ({id, name, avatar, distance, rating, reviews, price, available, servicesOffered, onPress, testID}) => {
+  ({id, name, avatar, distance, rating, reviews, price, available, servicesOffered, onPress, onReservePress, testID}) => {
     // Helper to render service icons
     const renderServiceIcons = () => {
       const icons = [];
@@ -64,8 +65,21 @@ export const WalkerCard = memo<IWalkerCardProps>(
       return icons;
     };
 
+    const handleReserve = () => {
+      if (onReservePress) {
+        onReservePress(id);
+      } else {
+        onPress(id);
+      }
+    };
+
     return (
-      <View style={styles.container} testID={testID}>
+      <TouchableOpacity
+        style={styles.container}
+        testID={testID}
+        onPress={() => onPress(id)}
+        activeOpacity={0.7}
+      >
         <View style={styles.content}>
           <Image source={{uri: avatar}} style={styles.avatar} />
           <View style={styles.info}>
@@ -100,7 +114,7 @@ export const WalkerCard = memo<IWalkerCardProps>(
               <Text style={styles.price}>${price}/hr</Text>
               <Button
                 title="Reservar"
-                onPress={() => onPress(id)}
+                onPress={handleReserve}
                 variant="primary"
                 size="small"
                 style={styles.button}
@@ -108,7 +122,7 @@ export const WalkerCard = memo<IWalkerCardProps>(
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   },
 );

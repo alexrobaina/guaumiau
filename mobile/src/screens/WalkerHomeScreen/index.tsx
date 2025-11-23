@@ -193,6 +193,13 @@ export const WalkerHomeScreen = memo(() => {
     [navigation],
   );
 
+  const handleReservePress = useCallback(
+    (id: string) => {
+      navigation.navigate('Booking', { providerId: id });
+    },
+    [navigation],
+  );
+
   const handleFilterPress = useCallback(
     (filter: string) => {
       console.log('\n🎯 [FRONTEND] User clicked filter:', filter);
@@ -331,6 +338,7 @@ export const WalkerHomeScreen = memo(() => {
                   id={provider.id}
                   key={provider.id}
                   onPress={handleWalkerPress}
+                  onReservePress={handleReservePress}
                   rating={provider.averageRating}
                   reviews={provider.totalReviews}
                   available={provider.isAvailable}

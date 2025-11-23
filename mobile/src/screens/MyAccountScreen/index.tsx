@@ -1,12 +1,18 @@
 import React, { memo } from 'react';
 import { View, ScrollView, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { User, Mail, MapPin, Calendar, Shield, Edit } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '@/navigation/types';
 import { useUser } from '@/hooks/api/useUser';
 import { Text, Button, Card, Spacer } from '@/components';
 import { theme } from '@/theme';
 import { styles } from './styles';
 
+type NavigationProp = NativeStackNavigationProp<MainStackParamList, 'MyAccount'>;
+
 export const MyAccountScreen = memo(() => {
+  const navigation = useNavigation<NavigationProp>();
   const { data, isLoading, error, refetch, isFetching } = useUser();
 
   // Loading state
@@ -94,14 +100,11 @@ export const MyAccountScreen = memo(() => {
           {/* Edit Profile Button */}
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => {
-              // TODO: Navigate to edit profile screen
-              console.log('Edit profile');
-            }}
+            onPress={() => navigation.navigate('EditProfile')}
           >
             <Edit size={18} color="#ffffff" />
             <Text variant="body" style={styles.editButtonText}>
-              Edit Profile
+              Editar Perfil
             </Text>
           </TouchableOpacity>
         </View>

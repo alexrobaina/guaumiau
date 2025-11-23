@@ -7,11 +7,16 @@ import { AchievementsScreen } from '../screens/AchievementsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { MyPetsScreen } from '../screens/MyPetsScreen';
+import { MyBookingsScreen } from '../screens/MyBookingsScreen';
+import { BookingDetailScreen } from '../screens/BookingDetailScreen';
 import { MyAccountScreen } from '../screens/MyAccountScreen';
+import { EditProfileScreen } from '../screens/EditProfileScreen';
 import { WalkerHomeScreen } from '../screens/WalkerHomeScreen';
 import { ProviderProfileScreen } from '../screens/ProviderProfileScreen';
 import { SearchWalkersScreen } from '../screens/SearchWalkersScreen';
 import { PetProfileScreen } from '../screens/PetProfileScreen';
+import { BookingScreen } from '../screens/BookingScreen';
+import { PaymentScreen } from '../screens/PaymentScreen';
 import { Sidebar } from '../components/organisms/Sidebar';
 import { theme } from '../theme';
 
@@ -48,7 +53,6 @@ export const MainNavigator = () => {
           screenOptions={{
             headerShown: true,
             headerLeft: () => <HeaderLeft />,
-            headerTitle: '',
             headerStyle: {
               backgroundColor: theme.colors.surface,
             },
@@ -58,44 +62,69 @@ export const MainNavigator = () => {
           <Stack.Screen
             name="WalkerHome"
             component={WalkerHomeScreen}
-            options={{ title: 'Walker Home', headerShown: false }}
+            options={{ title: 'Inicio', headerShown: false }}
           />
           <Stack.Screen
             name="Schedule"
             component={ScheduleScreen}
-            options={{ title: 'Schedule' }}
+            options={{ title: 'Agenda' }}
           />
           <Stack.Screen
             name="Achievements"
             component={AchievementsScreen}
-            options={{ title: 'Achievements' }}
+            options={{ title: 'Logros' }}
           />
-          <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
-          <Stack.Screen name="MyPets" component={MyPetsScreen} options={{ title: 'My Pets' }} />
+          <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Perfil' }} />
+          <Stack.Screen name="MyPets" component={MyPetsScreen} options={{ title: 'Mis Mascotas' }} />
+          <Stack.Screen
+            name="MyBookings"
+            component={MyBookingsScreen}
+            options={{ title: 'Mis Reservas' }}
+          />
+          <Stack.Screen
+            name="BookingDetail"
+            component={BookingDetailScreen}
+            options={{ title: 'Detalle de Reserva' }}
+          />
           <Stack.Screen
             name="MyAccount"
             component={MyAccountScreen}
-            options={{ title: 'My Account' }}
+            options={{ title: 'Mi Cuenta' }}
+          />
+          <Stack.Screen
+            name="EditProfile"
+            component={EditProfileScreen}
+            options={{ title: 'Editar Perfil' }}
           />
           <Stack.Screen
             name="Settings"
             component={SettingsScreen}
-            options={{ title: 'Settings' }}
+            options={{ title: 'Configuración' }}
           />
           <Stack.Screen
             name="ProviderProfile"
             component={ProviderProfileScreen}
-            options={{ title: 'Provider Profile' }}
+            options={{ title: 'Perfil del Paseador' }}
           />
           <Stack.Screen
             name="SearchWalkers"
             component={SearchWalkersScreen}
-            options={{ title: 'Search Walkers' }}
+            options={{ title: 'Buscar Paseadores' }}
           />
           <Stack.Screen
             name="PetProfile"
             component={PetProfileScreen}
-            options={{ title: 'Pet Profile', headerShown: false }}
+            options={{ title: 'Perfil de Mascota' }}
+          />
+          <Stack.Screen
+            name="Booking"
+            component={BookingScreen}
+            options={{ title: 'Reservar Servicio' }}
+          />
+          <Stack.Screen
+            name="Payment"
+            component={PaymentScreen}
+            options={{ title: 'Procesar Pago' }}
           />
         </Stack.Navigator>
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

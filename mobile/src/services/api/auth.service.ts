@@ -4,6 +4,7 @@ import {
   RegisterRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  UpdateProfileRequest,
   AuthResponse,
   ForgotPasswordResponse,
   ResetPasswordResponse,
@@ -119,6 +120,16 @@ export const authService = {
       '/auth/resend-verification',
       {email},
     );
+    return response.data;
+  },
+
+  /**
+   * Update user profile
+   * PATCH /auth/profile
+   * Requires: Authorization header with Bearer token
+   */
+  updateProfile: async (data: UpdateProfileRequest): Promise<MeResponse> => {
+    const response = await apiClient.patch<MeResponse>('/auth/profile', data);
     return response.data;
   },
 };

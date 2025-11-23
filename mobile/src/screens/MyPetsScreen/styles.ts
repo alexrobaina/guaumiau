@@ -1,9 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {theme} from '@/theme';
+import { StyleSheet } from 'react-native';
+import { theme } from '@/theme';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: theme.spacing.xl,
     backgroundColor: '#f9fafb',
   },
   header: {
@@ -11,7 +12,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.xl + 20, // Moved down (48 + 20 = 68px from top)
+    paddingTop: theme.spacing.xl, // Moved down (48 + 20 = 68px from top)
     paddingBottom: theme.spacing.md,
   },
   headerTitle: {
@@ -125,9 +126,16 @@ export const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
     textAlign: 'center',
   },
+  errorTitle: {
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   errorMessage: {
     marginTop: theme.spacing.sm,
     textAlign: 'center',
+    paddingHorizontal: theme.spacing.lg,
   },
   retryButton: {
     marginTop: theme.spacing.lg,
@@ -140,10 +148,107 @@ export const styles = StyleSheet.create({
     color: theme.colors.surface,
     fontWeight: '600',
   },
+  // Modern Empty State
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: theme.spacing.xxl,
+  },
+  illustrationContainer: {
+    marginBottom: theme.spacing.xl,
+  },
+  illustrationCircle: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: '#f0f9ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: theme.colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  illustrationInner: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#dbeafe',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  illustrationEmoji: {
+    fontSize: 64,
+  },
+  emptyContent: {
+    alignItems: 'center',
+    marginBottom: theme.spacing.xl,
+  },
   emptyTitle: {
-    fontSize: theme.fontSize.xl,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: theme.fontSize.lg,
+    fontWeight: '600',
+    marginBottom: theme.spacing.md,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: theme.spacing.md,
+  },
+  featuresContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: theme.spacing.xl,
+    marginBottom: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  featureItem: {
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  featureIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: theme.colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...theme.shadows.sm,
+  },
+  featureEmoji: {
+    fontSize: 28,
+  },
+  featureText: {
+    fontSize: theme.fontSize.xs,
+    textAlign: 'center',
+    maxWidth: 80,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.full,
+    ...theme.shadows.md,
+  },
+  primaryButtonText: {
+    color: theme.colors.surface,
+    fontWeight: '700',
+    fontSize: theme.fontSize.md,
   },
   emptyText: {
     textAlign: 'center',

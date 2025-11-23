@@ -12,9 +12,16 @@ export type MainStackParamList = {
   Achievements: undefined;
   Profile: undefined;
   MyPets: undefined;
+  MyBookings: undefined;
+  BookingDetail: { bookingId: string };
   Settings: undefined;
   MyAccount: undefined;
+  EditProfile: undefined;
   ProviderProfile: { providerId: string };
   SearchWalkers: undefined;
   PetProfile: { petId: string };
+  Booking: { providerId: string };
+  Payment: { booking: any };
 };
+
+export type RootStackParamList = MainStackParamList & AuthStackParamList;

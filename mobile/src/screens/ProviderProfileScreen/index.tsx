@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { View, ScrollView, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Star, CheckCircle, MessageCircle, Shield, Award, Heart } from 'lucide-react-native';
 import { useProvider } from '@/hooks/api/useProvider';
 import { MainStackParamList } from '@/navigation/types';
@@ -16,9 +17,11 @@ import {
 import { styles } from './styles';
 
 type ProviderProfileScreenRouteProp = RouteProp<MainStackParamList, 'ProviderProfile'>;
+type ProviderProfileNavigationProp = NativeStackNavigationProp<MainStackParamList, 'ProviderProfile'>;
 
 export const ProviderProfileScreen = memo(() => {
   const route = useRoute<ProviderProfileScreenRouteProp>();
+  const navigation = useNavigation<ProviderProfileNavigationProp>();
   const { providerId } = route.params;
   const { data: provider, isLoading, error, refetch, isFetching } = useProvider(providerId);
 
@@ -224,8 +227,7 @@ export const ProviderProfileScreen = memo(() => {
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() => {
-            }}
+            onPress={() => navigation.navigate('Booking', { providerId })}
           >
             <Text variant="body" style={styles.primaryButtonText}>
               Reservar Ahora
@@ -235,6 +237,7 @@ export const ProviderProfileScreen = memo(() => {
           <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => {
+              console.log('Message button pressed');
             }}
           >
             <MessageCircle size={20} color={theme.colors.primary} />

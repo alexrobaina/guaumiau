@@ -6,115 +6,112 @@ import {Text, Spinner} from '@/components';
 import {FilterChips} from './FilterChips';
 import {WalkerCard} from './WalkerCard';
 import {styles} from './styles';
-import {Walker, UserLocation} from './types';
+import {Walker, UserLocation, FilterType} from './types';
 import {theme} from '@/theme';
+import {useWalkers} from '@/hooks/api/useWalkers';
+import {SearchWalkersParams} from '@/services/api/walkers.service';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {MainStackParamList} from '@/navigation/types';
+import {useAuth} from '@/contexts/AuthContext';
 
-// Generate mock walkers around user location
-const generateMockWalkers = (userLat: number, userLng: number): Walker[] => {
-  const walkerTemplates = [
-    {
-      id: 1,
-      name: 'María González',
-      photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
-      rating: 4.9,
-      reviews: 127,
-      experience: '5 años de experiencia',
-      services: ['Paseo de perros', 'Cuidado de mascotas'],
-      price: 1500,
-      distance: '0.8 km',
-      offsetLat: 0.005,
-      offsetLng: 0.003,
-    },
-    {
-      id: 2,
-      name: 'Carlos Mendoza',
-      photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
-      rating: 4.8,
-      reviews: 95,
-      experience: '3 años de experiencia',
-      services: ['Paseo de perros'],
-      price: 1200,
-      distance: '1.2 km',
-      offsetLat: -0.008,
-      offsetLng: 0.006,
-    },
-    {
-      id: 3,
-      name: 'Laura Fernández',
-      photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
-      rating: 5.0,
-      reviews: 203,
-      experience: '7 años de experiencia',
-      services: ['Paseo de perros', 'Cuidado de mascotas', 'Baño y peluquería'],
-      price: 2000,
-      distance: '1.5 km',
-      offsetLat: 0.003,
-      offsetLng: -0.009,
-    },
-    {
-      id: 4,
-      name: 'Diego Ramírez',
-      photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop',
-      rating: 4.7,
-      reviews: 78,
-      experience: '4 años de experiencia',
-      services: ['Paseo de perros', 'Cuidado de mascotas'],
-      price: 1400,
-      distance: '1.8 km',
-      offsetLat: -0.006,
-      offsetLng: -0.005,
-    },
-  ];
-
-  return walkerTemplates.map(template => ({
-    id: template.id,
-    name: template.name,
-    photo: template.photo,
-    rating: template.rating,
-    reviews: template.reviews,
-    experience: template.experience,
-    services: template.services,
-    price: template.price,
-    distance: template.distance,
-    lat: userLat + template.offsetLat,
-    lng: userLng + template.offsetLng,
-  }));
-};
+type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 export function SearchWalkersScreen() {
+  const navigation = useNavigation<NavigationProp>();
+  const {user} = useAuth();
   const [selectedFilters, setSelectedFilters] = useState<string[]>(['Todos']);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
-  const [selectedWalkerId, setSelectedWalkerId] = useState<number | null>(null);
+  const [selectedWalkerId, setSelectedWalkerId] = useState<string | null>(null);
   const mapRef = useRef<MapView>(null);
 
-  // Generate walkers around user location
-  const mockWalkers = useMemo(() => {
-    if (!userLocation) return [];
-    return generateMockWalkers(userLocation.lat, userLocation.lng);
-  }, [userLocation]);
+  // Build search params based on filters
+  const searchParams = useMemo<SearchWalkersParams>(() => {
+    const params: SearchWalkersParams = {};
 
-  // Get user's current location
+    // Add user location if available
+    if (userLocation) {
+      params.latitude = userLocation.lat;
+      params.longitude = userLocation.lng;
+    }
+
+    // Process filters
+    if (!selectedFilters.includes('Todos')) {
+      // Distance filter
+      if (selectedFilters.includes('<2km')) {
+        params.maxDistance = 2;
+      } else if (selectedFilters.includes('<5km')) {
+        params.maxDistance = 5;
+      } else if (selectedFilters.includes('<10km')) {
+        params.maxDistance = 10;
+      }
+
+      // Rating filter
+      if (selectedFilters.includes('4.5+ estrellas')) {
+        params.minRating = 4.5;
+      } else if (selectedFilters.includes('4.0+ estrellas')) {
+        params.minRating = 4.0;
+      }
+
+      // Service type filters
+      const serviceTypes: string[] = [];
+      if (selectedFilters.includes('Paseo')) {
+        serviceTypes.push('DOG_WALKING');
+      }
+      if (selectedFilters.includes('Cuidado')) {
+        serviceTypes.push('DOG_SITTING', 'CAT_SITTING', 'PET_SITTING');
+      }
+      if (selectedFilters.includes('Hospedaje')) {
+        serviceTypes.push('DOG_BOARDING', 'CAT_BOARDING', 'PET_BOARDING');
+      }
+      if (selectedFilters.includes('Guardería')) {
+        serviceTypes.push('DOG_DAYCARE', 'PET_DAYCARE');
+      }
+
+      if (serviceTypes.length > 0) {
+        params.serviceTypes = serviceTypes;
+      }
+    }
+
+    return params;
+  }, [selectedFilters, userLocation]);
+
+  // Fetch walkers with filters
+  const {data: walkers = [], isLoading, isError, refetch} = useWalkers(searchParams);
+
+  // Get user's location (prioritize saved address over GPS)
   useEffect(() => {
+    // Check if user has saved coordinates
+    if (user?.latitude && user?.longitude) {
+      console.log('Using user saved location:', user.latitude, user.longitude);
+      setUserLocation({lat: user.latitude, lng: user.longitude});
+      setIsLoadingLocation(false);
+      return;
+    }
+
+    // Otherwise, get device GPS location
+    console.log('No saved location, getting GPS coordinates...');
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
+        console.log('GPS location obtained:', latitude, longitude);
         setUserLocation({lat: latitude, lng: longitude});
         setIsLoadingLocation(false);
       },
       error => {
-        console.error('Error getting location:', error);
+        console.error('Error getting GPS location:', error);
         Alert.alert(
           'Error de ubicación',
-          'No se pudo obtener tu ubicación. Usando ubicación predeterminada.',
+          'No se pudo obtener tu ubicación. Usando ubicación predeterminada (Palermo, Buenos Aires).',
         );
-        // Fallback to default location (Buenos Aires, Argentina)
-        setUserLocation({lat: -34.6037, lng: -58.3816});
+        // Fallback to Palermo, Buenos Aires
+        setUserLocation({lat: -34.5875, lng: -58.4200});
         setIsLoadingLocation(false);
       },
       {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
     );
-  }, []);
+  }, [user]);
 
   const toggleFilter = (filter: string) => {
     if (filter === 'Todos') {
@@ -127,14 +124,14 @@ export function SearchWalkersScreen() {
     }
   };
 
-  const handleWalkerCardPress = (walkerId: number) => {
+  const handleWalkerCardPress = (walkerId: string) => {
     setSelectedWalkerId(walkerId);
-    const walker = mockWalkers.find(w => w.id === walkerId);
-    if (walker && mapRef.current) {
+    const walker = walkers.find(w => w.id === walkerId);
+    if (walker?.latitude && walker?.longitude && mapRef.current) {
       mapRef.current.animateToRegion(
         {
-          latitude: walker.lat,
-          longitude: walker.lng,
+          latitude: walker.latitude,
+          longitude: walker.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         },
@@ -143,8 +140,12 @@ export function SearchWalkersScreen() {
     }
   };
 
-  const handleMarkerPress = (walkerId: number) => {
+  const handleMarkerPress = (walkerId: string) => {
     setSelectedWalkerId(walkerId);
+  };
+
+  const handleWalkerNavigate = (walkerId: string) => {
+    navigation.navigate('ProviderProfile', {providerId: walkerId});
   };
 
   if (isLoadingLocation) {
@@ -203,32 +204,34 @@ export function SearchWalkersScreen() {
           />
 
           {/* Walker Markers */}
-          {mockWalkers.map(walker => (
-            <Marker
-              key={walker.id}
-              coordinate={{
-                latitude: walker.lat,
-                longitude: walker.lng,
-              }}
-              onPress={() => handleMarkerPress(walker.id)}
-              pinColor={selectedWalkerId === walker.id ? '#FF6B35' : '#FF8C42'}>
-              <View
-                style={[
-                  styles.walkerMarkerContainer,
-                  selectedWalkerId === walker.id && styles.selectedMarker,
-                ]}>
-                <View style={styles.walkerMarker}>
-                  <View
-                    style={[
-                      styles.walkerMarkerPin,
-                      selectedWalkerId === walker.id && styles.selectedMarkerPin,
-                    ]}
-                  />
-                  <View style={styles.walkerMarkerCircle} />
+          {walkers
+            .filter(w => w.latitude && w.longitude)
+            .map(walker => (
+              <Marker
+                key={walker.id}
+                coordinate={{
+                  latitude: walker.latitude!,
+                  longitude: walker.longitude!,
+                }}
+                onPress={() => handleMarkerPress(walker.id)}
+                pinColor={selectedWalkerId === walker.id ? '#FF6B35' : '#FF8C42'}>
+                <View
+                  style={[
+                    styles.walkerMarkerContainer,
+                    selectedWalkerId === walker.id && styles.selectedMarker,
+                  ]}>
+                  <View style={styles.walkerMarker}>
+                    <View
+                      style={[
+                        styles.walkerMarkerPin,
+                        selectedWalkerId === walker.id && styles.selectedMarkerPin,
+                      ]}
+                    />
+                    <View style={styles.walkerMarkerCircle} />
+                  </View>
                 </View>
-              </View>
-            </Marker>
-          ))}
+              </Marker>
+            ))}
         </MapView>
       </View>
 
@@ -246,27 +249,78 @@ export function SearchWalkersScreen() {
           bounces={false}>
           {/* Results Count */}
           <Text style={styles.resultsText}>
-            {mockWalkers.length} paseadores encontrados
+            {isLoading
+              ? 'Buscando paseadores...'
+              : `${walkers.length} paseador${walkers.length !== 1 ? 'es' : ''} encontrado${walkers.length !== 1 ? 's' : ''}`}
           </Text>
 
           {/* Filter Chips */}
           <FilterChips
-            filters={['Todos', 'Paseador', 'Cuidador', '<2km', '4.5+ estrellas']}
+            filters={[
+              'Todos',
+              'Paseo',
+              'Cuidado',
+              'Hospedaje',
+              'Guardería',
+              '<2km',
+              '<5km',
+              '<10km',
+              '4.0+ estrellas',
+              '4.5+ estrellas',
+            ]}
             selectedFilters={selectedFilters}
             onToggleFilter={toggleFilter}
           />
 
+          {/* Loading State */}
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <Spinner size="large" />
+            </View>
+          )}
+
+          {/* Error State */}
+          {isError && (
+            <View style={styles.errorContainer}>
+              <Text variant="body" color="error" style={styles.errorText}>
+                Error al cargar los paseadores
+              </Text>
+              <Text
+                variant="caption"
+                color="primary"
+                style={styles.retryText}
+                onPress={() => refetch()}>
+                Reintentar
+              </Text>
+            </View>
+          )}
+
           {/* Walker Cards */}
-          <View style={styles.walkersList}>
-            {mockWalkers.map(walker => (
-              <WalkerCard
-                key={walker.id}
-                walker={walker}
-                onPress={() => handleWalkerCardPress(walker.id)}
-                isSelected={selectedWalkerId === walker.id}
-              />
-            ))}
-          </View>
+          {!isLoading && !isError && (
+            <View style={styles.walkersList}>
+              {walkers.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                  <Text variant="body" color="textSecondary" style={styles.emptyText}>
+                    No se encontraron paseadores con los filtros seleccionados
+                  </Text>
+                  {!selectedFilters.includes('Todos') && (
+                    <Text variant="caption" color="textSecondary" style={[styles.emptyText, {marginTop: 8}]}>
+                      Intenta remover algunos filtros para ver más resultados
+                    </Text>
+                  )}
+                </View>
+              ) : (
+                walkers.map(walker => (
+                  <WalkerCard
+                    key={walker.id}
+                    walker={walker}
+                    onPress={() => handleWalkerNavigate(walker.id)}
+                    isSelected={selectedWalkerId === walker.id}
+                  />
+                ))
+              )}
+            </View>
+          )}
         </ScrollView>
       </View>
     </View>

@@ -25,6 +25,7 @@ const refresh_token_dto_1 = require("./dto/refresh-token.dto");
 const verify_email_dto_1 = require("./dto/verify-email.dto");
 const resend_verification_dto_1 = require("./dto/resend-verification.dto");
 const update_location_dto_1 = require("./dto/update-location.dto");
+const update_profile_dto_1 = require("./dto/update-profile.dto");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const current_user_decorator_1 = require("./decorators/current-user.decorator");
 let AuthController = class AuthController {
@@ -61,6 +62,9 @@ let AuthController = class AuthController {
     }
     async updateLocation(user, updateLocationDto) {
         return this.authService.updateLocation(user.id, updateLocationDto.latitude, updateLocationDto.longitude, updateLocationDto.address, updateLocationDto.city, updateLocationDto.country);
+    }
+    async updateProfile(user, updateProfileDto) {
+        return this.authService.updateProfile(user.id, updateProfileDto);
     }
     async verifyEmailPage(token, res) {
         try {
@@ -381,6 +385,21 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_location_dto_1.UpdateLocationDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "updateLocation", null);
+__decorate([
+    (0, common_1.Patch)('profile'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('JWT-auth'),
+    (0, throttler_1.Throttle)({ default: { limit: 10, ttl: 60000 } }),
+    (0, swagger_1.ApiOperation)({ summary: 'Update user profile' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Profile updated successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request - validation error or duplicate email/username' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_profile_dto_1.UpdateProfileDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "updateProfile", null);
 __decorate([
     (0, common_1.Get)('verify'),
     (0, swagger_1.ApiExcludeEndpoint)(),

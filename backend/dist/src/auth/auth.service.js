@@ -283,6 +283,59 @@ let AuthService = AuthService_1 = class AuthService {
         const { password: _, refreshToken: __, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
+    async updateProfile(userId, updateData) {
+        if (updateData.email || updateData.username) {
+            const existingUser = await this.prisma.user.findFirst({
+                where: {
+                    AND: [
+                        { id: { not: userId } },
+                        {
+                            OR: [
+                                ...(updateData.email ? [{ email: updateData.email }] : []),
+                                ...(updateData.username ? [{ username: updateData.username }] : []),
+                            ],
+                        },
+                    ],
+                },
+            });
+            if (existingUser) {
+                throw new common_1.BadRequestException('Email or username already exists');
+            }
+        }
+        if (updateData.phone) {
+            const existingPhone = await this.prisma.user.findFirst({
+                where: {
+                    AND: [
+                        { id: { not: userId } },
+                        { phone: updateData.phone },
+                    ],
+                },
+            });
+            if (existingPhone) {
+                throw new common_1.BadRequestException('Phone number already exists');
+            }
+        }
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                ...(updateData.email && { email: updateData.email }),
+                ...(updateData.username && { username: updateData.username }),
+                ...(updateData.firstName && { firstName: updateData.firstName }),
+                ...(updateData.lastName && { lastName: updateData.lastName }),
+                ...(updateData.phone && { phone: updateData.phone }),
+                ...(updateData.avatar && { avatar: updateData.avatar }),
+                ...(updateData.address && { address: updateData.address }),
+                ...(updateData.latitude !== undefined && { latitude: updateData.latitude }),
+                ...(updateData.longitude !== undefined && { longitude: updateData.longitude }),
+                ...(updateData.city && { city: updateData.city }),
+                ...(updateData.state && { state: updateData.state }),
+                ...(updateData.postalCode && { postalCode: updateData.postalCode }),
+                ...(updateData.country && { country: updateData.country }),
+            },
+        });
+        const { password: _, refreshToken: __, ...userWithoutPassword } = user;
+        return { user: userWithoutPassword };
+    }
     async generateTokens(userId) {
         const payload = { sub: userId };
         const accessToken = this.jwtService.sign(payload, {

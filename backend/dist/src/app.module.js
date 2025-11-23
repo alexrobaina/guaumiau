@@ -23,6 +23,10 @@ const pets_module_1 = require("./pets/pets.module");
 const uploads_module_1 = require("./uploads/uploads.module");
 const providers_module_1 = require("./providers/providers.module");
 const places_module_1 = require("./places/places.module");
+const bookings_module_1 = require("./bookings/bookings.module");
+const walkers_module_1 = require("./walkers/walkers.module");
+const services_module_1 = require("./services/services.module");
+const payments_module_1 = require("./payments/payments.module");
 const morgan_middleware_1 = require("./common/middleware/morgan.middleware");
 const winston_config_1 = require("./common/logger/winston.config");
 let AppModule = class AppModule {
@@ -57,6 +61,10 @@ exports.AppModule = AppModule = __decorate([
             uploads_module_1.UploadsModule,
             providers_module_1.ProvidersModule,
             places_module_1.PlacesModule,
+            bookings_module_1.BookingsModule,
+            walkers_module_1.WalkersModule,
+            services_module_1.ServicesModule,
+            payments_module_1.PaymentsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

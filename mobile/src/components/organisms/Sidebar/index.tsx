@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, TouchableOpacity, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { User, LogOut, X, Cat, Dog, Footprints, Search } from 'lucide-react-native';
+import { User, LogOut, X, Cat, Dog, Footprints, Search, Calendar } from 'lucide-react-native';
 import { Text } from '@/components/atoms/Text';
 import { useAuth } from '@/contexts/AuthContext';
 import { theme } from '@/theme';
+import { styles } from './styles';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -79,6 +80,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       routeName: 'MyPets',
     },
     {
+      icon: <Calendar size={24} color={theme.colors.textSecondary} />,
+      activeIcon: <Calendar size={24} color={theme.colors.primary} />,
+      label: 'Mis Reservas',
+      routeName: 'MyBookings',
+    },
+    {
       label: 'Mi Perfil',
       routeName: 'MyAccount',
       icon: <User size={24} color={theme.colors.textSecondary} />,
@@ -138,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             >
               <LogOut size={24} color={theme.colors.error} />
               <Text variant="body" color="error" style={styles.logoutLabel}>
-                Logout
+                Cerrar Sesión
               </Text>
             </TouchableOpacity>
           </View>
@@ -147,88 +154,3 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-  },
-  header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    paddingTop: theme.spacing.xxl + 30, // Extra padding for status bar
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.secondary,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  brandContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.sm,
-  },
-  brandText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.md,
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-  },
-  closeButton: {
-    padding: theme.spacing.xs,
-  },
-  menu: {
-    flex: 1,
-    paddingTop: theme.spacing.md,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    marginHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-  },
-  itemActive: {
-    backgroundColor: `${theme.colors.primary}15`,
-  },
-  iconContainer: {
-    width: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    marginLeft: theme.spacing.md,
-    fontSize: 16,
-  },
-  labelActive: {
-    color: theme.colors.primary,
-    fontWeight: '600',
-  },
-  footer: {
-    paddingHorizontal: theme.spacing.xxl,
-    paddingBottom: theme.spacing.xl,
-    paddingTop: theme.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.secondary,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.md,
-  },
-  logoutLabel: {
-    marginLeft: theme.spacing.md,
-    fontSize: 16,
-  },
-});

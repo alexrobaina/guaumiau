@@ -14,6 +14,10 @@ import { PetsModule } from './pets/pets.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { ProvidersModule } from './providers/providers.module';
 import { PlacesModule } from './places/places.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { WalkersModule } from './walkers/walkers.module';
+import { ServicesModule } from './services/services.module';
+import { PaymentsModule } from './payments/payments.module';
 import { MorganMiddleware } from './common/middleware/morgan.middleware';
 import { winstonConfig } from './common/logger/winston.config';
 
@@ -42,6 +46,10 @@ import { winstonConfig } from './common/logger/winston.config';
     UploadsModule,
     ProvidersModule,
     PlacesModule,
+    BookingsModule,
+    WalkersModule,
+    ServicesModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [

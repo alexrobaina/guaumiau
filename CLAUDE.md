@@ -440,3 +440,4 @@ src/
 
 - Run the project in the background and pay attention to the logs. Don't kill the project; only kill it if I tell you to.
   Bash
+- All text of the UI needs to be in spanish.

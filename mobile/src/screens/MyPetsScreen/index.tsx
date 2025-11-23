@@ -25,7 +25,11 @@ interface PetCardProps {
 const PetCard: React.FC<PetCardProps> = ({ pet, onEdit, onPress }) => {
   // Format pet info string
   const genderLabel =
-    pet.gender === PetGender.MALE ? 'Macho' : pet.gender === PetGender.FEMALE ? 'Hembra' : 'Desconocido';
+    pet.gender === PetGender.MALE
+      ? 'Macho'
+      : pet.gender === PetGender.FEMALE
+        ? 'Hembra'
+        : 'Desconocido';
   const info = `${genderLabel}${pet.age ? `, ${pet.age} años` : ''}`;
 
   // Get primary photo or use placeholder
@@ -131,11 +135,6 @@ export function MyPetsScreen() {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text variant="h1" style={styles.headerTitle}>
-            Mis Mascotas
-          </Text>
-        </View>
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text variant="body" color="textSecondary" style={styles.centerText}>
@@ -148,30 +147,32 @@ export function MyPetsScreen() {
 
   // Error state
   if (isError) {
+    const errorMessage = error?.message || '';
+    const isAuthError = errorMessage.includes('refresh token') || error?.response?.status === 401;
+
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text variant="h1" style={styles.headerTitle}>
-            Mis Mascotas
-          </Text>
-        </View>
         <View style={styles.centerContainer}>
           <AlertCircle size={48} color={theme.colors.error} />
-          <Text variant="body" color="error" style={styles.centerText}>
-            Error al cargar las mascotas
+          <Text variant="h3" style={styles.errorTitle}>
+            {isAuthError ? 'Sesión expirada' : 'Error al cargar las mascotas'}
           </Text>
-          <Text variant="caption" color="textSecondary" style={styles.errorMessage}>
-            {error?.response?.data?.message || error?.message || 'Error desconocido'}
+          <Text variant="body" color="textSecondary" style={styles.errorMessage}>
+            {isAuthError
+              ? 'Por favor, cierra sesión e inicia sesión nuevamente para continuar.'
+              : error?.response?.data?.message || error?.message || 'Error desconocido'}
           </Text>
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={() => refetch()}
-            activeOpacity={0.7}
-          >
-            <Text variant="body" style={styles.retryButtonText}>
-              Reintentar
-            </Text>
-          </TouchableOpacity>
+          {!isAuthError && (
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={() => refetch()}
+              activeOpacity={0.7}
+            >
+              <Text variant="body" style={styles.retryButtonText}>
+                Reintentar
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     );
@@ -181,25 +182,70 @@ export function MyPetsScreen() {
   if (!pets || pets.length === 0) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text variant="h1" style={styles.headerTitle}>
-            Mis Mascotas
-          </Text>
-        </View>
-        <View style={styles.centerContainer}>
-          <Text variant="h2" style={styles.emptyTitle}>
-            Aún no tienes mascotas
-          </Text>
-          <Text variant="body" color="textSecondary" style={styles.emptyText}>
-            Agrega tu primera mascota para comenzar
-          </Text>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddPet} activeOpacity={0.7}>
-            <Plus size={24} color="#FFF" />
-            <Text variant="body" style={styles.addButtonText}>
-              Agregar Mascota
+        <View style={styles.emptyStateContainer}>
+          {/* Illustration Container */}
+          <View style={styles.illustrationContainer}>
+            <View style={styles.illustrationCircle}>
+              <View style={styles.illustrationInner}>
+                <Text style={styles.illustrationEmoji}>🐾</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Content */}
+          <View style={styles.emptyContent}>
+            <Text variant="h1" style={styles.emptyTitle}>
+              ¡Bienvenido!
+            </Text>
+            <Text variant="h3" color="textSecondary" style={styles.emptySubtitle}>
+              Crea el perfil de tu mascota
+            </Text>
+            <Text variant="body" color="textSecondary" style={styles.emptyDescription}>
+              Agrega información sobre tu mascota para que los paseadores puedan conocerla mejor y
+              brindarle el mejor cuidado posible.
+            </Text>
+          </View>
+
+          {/* Features */}
+          <View style={styles.featuresContainer}>
+            <View style={styles.featureItem}>
+              <View style={styles.featureIcon}>
+                <Text style={styles.featureEmoji}>📸</Text>
+              </View>
+              <Text variant="caption" color="textSecondary" style={styles.featureText}>
+                Fotos y detalles
+              </Text>
+            </View>
+
+            <View style={styles.featureItem}>
+              <View style={styles.featureIcon}>
+                <Text style={styles.featureEmoji}>💉</Text>
+              </View>
+              <Text variant="caption" color="textSecondary" style={styles.featureText}>
+                Historial médico
+              </Text>
+            </View>
+
+            <View style={styles.featureItem}>
+              <View style={styles.featureIcon}>
+                <Text style={styles.featureEmoji}>❤️</Text>
+              </View>
+              <Text variant="caption" color="textSecondary" style={styles.featureText}>
+                Comportamiento
+              </Text>
+            </View>
+          </View>
+
+          {/* CTA Button */}
+          <TouchableOpacity style={styles.primaryButton} onPress={handleAddPet} activeOpacity={0.8}>
+            <Plus size={24} color="#FFF" strokeWidth={2.5} />
+            <Text variant="body" style={styles.primaryButtonText}>
+              Agregar mi primera mascota
             </Text>
           </TouchableOpacity>
         </View>
+
+        <AddPetModal visible={isAddModalVisible} onClose={handleCloseModal} pet={selectedPet} />
       </View>
     );
   }
@@ -207,12 +253,6 @@ export function MyPetsScreen() {
   // Pets list
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text variant="h1" style={styles.headerTitle}>
-          Mis Mascotas
-        </Text>
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}

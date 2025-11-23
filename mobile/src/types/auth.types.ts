@@ -6,9 +6,12 @@ export interface User {
   firstName: string;
   lastName: string;
   roles: string[];
+  phone: string | null;
   avatar: string | null;
   address: string | null;
   city: string | null;
+  state: string | null;
+  postalCode: string | null;
   country: string;
   latitude: number | null;
   longitude: number | null;
@@ -47,6 +50,22 @@ export interface ForgotPasswordRequest {
 export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
+}
+
+export interface UpdateProfileRequest {
+  email?: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  avatar?: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
 }
 
 // Response Types

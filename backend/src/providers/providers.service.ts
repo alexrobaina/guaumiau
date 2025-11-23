@@ -261,7 +261,8 @@ export class ProvidersService {
    * Get a single provider by ID
    */
   async findOne(id: string): Promise<ProviderResponseDto> {
-    const provider = await this.prisma.serviceProviderProfile.findUnique({
+    // Try to find by provider ID first, then by user ID
+    let provider = await this.prisma.serviceProviderProfile.findUnique({
       where: { id },
       include: {
         user: {
@@ -283,6 +284,32 @@ export class ProvidersService {
         },
       },
     });
+
+    // If not found by provider ID, try finding by user ID
+    if (!provider) {
+      provider = await this.prisma.serviceProviderProfile.findUnique({
+        where: { userId: id },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatar: true,
+              city: true,
+              country: true,
+              latitude: true,
+              longitude: true,
+            },
+          },
+          services: {
+            where: {
+              isActive: true,
+            },
+          },
+        },
+      });
+    }
 
     if (!provider) {
       throw new Error('Provider not found');

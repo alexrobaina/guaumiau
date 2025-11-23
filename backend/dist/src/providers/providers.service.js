@@ -199,7 +199,7 @@ let ProvidersService = class ProvidersService {
         };
     }
     async findOne(id) {
-        const provider = await this.prisma.serviceProviderProfile.findUnique({
+        let provider = await this.prisma.serviceProviderProfile.findUnique({
             where: { id },
             include: {
                 user: {
@@ -221,6 +221,30 @@ let ProvidersService = class ProvidersService {
                 },
             },
         });
+        if (!provider) {
+            provider = await this.prisma.serviceProviderProfile.findUnique({
+                where: { userId: id },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            avatar: true,
+                            city: true,
+                            country: true,
+                            latitude: true,
+                            longitude: true,
+                        },
+                    },
+                    services: {
+                        where: {
+                            isActive: true,
+                        },
+                    },
+                },
+            });
+        }
         if (!provider) {
             throw new Error('Provider not found');
         }

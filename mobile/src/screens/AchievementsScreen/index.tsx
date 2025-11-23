@@ -1,8 +1,7 @@
-import React from 'react';
-import {ScrollView, View, StyleSheet} from 'react-native';
-import {Layout} from '@/components/Layout';
-import {Text, Spacer, Card} from '@/components';
-import {theme} from '@/theme';
+import { ScrollView, StyleSheet } from 'react-native';
+import { Layout } from '@/components/Layout';
+import { Text, Spacer, Card } from '@/components';
+import { theme } from '@/theme';
 
 export function AchievementsScreen() {
   return (

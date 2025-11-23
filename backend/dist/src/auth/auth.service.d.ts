@@ -17,9 +17,9 @@ export declare class AuthService {
             id: string;
             email: string;
             username: string;
-            phone: string | null;
             firstName: string;
             lastName: string;
+            phone: string | null;
             avatar: string | null;
             roles: import("@prisma/client").$Enums.UserRole[];
             address: string | null;
@@ -53,9 +53,9 @@ export declare class AuthService {
             id: string;
             email: string;
             username: string;
-            phone: string | null;
             firstName: string;
             lastName: string;
+            phone: string | null;
             avatar: string | null;
             roles: import("@prisma/client").$Enums.UserRole[];
             address: string | null;
@@ -92,9 +92,9 @@ export declare class AuthService {
         id: string;
         email: string;
         username: string;
-        phone: string | null;
         firstName: string;
         lastName: string;
+        phone: string | null;
         avatar: string | null;
         roles: import("@prisma/client").$Enums.UserRole[];
         address: string | null;
@@ -137,9 +137,9 @@ export declare class AuthService {
         id: string;
         email: string;
         username: string;
-        phone: string | null;
         firstName: string;
         lastName: string;
+        phone: string | null;
         avatar: string | null;
         roles: import("@prisma/client").$Enums.UserRole[];
         address: string | null;
@@ -164,6 +164,54 @@ export declare class AuthService {
         emergencyContactPhone: string | null;
         createdAt: Date;
         updatedAt: Date;
+    }>;
+    updateProfile(userId: string, updateData: {
+        email?: string;
+        username?: string;
+        firstName?: string;
+        lastName?: string;
+        phone?: string;
+        avatar?: string;
+        address?: string;
+        latitude?: number;
+        longitude?: number;
+        city?: string;
+        state?: string;
+        postalCode?: string;
+        country?: string;
+    }): Promise<{
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            firstName: string;
+            lastName: string;
+            phone: string | null;
+            avatar: string | null;
+            roles: import("@prisma/client").$Enums.UserRole[];
+            address: string | null;
+            city: string | null;
+            state: string | null;
+            postalCode: string | null;
+            country: string;
+            latitude: number | null;
+            longitude: number | null;
+            isEmailVerified: boolean;
+            isPhoneVerified: boolean;
+            isActive: boolean;
+            termsAccepted: boolean;
+            termsAcceptedAt: Date | null;
+            notificationSettings: import("@prisma/client/runtime/library").JsonValue | null;
+            pushTokens: string[];
+            resetPasswordToken: string | null;
+            resetPasswordExpires: Date | null;
+            emailVerificationToken: string | null;
+            emailVerificationExpires: Date | null;
+            emergencyContactName: string | null;
+            emergencyContactPhone: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+        };
     }>;
     private generateTokens;
 }
